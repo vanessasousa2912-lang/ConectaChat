@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConectaChat | Conversas & Amizades</title>
+    <!-- Tailwind CSS para Estilização de Elite -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonte Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Esconder barras de rolagem mas manter funcionamento */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col overflow-hidden">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- AUTH SCREEN (Login / Registro) -->
+    <div id="auth-screen" class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-slate-950 relative overflow-hidden">
+        <!-- Detalhes de luz de fundo modernas -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="sm:mx-auto sm:w-full sm:max-w-md z-10">
+            <div class="flex justify-center items-center gap-2">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold tracking-tight text-white">ConectaChat</h2>
+            </div>
+            <h3 id="auth-title" class="mt-6 text-center text-xl font-medium tracking-tight text-slate-300">Acesse sua conta para conversar</h3>
+        </div>
+
+        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10">
+            <div class="bg-slate-900/50 backdrop-blur-md border border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
+                <form id="auth-form" class="space-y-5">
+                    <!-- Botão de Entrada Rápida (Última Conta no Dispositivo) -->
+                    <div id="last-account-container" class="hidden">
+                        <button type="button" id="last-account-btn" class="flex w-full justify-center items-center gap-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-4 py-3.5 text-sm font-semibold text-indigo-300 shadow-lg shadow-indigo-500/5 transition-all duration-200">
+                            <svg class="w-5 h-5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            <span class="truncate">Entrar como <strong id="last-account-user" class="text-white font-bold">...</strong></span>
+                        </button>
+                        <div class="relative my-4">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-slate-800"></div>
+                            </div>
+                            <div class="relative flex justify-center text-[10px] uppercase tracking-wider">
+                                <span class="bg-slate-900 px-3 text-slate-500 font-semibold">Ou conecte-se com outra conta</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo de Nome de Exibição (Oculto no Login) -->
+                    <div id="display-name-group" class="hidden">
+                        <label for="reg-name" class="block text-sm font-medium text-slate-300">Como quer ser chamado? (Nome de Exibição)</label>
+                        <div class="mt-1">
+                            <input id="reg-name" name="name" type="text" placeholder="Ex: Luis Henrique" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="auth-username" class="block text-sm font-medium text-slate-300">Nome de Usuário (@ID)</label>
+                        <div class="mt-1 relative rounded-xl shadow-sm">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                <span class="text-slate-500 sm:text-sm">@</span>
+                            </div>
+                            <input id="auth-username" name="username" type="text" required placeholder="luis_prog" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 pl-8 pr-4 py-3 text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="auth-password" class="block text-sm font-medium text-slate-300">Senha</label>
+                        <div class="mt-1">
+                            <input id="auth-password" name="password" type="password" required placeholder="Sua senha secreta" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" id="auth-submit-btn" class="flex w-full justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 hover:from-indigo-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all duration-200">
+                            Entrar no Chat
+                        </button>
+                    </div>
+                </form>
+
+                <div class="mt-6">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-slate-800"></div>
+                        </div>
+                        <div class="relative flex justify-center text-xs uppercase">
+                            <span class="bg-slate-900 px-2 text-slate-400">Ou</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 text-center">
+                        <button id="toggle-auth-mode" class="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
+                            Não tem uma conta? Cadastre-se agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN INTERFACE (Oculta por padrão até logar) -->
+    <div id="main-app" class="hidden flex-1 flex flex-col overflow-hidden h-full">
+        <!-- Topbar / Adicionar Amigos -->
+        <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-10 shadow-md">
+            <!-- Logo e Perfil Rápido -->
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-white tracking-wide">ConectaChat</h1>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <p id="user-identity" class="text-xs text-slate-400 font-medium"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de Adicionar Amigo (Top center) -->
+            <form id="add-friend-form" class="flex-1 max-w-md min-w-[240px]">
+                <div class="relative flex items-center">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <span class="text-slate-400 text-sm">@</span>
+                    </div>
+                    <input id="friend-search-input" type="text" placeholder="Adicionar amigo pelo usuário..." required class="block w-full rounded-xl border border-slate-800 bg-slate-950 pl-8 pr-24 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    <button type="submit" class="absolute right-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 font-semibold px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider transition-all border border-emerald-500/30">
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+
+            <!-- Logout -->
+            <button id="logout-btn" class="flex items-center gap-2 text-xs text-slate-400 hover:text-rose-400 bg-slate-950/50 hover:bg-rose-500/10 border border-slate-800 hover:border-rose-500/20 px-3 py-2 rounded-xl transition-all">
+                <span>Sair</span>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </button>
+        </header>
+
+        <!-- Corpo Principal do App -->
+        <main class="flex-1 flex overflow-hidden relative">
+            
+            <!-- LATERAL: Contatos, Amigos e Pedidos -->
+            <aside id="sidebar-panel" class="w-full md:w-80 bg-slate-900 border-r border-slate-800 flex flex-col h-full shrink-0 z-20">
+                
+                <!-- Abas da barra lateral (Pedidos Pendentes vs Lista de Amigos) -->
+                <div class="flex border-b border-slate-800">
+                    <button id="tab-friends" class="flex-1 py-3 text-center text-xs font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all">
+                        Amigos (<span id="count-friends">0</span>)
+                    </button>
+                    <button id="tab-requests" class="flex-1 py-3 text-center text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1">
+                        Solicitações
+                        <span id="badge-requests" class="hidden bg-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">0</span>
+                    </button>
+                </div>
+
+                <!-- Lista de Amigos -->
+                <div id="panel-friends-list" class="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
+                    <!-- Amigos renderizados aqui via JS -->
+                    <div id="friends-empty" class="text-center py-8 text-slate-500 text-xs">
+                        <svg class="w-12 h-12 mx-auto text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        Nenhum amigo conectado ainda.<br>Adicione pessoas pelo topo!
+                    </div>
+                    <div id="friends-container" class="space-y-1"></div>
+                </div>
+
+                <!-- Painel de Pedidos Pendentes (Oculto por padrão) -->
+                <div id="panel-requests-list" class="hidden flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar">
+                    
+                    <!-- Recebidos -->
+                    <div>
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Recebidos</h4>
+                        <div id="req-received-container" class="space-y-1">
+                            <p class="text-xs text-slate-500 py-2 italic text-center">Nenhum pedido pendente</p>
+                        </div>
+                    </div>
+
+                    <!-- Enviados -->
+                    <div>
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Enviados</h4>
+                        <div id="req-sent-container" class="space-y-1">
+                            <p class="text-xs text-slate-500 py-2 italic text-center">Nenhum pedido enviado</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Rodapé Usuário -->
+                <div class="bg-slate-950/80 border-t border-slate-800/80 p-3 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-indigo-600 flex items-center justify-center font-bold text-xs text-white uppercase" id="user-avatar">
+                            U
+                        </div>
+                        <div>
+                            <p id="user-display-name" class="text-xs font-bold text-white truncate max-w-[140px]"></p>
+                            <p id="user-tag" class="text-[10px] text-slate-500 font-medium truncate max-w-[140px]"></p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- AREA PRINCIPAL: Chat de Conversa -->
+            <section id="chat-panel" class="absolute inset-0 md:relative md:flex flex-1 flex flex-col bg-slate-950 z-10 hidden">
+                
+                <!-- Chat Selecionado / Header -->
+                <div id="chat-header" class="hidden bg-slate-900/60 border-b border-slate-800/80 px-4 py-3 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <!-- Botão de Voltar (Visível no celular) -->
+                        <button id="chat-back-btn" class="md:hidden text-slate-400 hover:text-slate-100 p-1 bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-all">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white" id="active-chat-avatar">
+                            A
+                        </div>
+                        <div>
+                            <h3 id="active-chat-name" class="text-sm font-bold text-white">Carregando...</h3>
+                            <p id="active-chat-status" class="text-[10px] text-slate-400 font-medium">@username</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feed de Mensagens -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar flex flex-col">
+                    <!-- Mensagem vazia de início -->
+                    <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center text-slate-500 p-8">
+                        <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-sm font-semibold text-slate-300">Escolha um amigo para conversar</h4>
+                        <p class="text-xs text-slate-500 text-center mt-1">Conecte-se instantaneamente, troque mensagens e divirta-se!</p>
+                    </div>
+                    <div id="messages-container" class="space-y-4"></div>
+                </div>
+
+                <!-- Barra de envio de mensagens -->
+                <div id="chat-input-bar" class="hidden p-3 bg-slate-900/40 border-t border-slate-800/80">
+                    <form id="chat-form" class="flex items-center gap-2">
+                        <input id="message-input" type="text" autocomplete="off" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script de lógica do app -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configurações do Firebase injetadas pelo ambiente ou Mock
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "mock-api-key",
+            authDomain: "mock-auth-domain",
+            projectId: "mock-project-id",
+            storageBucket: "mock-storage-bucket",
+            messagingSenderId: "mock-sender-id",
+            appId: "mock-app-id"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'co-chat-app';
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Estado do App
+        let firebaseAuthenticated = false;
+        let currentUser = null; // Guardará o perfil local `{username, name, uid}`
+        let activeFriend = null; // Guardará o perfil de quem estamos conversando `{username, name}`
+        let accountsMap = {}; // Cache de todos os usuários registrados
+        let lastAccountData = null; // Guardará as credenciais para o login rápido neste dispositivo
+        let unsubscribeFriends = null;
+        let unsubscribeMessages = null;
+
+        // Custom Toast Notification Maker
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 ${
+                type === 'success' 
+                    ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-300' 
+                    : type === 'error' 
+                    ? 'bg-rose-950/90 border-rose-500/30 text-rose-300' 
+                    : 'bg-indigo-950/90 border-indigo-500/30 text-indigo-300'
+            }`;
+            
+            toast.innerHTML = `
+                <span class="w-1.5 h-1.5 rounded-full ${type === 'success' ? 'bg-emerald-400' : type === 'error' ? 'bg-rose-400' : 'bg-indigo-400'}"></span>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Forçar reflow para animação
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // Sumir após 3 segundos
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Autenticar Anonimamente Antes de Qualquer Ação (Regra 3)
+        async function authenticateFirebase() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                firebaseAuthenticated = true;
+                console.log("Autenticação de retaguarda concluída.");
+                // Começa a escutar atualizações de contas de usuários para cache
+                startListeningAccounts();
+                
+                // Procurar por atalhos de última conta logada neste dispositivo (Regra 3 - Após Auth)
+                await checkLastAccount();
+            } catch (err) {
+                console.error("Falha ao inicializar autenticação:", err);
+                showToast("Erro ao conectar ao servidor. Verifique sua conexão.", "error");
+            }
+        }
+
+        // Buscar dados de login rápido do dispositivo no banco de dados privado (Regra 1)
+        async function checkLastAccount() {
+            const userId = auth.currentUser?.uid;
+            if (!userId) return;
+            try {
+                const lastAccDocRef = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'lastAccount');
+                const docSnap = await getDoc(lastAccDocRef);
+                if (docSnap.exists()) {
+                    lastAccountData = docSnap.data();
+                    showLastAccountUI(lastAccountData);
+                }
+            } catch (err) {
+                console.warn("Não foi possível carregar a última conta deste dispositivo:", err);
+            }
+        }
+
+        // Exibir botão de login rápido com a última conta conectada
+        function showLastAccountUI(data) {
+            const container = document.getElementById('last-account-container');
+            const userLabel = document.getElementById('last-account-user');
+            if (data && data.username) {
+                userLabel.innerText = `${data.name} (@${data.username})`;
+                if (!registerMode) {
+                    container.classList.remove('hidden');
+                }
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // Cachear contas registradas em tempo real
+        function startListeningAccounts() {
+            const accountsCol = collection(db, 'artifacts', appId, 'public', 'data', 'accounts');
+            onSnapshot(accountsCol, (snapshot) => {
+                accountsMap = {};
+                snapshot.forEach(doc => {
+                    accountsMap[doc.id] = doc.data();
+                });
+                console.log("Contas carregadas com sucesso:", Object.keys(accountsMap).length);
+            }, (error) => {
+                console.error("Erro ao sincronizar lista de usuários:", error);
+            });
+        }
+
+        // Manipulação do Formulário de Login/Registro
+        const authForm = document.getElementById('auth-form');
+        const authTitle = document.getElementById('auth-title');
+        const displayNameGroup = document.getElementById('display-name-group');
+        const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        let registerMode = false;
+
+        // Alternar entre login e registro
+        toggleAuthModeBtn.addEventListener('click', () => {
+            registerMode = !registerMode;
+            if (registerMode) {
+                authTitle.innerText = "Crie sua conta para começar";
+                displayNameGroup.classList.remove('hidden');
+                document.getElementById('reg-name').required = true;
+                authSubmitBtn.innerText = "Registrar Conta";
+                toggleAuthModeBtn.innerText = "Já tem uma conta? Conecte-se";
+                document.getElementById('last-account-container').classList.add('hidden');
+            } else {
+                authTitle.innerText = "Acesse sua conta para conversar";
+                displayNameGroup.classList.add('hidden');
+                document.getElementById('reg-name').required = false;
+                authSubmitBtn.innerText = "Entrar no Chat";
+                toggleAuthModeBtn.innerText = "Não tem uma conta? Cadastre-se agora";
+                if (lastAccountData) {
+                    document.getElementById('last-account-container').classList.remove('hidden');
+                }
+            }
+        });
+
+        // Configurar evento de clique para o atalho de Entrada Rápida
+        document.getElementById('last-account-btn').addEventListener('click', () => {
+            if (!lastAccountData) return;
+            
+            document.getElementById('auth-username').value = lastAccountData.username;
+            document.getElementById('auth-password').value = lastAccountData.password;
+            
+            if (registerMode) {
+                toggleAuthModeBtn.click();
+            }
+            
+            // Submeter automaticamente
+            authForm.dispatchEvent(new Event('submit'));
+        });
+
+        // Evento de Envio do formulário de autenticação
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!firebaseAuthenticated) {
+                showToast("Aguarde a conexão com o servidor ser estabelecida.", "error");
+                return;
+            }
+
+            const usernameInput = document.getElementById('auth-username').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('auth-password').value;
+            const displayNameInput = document.getElementById('reg-name').value.trim();
+
+            // Validação de segurança simples
+            if (!/^[a-zA-Z0-9_]{3,15}$/.test(usernameInput)) {
+                showToast("O nome de usuário deve conter apenas letras, números ou '_' e ter de 3 a 15 caracteres.", "error");
+                return;
+            }
+
+            if (registerMode) {
+                // REGISTRO
+                if (accountsMap[usernameInput]) {
+                    showToast("Este nome de usuário já está sendo usado por outra pessoa.", "error");
+                    return;
+                }
+
+                try {
+                    const userAccountDoc = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
+                    const newUserData = {
+                        username: usernameInput,
+                        name: displayNameInput || usernameInput,
+                        password: passwordInput, // Armazenando senha simples para este app demo
+                        uid: auth.currentUser?.uid || crypto.randomUUID()
+                    };
+
+                    await setDoc(userAccountDoc, newUserData);
+                    showToast("Sua conta foi criada! Faça login agora.");
+                    // Mudar para tela de login automaticamente
+                    toggleAuthModeBtn.click();
+                    document.getElementById('auth-password').value = '';
+                } catch (err) {
+                    console.error("Erro ao registrar conta:", err);
+                    showToast("Não foi possível criar a conta.", "error");
+                }
+            } else {
+                // LOGIN
+                const matchedUser = accountsMap[usernameInput];
+                if (!matchedUser || matchedUser.password !== passwordInput) {
+                    showToast("Nome de usuário ou senha incorretos.", "error");
+                    return;
+                }
+
+                // Definir usuário atual logado
+                currentUser = matchedUser;
+                showToast(`Bem-vindo de volta, ${currentUser.name}!`);
+                
+                // Persistir credenciais de login rápido localmente via Firestore Privado (Regra 1 e 3)
+                const userId = auth.currentUser?.uid;
+                if (userId) {
+                    try {
+                        const lastAccDocRef = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'lastAccount');
+                        await setDoc(lastAccDocRef, {
+                            username: currentUser.username,
+                            name: currentUser.name,
+                            password: passwordInput,
+                            timestamp: Date.now()
+                        });
+                        
+                        // Atualizar cache local do script
+                        lastAccountData = {
+                            username: currentUser.username,
+                            name: currentUser.name,
+                            password: passwordInput
+                        };
+                        showLastAccountUI(lastAccountData);
+                    } catch (err) {
+                        console.warn("Não foi possível salvar o atalho de login no servidor:", err);
+                    }
+                }
+                
+                // Mudar Tela
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+
+                // Configurar Informações no App
+                document.getElementById('user-identity').innerText = `@${currentUser.username}`;
+                document.getElementById('user-display-name').innerText = currentUser.name;
+                document.getElementById('user-tag').innerText = `@${currentUser.username}`;
+                document.getElementById('user-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
+
+                // Inicializar escutas de dados do usuário
+                startUserSession();
+            }
+        });
+
+        // Inicializar canais de escuta após o login do usuário
+        function startUserSession() {
+            // Cancelar escutas anteriores se houverem
+            if (unsubscribeFriends) unsubscribeFriends();
+            if (unsubscribeMessages) unsubscribeMessages();
+
+            // Sincronizar Amigos e Solicitações (Sem filtros complexos - Regra 2)
+            const friendsCol = collection(db, 'artifacts', appId, 'public', 'data', 'friends');
+            
+            unsubscribeFriends = onSnapshot(friendsCol, (snapshot) => {
+                const friendsList = [];
+                const reqReceived = [];
+                const reqSent = [];
+
+                snapshot.forEach(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    
+                    if (data.status === 'accepted') {
+                        // Se é amizade confirmada envolvendo o usuário atual
+                        if (data.sender === currentUser.username) {
+                            friendsList.push({ requestDocId: data.id, friendUsername: data.receiver });
+                        } else if (data.receiver === currentUser.username) {
+                            friendsList.push({ requestDocId: data.id, friendUsername: data.sender });
+                        }
+                    } else if (data.status === 'pending') {
+                        // Se é pendente e eu recebi
+                        if (data.receiver === currentUser.username) {
+                            reqReceived.push(data);
+                        }
+                        // Se é pendente e eu enviei
+                        else if (data.sender === currentUser.username) {
+                            reqSent.push(data);
+                        }
+                    }
+                });
+
+                renderFriends(friendsList);
+                renderRequests(reqReceived, reqSent);
+            }, (error) => {
+                console.error("Erro ao escutar amizades:", error);
+            });
+        }
+
+        // Renderizar amigos confirmados na tela lateral
+        function renderFriends(friends) {
+            const container = document.getElementById('friends-container');
+            const emptyEl = document.getElementById('friends-empty');
+            const countFriendsEl = document.getElementById('count-friends');
+
+            container.innerHTML = '';
+            countFriendsEl.innerText = friends.length;
+
+            if (friends.length === 0) {
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+
+            friends.forEach(f => {
+                const friendData = accountsMap[f.friendUsername];
+                const displayName = friendData ? friendData.name : f.friendUsername;
+                const activeClass = (activeFriend && activeFriend.username === f.friendUsername) 
+                    ? 'bg-indigo-600/20 border-indigo-500/40 text-white' 
+                    : 'bg-slate-950/40 hover:bg-slate-800/60 border-transparent text-slate-300';
+
+                const friendItem = document.createElement('div');
+                friendItem.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${activeClass}`;
+                friendItem.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-xs text-indigo-400 uppercase">
+                            ${displayName.charAt(0)}
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold truncate max-w-[140px]">${displayName}</p>
+                            <p class="text-[10px] text-slate-500 font-medium">@${f.friendUsername}</p>
+                        </div>
+                    </div>
+                `;
+                
+                friendItem.addEventListener('click', () => {
+                    openChatWith({ username: f.friendUsername, name: displayName });
+                });
+
+                container.appendChild(friendItem);
+            });
+        }
+
+        // Renderizar os pedidos pendentes
+        function renderRequests(received, sent) {
+            const receivedContainer = document.getElementById('req-received-container');
+            const sentContainer = document.getElementById('req-sent-container');
+            const badgeRequests = document.getElementById('badge-requests');
+
+            // Atualiza Badge do menu
+            if (received.length > 0) {
+                badgeRequests.innerText = received.length;
+                badgeRequests.classList.remove('hidden');
+            } else {
+                badgeRequests.classList.add('hidden');
+            }
+
+            // Renderizar recebidos
+            receivedContainer.innerHTML = '';
+            if (received.length === 0) {
+                receivedContainer.innerHTML = '<p class="text-[11px] text-slate-600 py-2 italic text-center">Nenhum pedido recebido</p>';
+            } else {
+                received.forEach(req => {
+                    const senderName = accountsMap[req.sender] ? accountsMap[req.sender].name : req.sender;
+                    const item = document.createElement('div');
+                    item.className = 'p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between gap-2';
+                    item.innerHTML = `
+                        <div class="truncate">
+                            <p class="text-xs font-semibold text-slate-200 truncate">${senderName}</p>
+                            <p class="text-[9px] text-slate-500">@${req.sender}</p>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 transition-all" title="Aceitar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white transition-all" title="Recusar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+
+                    item.querySelector('.accept-btn').addEventListener('click', () => handleAcceptRequest(req.id, req.sender));
+                    item.querySelector('.decline-btn').addEventListener('click', () => handleDeleteRequest(req.id));
+                    receivedContainer.appendChild(item);
+                });
+            }
+
+            // Renderizar enviados
+            sentContainer.innerHTML = '';
+            if (sent.length === 0) {
+                sentContainer.innerHTML = '<p class="text-[11px] text-slate-600 py-2 italic text-center">Nenhum pedido pendente</p>';
+            } else {
+                sent.forEach(req => {
+                    const receiverName = accountsMap[req.receiver] ? accountsMap[req.receiver].name : req.receiver;
+                    const item = document.createElement('div');
+                    item.className = 'p-2.5 rounded-xl bg-slate-950/30 border border-slate-800/50 flex items-center justify-between gap-2';
+                    item.innerHTML = `
+                        <div class="truncate">
+                            <p class="text-xs font-semibold text-slate-400 truncate">${receiverName}</p>
+                            <p class="text-[9px] text-slate-600">@${req.receiver}</p>
+                        </div>
+                        <button class="cancel-btn p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all" title="Cancelar">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    `;
+                    item.querySelector('.cancel-btn').addEventListener('click', () => handleDeleteRequest(req.id));
+                    sentContainer.appendChild(item);
+                });
+            }
+        }
+
+        // Formulário de Adição de Amigos
+        document.getElementById('add-friend-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('friend-search-input');
+            const targetUsername = input.value.trim().toLowerCase();
+
+            if (!targetUsername) return;
+
+            if (targetUsername === currentUser.username) {
+                showToast("Você não pode adicionar a si mesmo!", "error");
+                return;
+            }
+
+            // Verificar se o usuário existe
+            if (!accountsMap[targetUsername]) {
+                showToast(`Usuário @${targetUsername} não encontrado.`, "error");
+                return;
+            }
+
+            try {
+                // Verificar se já existe uma amizade ou pedido em andamento
+                const friendsCol = collection(db, 'artifacts', appId, 'public', 'data', 'friends');
+                // Sincronizando com a base local para evitar complex queries do Firebase (Regra 2)
+                let friendshipExists = false;
+
+                const querySnapshot = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', `${currentUser.username}_${targetUsername}`));
+                const querySnapshotAlt = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', `${targetUsername}_${currentUser.username}`));
+
+                if (querySnapshot.exists() || querySnapshotAlt.exists()) {
+                    showToast("Uma solicitação ou amizade com este usuário já existe.", "error");
+                    return;
+                }
+
+                // Criar o registro de pedido pendente usando uma ID previsível para checagem rápida
+                const requestDocId = `${currentUser.username}_${targetUsername}`;
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', requestDocId), {
+                    sender: currentUser.username,
+                    receiver: targetUsername,
+                    status: 'pending',
+                    timestamp: Date.now()
+                });
+
+                showToast(`Solicitação enviada para @${targetUsername}!`);
+                input.value = '';
+            } catch (err) {
+                console.error("Erro ao enviar pedido de amizade:", err);
+                showToast("Erro ao processar pedido de amizade.", "error");
+            }
+        });
+
+        // Aceitar solicitação recebida
+        async function handleAcceptRequest(docId, senderUsername) {
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), {
+                    status: 'accepted'
+                });
+                showToast(`Você agora é amigo de @${senderUsername}!`);
+            } catch (err) {
+                console.error("Erro ao aceitar amizade:", err);
+                showToast("Erro ao aceitar convite.", "error");
+            }
+        }
+
+        // Recusar ou Cancelar solicitação
+        async function handleDeleteRequest(docId) {
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
+                showToast("Solicitação de amizade resolvida.");
+            } catch (err) {
+                console.error("Erro ao remover solicitação:", err);
+                showToast("Erro ao deletar solicitação.", "error");
+            }
+        }
+
+        // Abrir chat ativo com um amigo
+        function openChatWith(friend) {
+            activeFriend = friend;
+
+            // Ajustar visual de abas e telas se for mobile
+            document.getElementById('chat-panel').classList.remove('hidden');
+            document.getElementById('chat-panel').classList.add('flex');
+            
+            // Renderizar cabeçalho do chat
+            document.getElementById('chat-header').classList.remove('hidden');
+            document.getElementById('chat-input-bar').classList.remove('hidden');
+            document.getElementById('chat-placeholder').classList.add('hidden');
+            
+            document.getElementById('active-chat-name').innerText = friend.name;
+            document.getElementById('active-chat-status').innerText = `@${friend.username}`;
+            document.getElementById('active-chat-avatar').innerText = friend.name.charAt(0).toUpperCase();
+
+            // Atualiza seleção na barra lateral
+            startUserSession(); // Atualizar destaque na lista
+
+            // Começar escuta do feed de mensagens (Sem queries complexas - Regra 2)
+            if (unsubscribeMessages) unsubscribeMessages();
+
+            const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+            
+            unsubscribeMessages = onSnapshot(messagesCol, (snapshot) => {
+                const messagesList = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    // Filtragem em memória para respeitar a Regra 2 (Sem queries complexas)
+                    const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
+                    const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
+                    
+                    if (isFromMeToFriend || isFromFriendToMe) {
+                        messagesList.push(data);
+                    }
+                });
+
+                // Ordenar por horário em memória do JS
+                messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                renderMessages(messagesList);
+            }, (error) => {
+                console.error("Erro ao carregar chat:", error);
+            });
+        }
+
+        // Renderizar a lista ordenada de mensagens
+        function renderMessages(messages) {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-600 text-xs">
+                        Este é o começo da sua conversa com <strong class="text-slate-400">${activeFriend.name}</strong>.<br>
+                        Mande uma mensagem para começar a bater papo!
+                    </div>
+                `;
+                return;
+            }
+
+            messages.forEach(msg => {
+                const isMine = msg.sender === currentUser.username;
+                const alignmentClass = isMine ? 'justify-end' : 'justify-start';
+                const bubbleColor = isMine 
+                    ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-br-none shadow-md shadow-indigo-500/10' 
+                    : 'bg-slate-900 border border-slate-800 text-slate-100 rounded-bl-none';
+
+                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const msgElement = document.createElement('div');
+                msgElement.className = `flex ${alignmentClass} w-full`;
+                msgElement.innerHTML = `
+                    <div class="max-w-[75%]">
+                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor}">
+                            ${msg.text}
+                        </div>
+                        <p class="text-[9px] text-slate-500 mt-1 ${isMine ? 'text-right' : 'text-left'}">${time}</p>
+                    </div>
+                `;
+                container.appendChild(msgElement);
+            });
+
+            // Forçar rolagem automática suave para a última mensagem
+            const chatMessagesDiv = document.getElementById('chat-messages');
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }
+
+        // Evento de Envio do Formulário do Chat
+        document.getElementById('chat-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+
+            if (!text || !activeFriend) return;
+
+            try {
+                const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+                await addDoc(messagesCol, {
+                    sender: currentUser.username,
+                    receiver: activeFriend.username,
+                    text: text,
+                    timestamp: Date.now()
+                });
+                
+                input.value = '';
+                input.focus();
+            } catch (err) {
+                console.error("Falha ao enviar mensagem:", err);
+                showToast("Erro ao entregar mensagem.", "error");
+            }
+        });
+
+        // Controle de Abas da Sidebar
+        const tabFriends = document.getElementById('tab-friends');
+        const tabRequests = document.getElementById('tab-requests');
+        const panelFriends = document.getElementById('panel-friends-list');
+        const panelRequests = document.getElementById('panel-requests-list');
+
+        tabFriends.addEventListener('click', () => {
+            tabFriends.className = "flex-1 py-3 text-center text-xs font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all";
+            tabRequests.className = "flex-1 py-3 text-center text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1";
+            panelFriends.classList.remove('hidden');
+            panelRequests.classList.add('hidden');
+        });
+
+        tabRequests.addEventListener('click', () => {
+            tabRequests.className = "flex-1 py-3 text-center text-xs font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all flex items-center justify-center gap-1";
+            tabFriends.className = "flex-1 py-3 text-center text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all";
+            panelFriends.classList.add('hidden');
+            panelRequests.classList.remove('hidden');
+        });
+
+        // Botão de retornar do chat no Mobile
+        document.getElementById('chat-back-btn').addEventListener('click', () => {
+            document.getElementById('chat-panel').classList.add('hidden');
+            document.getElementById('chat-panel').classList.remove('flex');
+            activeFriend = null;
+            startUserSession(); // Redesenhar sem focar em ninguém
+        });
+
+        // Logout de Usuário
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            currentUser = null;
+            activeFriend = null;
+            if (unsubscribeFriends) unsubscribeFriends();
+            if (unsubscribeMessages) unsubscribeMessages();
+
+            // Esconder tela principal e revelar login
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('auth-password').value = '';
+            
+            // Reexibir botão da última conta conectada no login
+            if (lastAccountData && !registerMode) {
+                document.getElementById('last-account-container').classList.remove('hidden');
+            }
+            
+            showToast("Você desconectou da conta.");
+        });
+
+        // Inicialização global no carregamento da página
+        window.onload = function() {
+            authenticateFirebase();
+        };
+    </script>
+</body>
+</html>
