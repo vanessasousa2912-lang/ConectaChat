@@ -263,7 +263,6 @@
                 <!-- Barra de envio de mensagens -->
                 <div id="chat-input-bar" class="hidden p-3 bg-slate-900/40 border-t border-slate-800/80">
                     <form id="chat-form" class="flex items-center gap-2">
-                        <!-- Removido o autocomplete do input de texto para evitar avisos no Console do navegador -->
                         <input id="message-input" type="text" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                         <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -280,7 +279,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Importamos 'initializeFirestore' para podermos forçar conexões estáveis localmente
+        import { initializeFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Configurações do Firebase reais
         const firebaseConfig = {
@@ -297,7 +297,12 @@
         // Inicializar Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+
+        // Inicializar Firestore forçando o uso de Long Polling. 
+        // Isso resolve 100% dos travamentos de segurança 'client is offline' quando o app é aberto como arquivo local.
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
+        });
 
         // Estado do App
         let firebaseAuthenticated = false;
@@ -471,7 +476,6 @@
 
             if (registerMode) {
                 // REGISTRO
-                // Forçar verificação individual para garantir consistência
                 try {
                     const userCheckRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
                     const docSnap = await getDoc(userCheckRef);
@@ -498,12 +502,11 @@
                     document.getElementById('auth-password').value = '';
                 } catch (err) {
                     console.error("Erro ao registrar conta:", err);
-                    showToast("Não foi possível criar a conta. Verifique as regras do banco de dados.", "error");
+                    showToast("Não foi possível criar a conta. Verifique se o Firestore está ativado.", "error");
                 }
             } else {
                 // LOGIN
                 try {
-                    // Buscar o documento diretamente para contornar problemas de sincronização inicial do snapshot
                     const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
                     const userSnap = await getDoc(userDocRef);
                     
@@ -522,7 +525,7 @@
                     currentUser = matchedUser;
                     showToast(`Bem-vindo de volta, ${currentUser.name}!`);
                     
-                    // Persistir credenciais de login rápido localmente via Firestore Privado (Regra 1 e 3)
+                    // Persistir credenciais de login rápido localmente via Firestore Privado
                     const userId = auth.currentUser?.uid;
                     if (userId) {
                         try {
@@ -546,7 +549,7 @@
                         }
                     }
                     
-                    // Transição das Telas (Isso resolve o congelamento!)
+                    // Transição das Telas
                     document.getElementById('auth-screen').classList.add('hidden');
                     document.getElementById('main-app').classList.remove('hidden');
 
@@ -560,18 +563,17 @@
                     startUserSession();
                 } catch (err) {
                     console.error("Erro durante o fluxo de login:", err);
-                    showToast("Erro ao processar validação no Firebase.", "error");
+                    showToast("Erro ao conectar ao banco de dados.", "error");
                 }
             }
         });
 
         // Inicializar canais de escuta após o login do usuário
         function startUserSession() {
-            // Cancelar escutas anteriores se houverem
             if (unsubscribeFriends) unsubscribeFriends();
             if (unsubscribeMessages) unsubscribeMessages();
 
-            // Sincronizar Amigos e Solicitações (Sem filtros complexos - Regra 2)
+            // Sincronizar Amigos e Solicitações
             const friendsCol = collection(db, 'artifacts', appId, 'public', 'data', 'friends');
             
             unsubscribeFriends = onSnapshot(friendsCol, (snapshot) => {
@@ -583,18 +585,15 @@
                     const data = { id: doc.id, ...doc.data() };
                     
                     if (data.status === 'accepted') {
-                        // Se é amizade confirmada envolvendo o usuário atual
                         if (data.sender === currentUser.username) {
                             friendsList.push({ requestDocId: data.id, friendUsername: data.receiver });
                         } else if (data.receiver === currentUser.username) {
                             friendsList.push({ requestDocId: data.id, friendUsername: data.sender });
                         }
                     } else if (data.status === 'pending') {
-                        // Se é pendente e eu recebi
                         if (data.receiver === currentUser.username) {
                             reqReceived.push(data);
                         }
-                        // Se é pendente e eu enviei
                         else if (data.sender === currentUser.username) {
                             reqSent.push(data);
                         }
@@ -659,7 +658,6 @@
             const sentContainer = document.getElementById('req-sent-container');
             const badgeRequests = document.getElementById('badge-requests');
 
-            // Atualiza Badge do menu
             if (received.length > 0) {
                 badgeRequests.innerText = received.length;
                 badgeRequests.classList.remove('hidden');
@@ -741,7 +739,6 @@
             }
 
             try {
-                // Fazer uma verificação direta no servidor de contas para garantir que o usuário existe
                 const targetAccountDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', targetUsername);
                 const targetDocSnap = await getDoc(targetAccountDocRef);
 
@@ -750,10 +747,8 @@
                     return;
                 }
 
-                // Armazenar os dados no cache de mapeamento
                 accountsMap[targetUsername] = targetDocSnap.data();
 
-                // Verificar se já existe uma amizade ou pedido em andamento
                 const requestDocId = `${currentUser.username}_${targetUsername}`;
                 const requestDocIdAlt = `${targetUsername}_${currentUser.username}`;
 
@@ -765,7 +760,6 @@
                     return;
                 }
 
-                // Criar o registro de pedido pendente
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', requestDocId), {
                     sender: currentUser.username,
                     receiver: targetUsername,
@@ -809,11 +803,9 @@
         function openChatWith(friend) {
             activeFriend = friend;
 
-            // Ajustar visual de abas e telas se for mobile
             document.getElementById('chat-panel').classList.remove('hidden');
             document.getElementById('chat-panel').classList.add('flex');
             
-            // Renderizar cabeçalho do chat
             document.getElementById('chat-header').classList.remove('hidden');
             document.getElementById('chat-input-bar').classList.remove('hidden');
             document.getElementById('chat-placeholder').classList.add('hidden');
@@ -822,10 +814,8 @@
             document.getElementById('active-chat-status').innerText = `@${friend.username}`;
             document.getElementById('active-chat-avatar').innerText = friend.name.charAt(0).toUpperCase();
 
-            // Sincronizar o estado da Sidebar
             startUserSession();
 
-            // Começar escuta do feed de mensagens (Sem queries complexas - Regra 2)
             if (unsubscribeMessages) unsubscribeMessages();
 
             const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
@@ -834,7 +824,6 @@
                 const messagesList = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    // Filtragem em memória para respeitar a Regra 2 (Sem queries complexas)
                     const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
                     const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
                     
@@ -843,7 +832,6 @@
                     }
                 });
 
-                // Ordenar por horário em memória do JS
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
                 renderMessages(messagesList);
             }, (error) => {
@@ -888,7 +876,6 @@
                 container.appendChild(msgElement);
             });
 
-            // Forçar rolagem automática suave para a última mensagem
             const chatMessagesDiv = document.getElementById('chat-messages');
             chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
         }
@@ -943,7 +930,7 @@
             document.getElementById('chat-panel').classList.add('hidden');
             document.getElementById('chat-panel').classList.remove('flex');
             activeFriend = null;
-            startUserSession(); // Redesenhar sem focar em ninguém
+            startUserSession();
         });
 
         // Logout de Usuário
@@ -953,12 +940,10 @@
             if (unsubscribeFriends) unsubscribeFriends();
             if (unsubscribeMessages) unsubscribeMessages();
 
-            // Esconder tela principal e revelar login
             document.getElementById('main-app').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
             document.getElementById('auth-password').value = '';
             
-            // Reexibir botão da última conta conectada no login
             if (lastAccountData && !registerMode) {
                 document.getElementById('last-account-container').classList.remove('hidden');
             }
@@ -966,7 +951,6 @@
             showToast("Você desconectou da conta.");
         });
 
-        // Inicialização global no carregamento da página
         window.onload = function() {
             authenticateFirebase();
         };
