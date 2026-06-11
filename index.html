@@ -9,6 +9,11 @@
     <!-- Fonte Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        html {
+            text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+            -moz-text-size-adjust: 100%;
+        }
         body {
             font-family: 'Inter', sans-serif;
         }
@@ -42,7 +47,7 @@
         <div class="sm:mx-auto sm:w-full sm:max-w-md z-10">
             <div class="flex justify-center items-center gap-2">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                 </div>
@@ -56,8 +61,8 @@
                 <form id="auth-form" class="space-y-5">
                     <!-- Botão de Entrada Rápida (Última Conta no Dispositivo) -->
                     <div id="last-account-container" class="hidden">
-                        <button type="button" id="last-account-btn" class="flex w-full justify-center items-center gap-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-4 py-3.5 text-sm font-semibold text-indigo-300 shadow-lg shadow-indigo-500/5 transition-all duration-200">
-                            <svg class="w-5 h-5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button type="button" id="last-account-btn" class="flex w-full justify-center items-center gap-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-4 py-3.5 text-sm font-semibold text-indigo-300 shadow-lg shadow-indigo-500/5 transition-all duration-200" aria-label="Entrar com a última conta conectada neste dispositivo">
+                            <svg class="w-5 h-5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>
                             <span class="truncate">Entrar como <strong id="last-account-user" class="text-white font-bold">...</strong></span>
@@ -131,7 +136,7 @@
             <!-- Logo e Perfil Rápido -->
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                 </div>
@@ -158,9 +163,9 @@
             </form>
 
             <!-- Logout -->
-            <button id="logout-btn" class="flex items-center gap-2 text-xs text-slate-400 hover:text-rose-400 bg-slate-950/50 hover:bg-rose-500/10 border border-slate-800 hover:border-rose-500/20 px-3 py-2 rounded-xl transition-all">
+            <button id="logout-btn" class="flex items-center gap-2 text-xs text-slate-400 hover:text-rose-400 bg-slate-950/50 hover:bg-rose-500/10 border border-slate-800 hover:border-rose-500/20 px-3 py-2 rounded-xl transition-all" aria-label="Sair da conta e desconectar">
                 <span>Sair</span>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
             </button>
@@ -187,7 +192,7 @@
                 <div id="panel-friends-list" class="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
                     <!-- Amigos renderizados aqui via JS -->
                     <div id="friends-empty" class="text-center py-8 text-slate-500 text-xs">
-                        <svg class="w-12 h-12 mx-auto text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-12 h-12 mx-auto text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                         Nenhum amigo conectado ainda.<br>Adicione pessoas pelo topo!
@@ -236,8 +241,8 @@
                 <div id="chat-header" class="hidden bg-slate-900/60 border-b border-slate-800/80 px-4 py-3 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <!-- Botão de Voltar (Visível no celular) -->
-                        <button id="chat-back-btn" class="md:hidden text-slate-400 hover:text-slate-100 p-1 bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-all">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button id="chat-back-btn" class="md:hidden text-slate-400 hover:text-slate-100 p-1 bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-all" aria-label="Voltar para a lista de canais de conversa" title="Voltar">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
@@ -256,7 +261,7 @@
                     <!-- Mensagem vazia de início -->
                     <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center text-slate-500 p-8">
                         <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                             </svg>
                         </div>
@@ -270,8 +275,8 @@
                 <div id="chat-input-bar" class="hidden p-3 bg-slate-900/40 border-t border-slate-800/80">
                     <form id="chat-form" class="flex items-center gap-2">
                         <input id="message-input" type="text" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                        <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center" aria-label="Enviar mensagem de texto" title="Enviar Mensagem">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                             </svg>
                         </button>
@@ -505,7 +510,7 @@
                 });
                 console.log("Sincronização de contas concluída.");
             }, (error) => {
-                if (error.message.includes('offline') || error.code === 'unavailable') {
+                if (error.message?.includes('offline') || error.code === 'unavailable' || error.message?.includes('client is offline')) {
                     activateOfflineFallback();
                 }
                 console.error("Aviso: Sincronização de contas suspensa temporariamente.", error);
@@ -574,22 +579,7 @@
             if (registerMode) {
                 // REGISTRO
                 if (isOfflineMode) {
-                    if (simData.accounts[usernameInput]) {
-                        showToast("Este nome de usuário já está sendo usado localmente.", "error");
-                        return;
-                    }
-                    const newUserData = {
-                        username: usernameInput,
-                        name: displayNameInput || usernameInput,
-                        password: passwordInput,
-                        uid: crypto.randomUUID()
-                    };
-                    simData.accounts[usernameInput] = newUserData;
-                    saveLocalSimulationData();
-                    accountsMap = simData.accounts;
-                    showToast("Sua conta offline foi criada com sucesso! Faça login.");
-                    toggleAuthModeBtn.click();
-                    document.getElementById('auth-password').value = '';
+                    executeOfflineRegistration(usernameInput, displayNameInput, passwordInput);
                     return;
                 }
 
@@ -618,10 +608,9 @@
                     toggleAuthModeBtn.click();
                     document.getElementById('auth-password').value = '';
                 } catch (err) {
-                    if (err.message.includes('offline') || err.code === 'unavailable') {
+                    if (err.code === 'unavailable' || !navigator.onLine || err.message?.toLowerCase().includes('offline') || err.message?.toLowerCase().includes('failed') || err.message?.toLowerCase().includes('client is offline')) {
                         activateOfflineFallback();
-                        // Chamar envio novamente para salvar no modo offline recém-ativado
-                        authForm.dispatchEvent(new Event('submit'));
+                        executeOfflineRegistration(usernameInput, displayNameInput, passwordInput);
                     } else {
                         console.error("Erro ao registrar conta:", err);
                         showToast("Não foi possível criar a conta remota.", "error");
@@ -630,21 +619,7 @@
             } else {
                 // LOGIN
                 if (isOfflineMode) {
-                    const matchedUser = simData.accounts[usernameInput];
-                    if (!matchedUser || matchedUser.password !== passwordInput) {
-                        showToast("Nome de usuário ou senha incorretos offline.", "error");
-                        return;
-                    }
-                    currentUser = matchedUser;
-                    showToast(`Conectado no Modo Offline como ${currentUser.name}!`);
-                    
-                    // Salvar login rápido localmente
-                    const backup = { username: currentUser.username, name: currentUser.name, password: passwordInput };
-                    localStorage.setItem('conectachat_last_account', JSON.stringify(backup));
-                    lastAccountData = backup;
-                    showLastAccountUI(lastAccountData);
-
-                    enterApplication();
+                    executeOfflineLogin(usernameInput, passwordInput);
                     return;
                 }
 
@@ -693,9 +668,9 @@
                     
                     enterApplication();
                 } catch (err) {
-                    if (err.message.includes('offline') || err.code === 'unavailable') {
+                    if (err.code === 'unavailable' || !navigator.onLine || err.message?.toLowerCase().includes('offline') || err.message?.toLowerCase().includes('failed') || err.message?.toLowerCase().includes('client is offline')) {
                         activateOfflineFallback();
-                        authForm.dispatchEvent(new Event('submit'));
+                        executeOfflineLogin(usernameInput, passwordInput);
                     } else {
                         console.error("Erro durante o fluxo de login:", err);
                         showToast("Erro ao conectar ao banco de dados.", "error");
@@ -703,6 +678,44 @@
                 }
             }
         });
+
+        // Funções de login e cadastro offline inline, garantindo que o fluxo prossiga perfeitamente
+        function executeOfflineRegistration(usernameInput, displayNameInput, passwordInput) {
+            if (simData.accounts[usernameInput]) {
+                showToast("Este nome de usuário já está sendo usado localmente.", "error");
+                return;
+            }
+            const newUserData = {
+                username: usernameInput,
+                name: displayNameInput || usernameInput,
+                password: passwordInput,
+                uid: crypto.randomUUID()
+            };
+            simData.accounts[usernameInput] = newUserData;
+            saveLocalSimulationData();
+            accountsMap = simData.accounts;
+            showToast("Sua conta offline foi criada com sucesso! Faça login.");
+            toggleAuthModeBtn.click();
+            document.getElementById('auth-password').value = '';
+        }
+
+        function executeOfflineLogin(usernameInput, passwordInput) {
+            const matchedUser = simData.accounts[usernameInput];
+            if (!matchedUser || matchedUser.password !== passwordInput) {
+                showToast("Nome de usuário ou senha incorretos offline.", "error");
+                return;
+            }
+            currentUser = matchedUser;
+            showToast(`Conectado no Modo Offline como ${currentUser.name}!`);
+            
+            // Salvar login rápido localmente
+            const backup = { username: currentUser.username, name: currentUser.name, password: passwordInput };
+            localStorage.setItem('conectachat_last_account', JSON.stringify(backup));
+            lastAccountData = backup;
+            showLastAccountUI(lastAccountData);
+
+            enterApplication();
+        }
 
         // Entrar no aplicativo e configurar interface
         function enterApplication() {
@@ -796,7 +809,7 @@
                 renderFriends(friendsList);
                 renderRequests(reqReceived, reqSent);
             }, (error) => {
-                if (error.message.includes('offline') || error.code === 'unavailable') {
+                if (error.message?.includes('offline') || error.code === 'unavailable' || error.message?.includes('client is offline')) {
                     activateOfflineFallback();
                 } else {
                     console.error("Erro ao escutar amizades:", error);
@@ -849,7 +862,7 @@
             });
         }
 
-        // Renderizar os pedidos pendentes
+        // Renderizar os pedidos pendentes (com melhorias de acessibilidade em botões)
         function renderRequests(received, sent) {
             const receivedContainer = document.getElementById('req-received-container');
             const sentContainer = document.getElementById('req-sent-container');
@@ -877,13 +890,13 @@
                             <p class="text-[9px] text-slate-500">@${req.sender}</p>
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
-                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 transition-all" title="Aceitar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 transition-all" aria-label="Aceitar solicitação de amizade de ${senderName}" title="Aceitar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                                 </svg>
                             </button>
-                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white transition-all" title="Recusar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white transition-all" aria-label="Recusar solicitação de amizade de ${senderName}" title="Recusar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
@@ -910,8 +923,8 @@
                             <p class="text-xs font-semibold text-slate-400 truncate">${receiverName}</p>
                             <p class="text-[9px] text-slate-600">@${req.receiver}</p>
                         </div>
-                        <button class="cancel-btn p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all" title="Cancelar">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <button class="cancel-btn p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all" aria-label="Cancelar solicitação de amizade enviada para ${receiverName}" title="Cancelar">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
@@ -996,7 +1009,7 @@
                 showToast(`Solicitação enviada para @${targetUsername}!`);
                 input.value = '';
             } catch (err) {
-                if (err.message.includes('offline') || err.code === 'unavailable') {
+                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
                     activateOfflineFallback();
                     // Chamar novamente agora no modo offline
                     document.getElementById('add-friend-form').dispatchEvent(new Event('submit'));
@@ -1025,7 +1038,7 @@
                 });
                 showToast(`Você agora é amigo de @${senderUsername}!`);
             } catch (err) {
-                if (err.message.includes('offline') || err.code === 'unavailable') {
+                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
                     activateOfflineFallback();
                     handleAcceptRequest(docId, senderUsername);
                 } else {
@@ -1051,7 +1064,7 @@
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
                 showToast("Solicitação de amizade resolvida.");
             } catch (err) {
-                if (err.message.includes('offline') || err.code === 'unavailable') {
+                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
                     activateOfflineFallback();
                     handleDeleteRequest(docId);
                 } else {
@@ -1102,7 +1115,7 @@
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
                 renderMessages(messagesList);
             }, (error) => {
-                if (error.message.includes('offline') || error.code === 'unavailable') {
+                if (error.message?.includes('offline') || error.code === 'unavailable' || error.message?.includes('client is offline')) {
                     activateOfflineFallback();
                 } else {
                     console.error("Erro ao carregar chat:", error);
@@ -1185,7 +1198,7 @@
                 input.value = '';
                 input.focus();
             } catch (err) {
-                if (err.message.includes('offline') || err.code === 'unavailable') {
+                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
                     activateOfflineFallback();
                     // Re-enviar usando canal offline
                     simData.messages.push({
