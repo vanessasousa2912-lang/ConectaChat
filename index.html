@@ -282,14 +282,15 @@
         import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Configurações do Firebase injetadas pelo ambiente ou Mock
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "mock-api-key",
-            authDomain: "mock-auth-domain",
-            projectId: "mock-project-id",
-            storageBucket: "mock-storage-bucket",
-            messagingSenderId: "mock-sender-id",
-            appId: "mock-app-id"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyDeoGIS270NUa0mrjbIdzNJWKawtTW5vCc",
+  authDomain: "conectachat-a08d3.firebaseapp.com",
+  projectId: "conectachat-a08d3",
+  storageBucket: "conectachat-a08d3.firebasestorage.app",
+  messagingSenderId: "351118018239",
+  appId: "1:351118018239:web:81ca59b3a2194a2c13e80a",
+  measurementId: "G-C22SPJWHYT"
+};
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'co-chat-app';
 
         // Inicializar Firebase
