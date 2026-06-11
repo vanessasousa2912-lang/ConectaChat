@@ -263,7 +263,8 @@
                 <!-- Barra de envio de mensagens -->
                 <div id="chat-input-bar" class="hidden p-3 bg-slate-900/40 border-t border-slate-800/80">
                     <form id="chat-form" class="flex items-center gap-2">
-                        <input id="message-input" type="text" autocomplete="off" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <!-- Removido o autocomplete do input de texto para evitar avisos no Console do navegador -->
+                        <input id="message-input" type="text" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                         <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -281,16 +282,16 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configurações do Firebase injetadas pelo ambiente ou Mock
-const firebaseConfig = {
-  apiKey: "AIzaSyDeoGIS270NUa0mrjbIdzNJWKawtTW5vCc",
-  authDomain: "conectachat-a08d3.firebaseapp.com",
-  projectId: "conectachat-a08d3",
-  storageBucket: "conectachat-a08d3.firebasestorage.app",
-  messagingSenderId: "351118018239",
-  appId: "1:351118018239:web:81ca59b3a2194a2c13e80a",
-  measurementId: "G-C22SPJWHYT"
-};
+        // Configurações do Firebase reais
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeoGIS270NUa0mrjbIdzNJWKawtTW5vCc",
+            authDomain: "conectachat-a08d3.firebaseapp.com",
+            projectId: "conectachat-a08d3",
+            storageBucket: "conectachat-a08d3.firebasestorage.app",
+            messagingSenderId: "351118018239",
+            appId: "1:351118018239:web:81ca59b3a2194a2c13e80a",
+            measurementId: "G-C22SPJWHYT"
+        };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'co-chat-app';
 
         // Inicializar Firebase
@@ -310,6 +311,7 @@ const firebaseConfig = {
         // Custom Toast Notification Maker
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
+            if (!container) return;
             const toast = document.createElement('div');
             toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 ${
                 type === 'success' 
@@ -348,7 +350,8 @@ const firebaseConfig = {
                 }
                 firebaseAuthenticated = true;
                 console.log("Autenticação de retaguarda concluída.");
-                // Começa a escutar atualizações de contas de usuários para cache
+                
+                // Buscar dados do cache de contas em tempo real
                 startListeningAccounts();
                 
                 // Procurar por atalhos de última conta logada neste dispositivo (Regra 3 - Após Auth)
@@ -397,9 +400,9 @@ const firebaseConfig = {
                 snapshot.forEach(doc => {
                     accountsMap[doc.id] = doc.data();
                 });
-                console.log("Contas carregadas com sucesso:", Object.keys(accountsMap).length);
+                console.log("Sincronização de contas concluída.");
             }, (error) => {
-                console.error("Erro ao sincronizar lista de usuários:", error);
+                console.error("Aviso: Sincronização de contas suspensa temporariamente.", error);
             });
         }
 
@@ -468,77 +471,97 @@ const firebaseConfig = {
 
             if (registerMode) {
                 // REGISTRO
-                if (accountsMap[usernameInput]) {
-                    showToast("Este nome de usuário já está sendo usado por outra pessoa.", "error");
-                    return;
-                }
-
+                // Forçar verificação individual para garantir consistência
                 try {
-                    const userAccountDoc = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
+                    const userCheckRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
+                    const docSnap = await getDoc(userCheckRef);
+                    if (docSnap.exists()) {
+                        showToast("Este nome de usuário já está sendo usado por outra pessoa.", "error");
+                        return;
+                    }
+
                     const newUserData = {
                         username: usernameInput,
                         name: displayNameInput || usernameInput,
-                        password: passwordInput, // Armazenando senha simples para este app demo
+                        password: passwordInput,
                         uid: auth.currentUser?.uid || crypto.randomUUID()
                     };
 
-                    await setDoc(userAccountDoc, newUserData);
+                    await setDoc(userCheckRef, newUserData);
                     showToast("Sua conta foi criada! Faça login agora.");
+                    
+                    // Atualizar cache imediatamente
+                    accountsMap[usernameInput] = newUserData;
+                    
                     // Mudar para tela de login automaticamente
                     toggleAuthModeBtn.click();
                     document.getElementById('auth-password').value = '';
                 } catch (err) {
                     console.error("Erro ao registrar conta:", err);
-                    showToast("Não foi possível criar a conta.", "error");
+                    showToast("Não foi possível criar a conta. Verifique as regras do banco de dados.", "error");
                 }
             } else {
                 // LOGIN
-                const matchedUser = accountsMap[usernameInput];
-                if (!matchedUser || matchedUser.password !== passwordInput) {
-                    showToast("Nome de usuário ou senha incorretos.", "error");
-                    return;
-                }
-
-                // Definir usuário atual logado
-                currentUser = matchedUser;
-                showToast(`Bem-vindo de volta, ${currentUser.name}!`);
-                
-                // Persistir credenciais de login rápido localmente via Firestore Privado (Regra 1 e 3)
-                const userId = auth.currentUser?.uid;
-                if (userId) {
-                    try {
-                        const lastAccDocRef = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'lastAccount');
-                        await setDoc(lastAccDocRef, {
-                            username: currentUser.username,
-                            name: currentUser.name,
-                            password: passwordInput,
-                            timestamp: Date.now()
-                        });
-                        
-                        // Atualizar cache local do script
-                        lastAccountData = {
-                            username: currentUser.username,
-                            name: currentUser.name,
-                            password: passwordInput
-                        };
-                        showLastAccountUI(lastAccountData);
-                    } catch (err) {
-                        console.warn("Não foi possível salvar o atalho de login no servidor:", err);
+                try {
+                    // Buscar o documento diretamente para contornar problemas de sincronização inicial do snapshot
+                    const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
+                    const userSnap = await getDoc(userDocRef);
+                    
+                    if (!userSnap.exists()) {
+                        showToast("Nome de usuário incorreto ou não cadastrado.", "error");
+                        return;
                     }
+                    
+                    const matchedUser = userSnap.data();
+                    if (matchedUser.password !== passwordInput) {
+                        showToast("Senha incorreta.", "error");
+                        return;
+                    }
+
+                    // Definir usuário atual logado
+                    currentUser = matchedUser;
+                    showToast(`Bem-vindo de volta, ${currentUser.name}!`);
+                    
+                    // Persistir credenciais de login rápido localmente via Firestore Privado (Regra 1 e 3)
+                    const userId = auth.currentUser?.uid;
+                    if (userId) {
+                        try {
+                            const lastAccDocRef = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'lastAccount');
+                            await setDoc(lastAccDocRef, {
+                                username: currentUser.username,
+                                name: currentUser.name,
+                                password: passwordInput,
+                                timestamp: Date.now()
+                            });
+                            
+                            // Atualizar cache local do script
+                            lastAccountData = {
+                                username: currentUser.username,
+                                name: currentUser.name,
+                                password: passwordInput
+                            };
+                            showLastAccountUI(lastAccountData);
+                        } catch (err) {
+                            console.warn("Não foi possível salvar o atalho de login no servidor:", err);
+                        }
+                    }
+                    
+                    // Transição das Telas (Isso resolve o congelamento!)
+                    document.getElementById('auth-screen').classList.add('hidden');
+                    document.getElementById('main-app').classList.remove('hidden');
+
+                    // Configurar Informações Visuais no App
+                    document.getElementById('user-identity').innerText = `@${currentUser.username}`;
+                    document.getElementById('user-display-name').innerText = currentUser.name;
+                    document.getElementById('user-tag').innerText = `@${currentUser.username}`;
+                    document.getElementById('user-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
+
+                    // Inicializar escutas de dados do usuário
+                    startUserSession();
+                } catch (err) {
+                    console.error("Erro durante o fluxo de login:", err);
+                    showToast("Erro ao processar validação no Firebase.", "error");
                 }
-                
-                // Mudar Tela
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-
-                // Configurar Informações no App
-                document.getElementById('user-identity').innerText = `@${currentUser.username}`;
-                document.getElementById('user-display-name').innerText = currentUser.name;
-                document.getElementById('user-tag').innerText = `@${currentUser.username}`;
-                document.getElementById('user-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
-
-                // Inicializar escutas de dados do usuário
-                startUserSession();
             }
         });
 
@@ -717,28 +740,32 @@ const firebaseConfig = {
                 return;
             }
 
-            // Verificar se o usuário existe
-            if (!accountsMap[targetUsername]) {
-                showToast(`Usuário @${targetUsername} não encontrado.`, "error");
-                return;
-            }
-
             try {
-                // Verificar se já existe uma amizade ou pedido em andamento
-                const friendsCol = collection(db, 'artifacts', appId, 'public', 'data', 'friends');
-                // Sincronizando com a base local para evitar complex queries do Firebase (Regra 2)
-                let friendshipExists = false;
+                // Fazer uma verificação direta no servidor de contas para garantir que o usuário existe
+                const targetAccountDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', targetUsername);
+                const targetDocSnap = await getDoc(targetAccountDocRef);
 
-                const querySnapshot = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', `${currentUser.username}_${targetUsername}`));
-                const querySnapshotAlt = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', `${targetUsername}_${currentUser.username}`));
+                if (!targetDocSnap.exists()) {
+                    showToast(`Usuário @${targetUsername} não encontrado.`, "error");
+                    return;
+                }
+
+                // Armazenar os dados no cache de mapeamento
+                accountsMap[targetUsername] = targetDocSnap.data();
+
+                // Verificar se já existe uma amizade ou pedido em andamento
+                const requestDocId = `${currentUser.username}_${targetUsername}`;
+                const requestDocIdAlt = `${targetUsername}_${currentUser.username}`;
+
+                const querySnapshot = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', requestDocId));
+                const querySnapshotAlt = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', requestDocIdAlt));
 
                 if (querySnapshot.exists() || querySnapshotAlt.exists()) {
                     showToast("Uma solicitação ou amizade com este usuário já existe.", "error");
                     return;
                 }
 
-                // Criar o registro de pedido pendente usando uma ID previsível para checagem rápida
-                const requestDocId = `${currentUser.username}_${targetUsername}`;
+                // Criar o registro de pedido pendente
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', requestDocId), {
                     sender: currentUser.username,
                     receiver: targetUsername,
@@ -795,8 +822,8 @@ const firebaseConfig = {
             document.getElementById('active-chat-status').innerText = `@${friend.username}`;
             document.getElementById('active-chat-avatar').innerText = friend.name.charAt(0).toUpperCase();
 
-            // Atualiza seleção na barra lateral
-            startUserSession(); // Atualizar destaque na lista
+            // Sincronizar o estado da Sidebar
+            startUserSession();
 
             // Começar escuta do feed de mensagens (Sem queries complexas - Regra 2)
             if (unsubscribeMessages) unsubscribeMessages();
