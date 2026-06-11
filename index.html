@@ -27,8 +27,14 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- Banner de Status de Conexão -->
+    <div id="connection-banner" class="bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2">
+        <span id="connection-dot" class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+        <span id="connection-text">Verificando conexão com o Firebase...</span>
+    </div>
+
     <!-- AUTH SCREEN (Login / Registro) -->
-    <div id="auth-screen" class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-slate-950 relative overflow-hidden">
+    <div id="auth-screen" class="flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 bg-slate-950 relative overflow-hidden">
         <!-- Detalhes de luz de fundo modernas -->
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -279,10 +285,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        // Importamos 'initializeFirestore' para podermos forçar conexões estáveis localmente
         import { initializeFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configurações do Firebase reais
+        // Configurações do Firebase reais de Luis
         const firebaseConfig = {
             apiKey: "AIzaSyDeoGIS270NUa0mrjbIdzNJWKawtTW5vCc",
             authDomain: "conectachat-a08d3.firebaseapp.com",
@@ -294,15 +299,98 @@
         };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'co-chat-app';
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        // --- MODO DE DIAGNÓSTICO E AUTO-FALLBACK OFFLINE ---
+        let isOfflineMode = false;
+        const banner = document.getElementById('connection-banner');
+        const bannerText = document.getElementById('connection-text');
+        const bannerDot = document.getElementById('connection-dot');
 
-        // Inicializar Firestore forçando o uso de Long Polling. 
-        // Isso resolve 100% dos travamentos de segurança 'client is offline' quando o app é aberto como arquivo local.
-        const db = initializeFirestore(app, {
-            experimentalForceLongPolling: true
-        });
+        function setStatusBanner(mode, message) {
+            bannerText.innerText = message;
+            if (mode === 'real') {
+                banner.className = "bg-emerald-600/20 border-b border-emerald-500/30 text-emerald-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
+                bannerDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
+            } else if (mode === 'checking') {
+                banner.className = "bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
+                bannerDot.className = "w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse";
+            } else {
+                banner.className = "bg-amber-600/20 border-b border-amber-500/30 text-amber-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
+                bannerDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
+            }
+        }
+
+        // --- MEMÓRIA DO SIMULADOR OFFLINE (Sincronização entre abas e cache local) ---
+        const syncChannel = window.BroadcastChannel ? new BroadcastChannel('conectachat-live-fallback') : null;
+        let simData = {
+            accounts: {},
+            friends: {},
+            messages: []
+        };
+
+        function loadLocalSimulationData() {
+            try {
+                const saved = localStorage.getItem('conectachat_offline_db');
+                if (saved) {
+                    simData = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.warn("Erro ao ler localStorage:", e);
+            }
+        }
+
+        function saveLocalSimulationData() {
+            try {
+                localStorage.setItem('conectachat_offline_db', JSON.stringify(simData));
+                if (syncChannel) {
+                    syncChannel.postMessage({ type: 'SYNC_STATE', data: simData });
+                }
+            } catch (e) {
+                console.warn("Erro ao salvar dados offline:", e);
+            }
+        }
+
+        // Se uma aba alterar algo offline, as outras sincronizam no mesmo segundo!
+        if (syncChannel) {
+            syncChannel.onmessage = (event) => {
+                if (event.data && event.data.type === 'SYNC_STATE') {
+                    simData = event.data.data;
+                    accountsMap = simData.accounts;
+                    if (currentUser) {
+                        triggerOfflineCallbacks();
+                    }
+                }
+            };
+        }
+
+        // Ativação dinâmica do Fallback se houver erro offline
+        function activateOfflineFallback(reason) {
+            if (isOfflineMode) return; // Já está ativado
+            isOfflineMode = true;
+            loadLocalSimulationData();
+            accountsMap = simData.accounts;
+            setStatusBanner('offline', `MODO OFFLINE ATIVO: Navegador bloqueou rede externa. Use o Live Server do VS Code ou continue offline!`);
+            showToast("Alternando para o banco de dados seguro local offline.", "warning");
+            
+            // Re-renderizar dados se o usuário já estiver dentro do app
+            if (currentUser) {
+                triggerOfflineCallbacks();
+            }
+        }
+
+        // Inicializar Firebase
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            // Configurar Firestore com desativação de stream de rede e pooling longo agressivo
+            db = initializeFirestore(app, {
+                experimentalForceLongPolling: true,
+                useFetchStreams: false
+            });
+        } catch (err) {
+            console.error("Falha ao configurar Firebase SDK:", err);
+            activateOfflineFallback("Erro na inicialização do Firebase.");
+        }
 
         // Estado do App
         let firebaseAuthenticated = false;
@@ -333,12 +421,10 @@
             
             container.appendChild(toast);
             
-            // Forçar reflow para animação
             setTimeout(() => {
                 toast.classList.remove('translate-y-2', 'opacity-0');
             }, 10);
 
-            // Sumir após 3 segundos
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
@@ -347,13 +433,16 @@
 
         // Autenticar Anonimamente Antes de Qualquer Ação (Regra 3)
         async function authenticateFirebase() {
+            if (isOfflineMode) return;
             try {
+                setStatusBanner('checking', 'Autenticando no Firebase...');
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
                 firebaseAuthenticated = true;
+                setStatusBanner('real', 'Conectado ao Firebase Cloud Server');
                 console.log("Autenticação de retaguarda concluída.");
                 
                 // Buscar dados do cache de contas em tempo real
@@ -362,13 +451,21 @@
                 // Procurar por atalhos de última conta logada neste dispositivo (Regra 3 - Após Auth)
                 await checkLastAccount();
             } catch (err) {
-                console.error("Falha ao inicializar autenticação:", err);
-                showToast("Erro ao conectar ao servidor. Verifique sua conexão.", "error");
+                console.warn("Autenticação falhou por bloqueio local. Ativando Modo Offline Simulado:", err);
+                activateOfflineFallback();
             }
         }
 
         // Buscar dados de login rápido do dispositivo no banco de dados privado (Regra 1)
         async function checkLastAccount() {
+            if (isOfflineMode) {
+                const localSavedAcc = localStorage.getItem('conectachat_last_account');
+                if (localSavedAcc) {
+                    lastAccountData = JSON.parse(localSavedAcc);
+                    showLastAccountUI(lastAccountData);
+                }
+                return;
+            }
             const userId = auth.currentUser?.uid;
             if (!userId) return;
             try {
@@ -379,7 +476,7 @@
                     showLastAccountUI(lastAccountData);
                 }
             } catch (err) {
-                console.warn("Não foi possível carregar a última conta deste dispositivo:", err);
+                console.warn("Não foi possível carregar a última conta deste dispositivo remotamente:", err);
             }
         }
 
@@ -399,6 +496,7 @@
 
         // Cachear contas registradas em tempo real
         function startListeningAccounts() {
+            if (isOfflineMode) return;
             const accountsCol = collection(db, 'artifacts', appId, 'public', 'data', 'accounts');
             onSnapshot(accountsCol, (snapshot) => {
                 accountsMap = {};
@@ -407,6 +505,9 @@
                 });
                 console.log("Sincronização de contas concluída.");
             }, (error) => {
+                if (error.message.includes('offline') || error.code === 'unavailable') {
+                    activateOfflineFallback();
+                }
                 console.error("Aviso: Sincronização de contas suspensa temporariamente.", error);
             });
         }
@@ -459,11 +560,7 @@
         // Evento de Envio do formulário de autenticação
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!firebaseAuthenticated) {
-                showToast("Aguarde a conexão com o servidor ser estabelecida.", "error");
-                return;
-            }
-
+            
             const usernameInput = document.getElementById('auth-username').value.trim().toLowerCase();
             const passwordInput = document.getElementById('auth-password').value;
             const displayNameInput = document.getElementById('reg-name').value.trim();
@@ -476,6 +573,26 @@
 
             if (registerMode) {
                 // REGISTRO
+                if (isOfflineMode) {
+                    if (simData.accounts[usernameInput]) {
+                        showToast("Este nome de usuário já está sendo usado localmente.", "error");
+                        return;
+                    }
+                    const newUserData = {
+                        username: usernameInput,
+                        name: displayNameInput || usernameInput,
+                        password: passwordInput,
+                        uid: crypto.randomUUID()
+                    };
+                    simData.accounts[usernameInput] = newUserData;
+                    saveLocalSimulationData();
+                    accountsMap = simData.accounts;
+                    showToast("Sua conta offline foi criada com sucesso! Faça login.");
+                    toggleAuthModeBtn.click();
+                    document.getElementById('auth-password').value = '';
+                    return;
+                }
+
                 try {
                     const userCheckRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
                     const docSnap = await getDoc(userCheckRef);
@@ -501,11 +618,36 @@
                     toggleAuthModeBtn.click();
                     document.getElementById('auth-password').value = '';
                 } catch (err) {
-                    console.error("Erro ao registrar conta:", err);
-                    showToast("Não foi possível criar a conta. Verifique se o Firestore está ativado.", "error");
+                    if (err.message.includes('offline') || err.code === 'unavailable') {
+                        activateOfflineFallback();
+                        // Chamar envio novamente para salvar no modo offline recém-ativado
+                        authForm.dispatchEvent(new Event('submit'));
+                    } else {
+                        console.error("Erro ao registrar conta:", err);
+                        showToast("Não foi possível criar a conta remota.", "error");
+                    }
                 }
             } else {
                 // LOGIN
+                if (isOfflineMode) {
+                    const matchedUser = simData.accounts[usernameInput];
+                    if (!matchedUser || matchedUser.password !== passwordInput) {
+                        showToast("Nome de usuário ou senha incorretos offline.", "error");
+                        return;
+                    }
+                    currentUser = matchedUser;
+                    showToast(`Conectado no Modo Offline como ${currentUser.name}!`);
+                    
+                    // Salvar login rápido localmente
+                    const backup = { username: currentUser.username, name: currentUser.name, password: passwordInput };
+                    localStorage.setItem('conectachat_last_account', JSON.stringify(backup));
+                    lastAccountData = backup;
+                    showLastAccountUI(lastAccountData);
+
+                    enterApplication();
+                    return;
+                }
+
                 try {
                     const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
                     const userSnap = await getDoc(userDocRef);
@@ -549,31 +691,82 @@
                         }
                     }
                     
-                    // Transição das Telas
-                    document.getElementById('auth-screen').classList.add('hidden');
-                    document.getElementById('main-app').classList.remove('hidden');
-
-                    // Configurar Informações Visuais no App
-                    document.getElementById('user-identity').innerText = `@${currentUser.username}`;
-                    document.getElementById('user-display-name').innerText = currentUser.name;
-                    document.getElementById('user-tag').innerText = `@${currentUser.username}`;
-                    document.getElementById('user-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
-
-                    // Inicializar escutas de dados do usuário
-                    startUserSession();
+                    enterApplication();
                 } catch (err) {
-                    console.error("Erro durante o fluxo de login:", err);
-                    showToast("Erro ao conectar ao banco de dados.", "error");
+                    if (err.message.includes('offline') || err.code === 'unavailable') {
+                        activateOfflineFallback();
+                        authForm.dispatchEvent(new Event('submit'));
+                    } else {
+                        console.error("Erro durante o fluxo de login:", err);
+                        showToast("Erro ao conectar ao banco de dados.", "error");
+                    }
                 }
             }
         });
+
+        // Entrar no aplicativo e configurar interface
+        function enterApplication() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+
+            // Configurar Informações Visuais no App
+            document.getElementById('user-identity').innerText = `@${currentUser.username}`;
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('user-tag').innerText = `@${currentUser.username}`;
+            document.getElementById('user-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
+
+            // Inicializar escutas de dados do usuário
+            startUserSession();
+        }
+
+        // Enviar os dados locais aos painéis se estiver offline
+        function triggerOfflineCallbacks() {
+            const friendsList = [];
+            const reqReceived = [];
+            const reqSent = [];
+
+            Object.values(simData.friends).forEach(data => {
+                if (data.status === 'accepted') {
+                    if (data.sender === currentUser.username) {
+                        friendsList.push({ requestDocId: data.id, friendUsername: data.receiver });
+                    } else if (data.receiver === currentUser.username) {
+                        friendsList.push({ requestDocId: data.id, friendUsername: data.sender });
+                    }
+                } else if (data.status === 'pending') {
+                    if (data.receiver === currentUser.username) {
+                        reqReceived.push(data);
+                    } else if (data.sender === currentUser.username) {
+                        reqSent.push(data);
+                    }
+                }
+            });
+
+            renderFriends(friendsList);
+            renderRequests(reqReceived, reqSent);
+
+            // Atualizar conversa ativa se aberta
+            if (activeFriend) {
+                const messagesList = simData.messages.filter(msg => {
+                    const isFromMeToFriend = (msg.sender === currentUser.username && msg.receiver === activeFriend.username);
+                    const isFromFriendToMe = (msg.sender === activeFriend.username && msg.receiver === currentUser.username);
+                    return isFromMeToFriend || isFromFriendToMe;
+                });
+                messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                renderMessages(messagesList);
+            }
+        }
 
         // Inicializar canais de escuta após o login do usuário
         function startUserSession() {
             if (unsubscribeFriends) unsubscribeFriends();
             if (unsubscribeMessages) unsubscribeMessages();
 
-            // Sincronizar Amigos e Solicitações
+            if (isOfflineMode) {
+                triggerOfflineCallbacks();
+                return;
+            }
+
+            // Sincronizar Amigos e Solicitações reais no Firebase
             const friendsCol = collection(db, 'artifacts', appId, 'public', 'data', 'friends');
             
             unsubscribeFriends = onSnapshot(friendsCol, (snapshot) => {
@@ -603,7 +796,11 @@
                 renderFriends(friendsList);
                 renderRequests(reqReceived, reqSent);
             }, (error) => {
-                console.error("Erro ao escutar amizades:", error);
+                if (error.message.includes('offline') || error.code === 'unavailable') {
+                    activateOfflineFallback();
+                } else {
+                    console.error("Erro ao escutar amizades:", error);
+                }
             });
         }
 
@@ -738,6 +935,35 @@
                 return;
             }
 
+            if (isOfflineMode) {
+                const friendExists = simData.accounts[targetUsername];
+                if (!friendExists) {
+                    showToast(`Usuário @${targetUsername} não encontrado offline.`, "error");
+                    return;
+                }
+
+                const requestDocId = `${currentUser.username}_${targetUsername}`;
+                const requestDocIdAlt = `${targetUsername}_${currentUser.username}`;
+
+                if (simData.friends[requestDocId] || simData.friends[requestDocIdAlt]) {
+                    showToast("Uma solicitação ou amizade com este usuário já existe offline.", "error");
+                    return;
+                }
+
+                simData.friends[requestDocId] = {
+                    id: requestDocId,
+                    sender: currentUser.username,
+                    receiver: targetUsername,
+                    status: 'pending',
+                    timestamp: Date.now()
+                };
+                saveLocalSimulationData();
+                triggerOfflineCallbacks();
+                showToast(`Solicitação enviada offline para @${targetUsername}!`);
+                input.value = '';
+                return;
+            }
+
             try {
                 const targetAccountDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', targetUsername);
                 const targetDocSnap = await getDoc(targetAccountDocRef);
@@ -770,32 +996,68 @@
                 showToast(`Solicitação enviada para @${targetUsername}!`);
                 input.value = '';
             } catch (err) {
-                console.error("Erro ao enviar pedido de amizade:", err);
-                showToast("Erro ao processar pedido de amizade.", "error");
+                if (err.message.includes('offline') || err.code === 'unavailable') {
+                    activateOfflineFallback();
+                    // Chamar novamente agora no modo offline
+                    document.getElementById('add-friend-form').dispatchEvent(new Event('submit'));
+                } else {
+                    console.error("Erro ao enviar pedido de amizade:", err);
+                    showToast("Erro ao processar pedido de amizade.", "error");
+                }
             }
         });
 
         // Aceitar solicitação recebida
         async function handleAcceptRequest(docId, senderUsername) {
+            if (isOfflineMode) {
+                if (simData.friends[docId]) {
+                    simData.friends[docId].status = 'accepted';
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    showToast(`Você agora é amigo de @${senderUsername}!`);
+                }
+                return;
+            }
+
             try {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), {
                     status: 'accepted'
                 });
                 showToast(`Você agora é amigo de @${senderUsername}!`);
             } catch (err) {
-                console.error("Erro ao aceitar amizade:", err);
-                showToast("Erro ao aceitar convite.", "error");
+                if (err.message.includes('offline') || err.code === 'unavailable') {
+                    activateOfflineFallback();
+                    handleAcceptRequest(docId, senderUsername);
+                } else {
+                    console.error("Erro ao aceitar amizade:", err);
+                    showToast("Erro ao aceitar convite.", "error");
+                }
             }
         }
 
         // Recusar ou Cancelar solicitação
         async function handleDeleteRequest(docId) {
+            if (isOfflineMode) {
+                if (simData.friends[docId]) {
+                    delete simData.friends[docId];
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    showToast("Solicitação de amizade resolvida.");
+                }
+                return;
+            }
+
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
                 showToast("Solicitação de amizade resolvida.");
             } catch (err) {
-                console.error("Erro ao remover solicitação:", err);
-                showToast("Erro ao deletar solicitação.", "error");
+                if (err.message.includes('offline') || err.code === 'unavailable') {
+                    activateOfflineFallback();
+                    handleDeleteRequest(docId);
+                } else {
+                    console.error("Erro ao remover solicitação:", err);
+                    showToast("Erro ao deletar solicitação.", "error");
+                }
             }
         }
 
@@ -818,6 +1080,11 @@
 
             if (unsubscribeMessages) unsubscribeMessages();
 
+            if (isOfflineMode) {
+                triggerOfflineCallbacks();
+                return;
+            }
+
             const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
             
             unsubscribeMessages = onSnapshot(messagesCol, (snapshot) => {
@@ -835,7 +1102,11 @@
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
                 renderMessages(messagesList);
             }, (error) => {
-                console.error("Erro ao carregar chat:", error);
+                if (error.message.includes('offline') || error.code === 'unavailable') {
+                    activateOfflineFallback();
+                } else {
+                    console.error("Erro ao carregar chat:", error);
+                }
             });
         }
 
@@ -888,6 +1159,20 @@
 
             if (!text || !activeFriend) return;
 
+            if (isOfflineMode) {
+                simData.messages.push({
+                    sender: currentUser.username,
+                    receiver: activeFriend.username,
+                    text: text,
+                    timestamp: Date.now()
+                });
+                saveLocalSimulationData();
+                triggerOfflineCallbacks();
+                input.value = '';
+                input.focus();
+                return;
+            }
+
             try {
                 const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
                 await addDoc(messagesCol, {
@@ -900,8 +1185,22 @@
                 input.value = '';
                 input.focus();
             } catch (err) {
-                console.error("Falha ao enviar mensagem:", err);
-                showToast("Erro ao entregar mensagem.", "error");
+                if (err.message.includes('offline') || err.code === 'unavailable') {
+                    activateOfflineFallback();
+                    // Re-enviar usando canal offline
+                    simData.messages.push({
+                        sender: currentUser.username,
+                        receiver: activeFriend.username,
+                        text: text,
+                        timestamp: Date.now()
+                    });
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    input.value = '';
+                } else {
+                    console.error("Falha ao enviar mensagem:", err);
+                    showToast("Erro ao entregar mensagem.", "error");
+                }
             }
         });
 
