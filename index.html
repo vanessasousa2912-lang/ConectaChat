@@ -502,6 +502,83 @@
             }
         }
 
+        // --- SISTEMA DE NOTIFICAÇÕES & RASTREAMENTO DE FOCO ---
+        let activeGroupList = []; // Cache global de grupos ativos para notificações em segundo plano
+        let isWindowFocused = true;
+        const sessionStartTime = Date.now();
+        const notifiedMessageIds = new Set();
+
+        // Conversão em lote do logo SVG para Data URI compatível com Notificação de SO (Favicon do chat)
+        const APP_ICON_DATA_URI = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%236366f1"/><path d="M30 45h.01M50 45h.01M70 45h.01M80 45c0 16.5-13.5 30-30 30a32.8 32.8 0 01-14.2-3.2L16 75l4.6-12.4C17.7 56.8 16 51.1 16 45c0-16.5 13.5-30 30-30s30 13.5 30 30z" fill="%23fff" stroke="%23fff" stroke-width="2" stroke-linejoin="round"/></svg>`;
+
+        // Eventos nativos de monitoramento de foco da página
+        window.addEventListener('focus', () => { isWindowFocused = true; });
+        window.addEventListener('blur', () => { isWindowFocused = false; });
+
+        // Sintetizador de Áudio nativo (Sino duplo dinâmico)
+        function playNotificationSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // Ré (D5)
+                gain.gain.setValueAtTime(0, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.31);
+                
+                setTimeout(() => {
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880, ctx.currentTime); // Lá (A5)
+                    gain2.gain.setValueAtTime(0, ctx.currentTime);
+                    gain2.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.05);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                    osc2.start(ctx.currentTime);
+                    osc2.stop(ctx.currentTime + 0.36);
+                }, 80);
+            } catch (e) {
+                console.debug("Web Audio dependente de interação inicial ou bloqueado.");
+            }
+        }
+
+        // Solicitação de permissões nativas
+        function requestNotificationPermission() {
+            if ("Notification" in window) {
+                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                    Notification.requestPermission();
+                }
+            }
+        }
+
+        // Função de disparo unificada
+        function sendSystemNotification(title, body) {
+            playNotificationSound();
+            
+            // 1. Notificação Nativa do Sistema Operacional (Se permitido)
+            if ("Notification" in window && Notification.permission === "granted") {
+                try {
+                    new Notification(title, {
+                        body: body,
+                        icon: APP_ICON_DATA_URI
+                    });
+                } catch (e) {
+                    console.warn("Notificação nativa bloqueada no iframe.");
+                }
+            }
+            
+            // 2. Notificação Visual Interna Customizada (Segurança e redundância)
+            showToast(`${title}: ${body}`, "info");
+        }
+
         // --- MEMÓRIA DO SIMULADOR OFFLINE (Suporta Grupos Offline!) ---
         const syncChannel = window.BroadcastChannel ? new BroadcastChannel('conectachat-live-fallback') : null;
         let simData = {
@@ -541,7 +618,44 @@
                 if (event.data && event.data.type === 'SYNC_STATE') {
                     simData = event.data.data;
                     accountsMap = simData.accounts;
+                    
+                    // Disparar notificações offline para abas secundárias abertas em background
                     if (currentUser) {
+                        // 1. Notificações de DMs offline
+                        simData.messages.forEach(msg => {
+                            const msgId = `offline_dm_${msg.sender}_${msg.timestamp}`;
+                            if (msg.timestamp > sessionStartTime && msg.sender !== currentUser.username && msg.receiver === currentUser.username) {
+                                if (!notifiedMessageIds.has(msgId)) {
+                                    notifiedMessageIds.add(msgId);
+                                    const isViewingSender = activeFriend && activeFriend.username === msg.sender;
+                                    if (!isWindowFocused || !isViewingSender) {
+                                        const senderName = accountsMap[msg.sender]?.name || msg.sender;
+                                        sendSystemNotification("ConectaChat", `${senderName} te mandou mensagem`);
+                                    }
+                                }
+                            }
+                        });
+
+                        // 2. Notificações de Grupos offline
+                        if (simData.groupMessages) {
+                            simData.groupMessages.forEach(msg => {
+                                const msgId = `offline_group_${msg.sender}_${msg.timestamp}`;
+                                const myGroups = Object.values(simData.groups).filter(g => g.members.includes(currentUser.username));
+                                const belongsToMyGroup = myGroups.some(g => g.id === msg.groupId);
+                                
+                                if (belongsToMyGroup && msg.timestamp > sessionStartTime && msg.sender !== currentUser.username) {
+                                    if (!notifiedMessageIds.has(msgId)) {
+                                        notifiedMessageIds.add(msgId);
+                                        const isViewingGroup = activeGroup && activeGroup.id === msg.groupId;
+                                        if (!isWindowFocused || !isViewingGroup) {
+                                            const senderName = msg.senderName || accountsMap[msg.sender]?.name || msg.sender;
+                                            sendSystemNotification("ConectaChat", `${senderName} mandou mensagem no grupo`);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        
                         triggerOfflineCallbacks();
                     }
                 }
@@ -868,6 +982,7 @@
             document.getElementById('user-tag').innerText = `@${currentUser.username}`;
 
             updateUIPersonalProfile();
+            requestNotificationPermission(); // Solicitar permissão nativa ao carregar painel principal
             startUserSession();
         }
 
@@ -1033,6 +1148,10 @@
             if (unsubscribeMessages) unsubscribeMessages();
             if (unsubscribeGroupMessages) unsubscribeGroupMessages();
 
+            // Cancelar escutas de notificações globais antigas para evitar leaks
+            if (window.globalDMsListener) { window.globalDMsListener(); window.globalDMsListener = null; }
+            if (window.globalGroupsListener) { window.globalGroupsListener(); window.globalGroupsListener = null; }
+
             if (isOfflineMode) {
                 triggerOfflineCallbacks();
                 return;
@@ -1082,6 +1201,7 @@
                 });
 
                 renderGroups(groupsList);
+                activeGroupList = groupsList; // Atualiza lista global de moderação para disparo de notificações de grupo
 
                 // Se houver canal de grupo ativo, validar se o usuário ainda pertence a ele
                 if (activeGroup) {
@@ -1101,6 +1221,57 @@
                 if (error.message?.includes('offline') || error.code === 'unavailable') {
                     activateOfflineFallback();
                 }
+            });
+
+            // --- CONFIGURAR LISTENER GLOBAL DE NOTIFICAÇÕES (DMs) ---
+            const globalDMsCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+            window.globalDMsListener = onSnapshot(globalDMsCol, (snapshot) => {
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === "added") {
+                        const data = change.doc.data();
+                        const docId = change.doc.id;
+                        
+                        // Notificar apenas se a mensagem for nova, destinada a nós e de autoria externa
+                        if (data.timestamp > sessionStartTime && data.sender !== currentUser.username && data.receiver === currentUser.username) {
+                            if (!notifiedMessageIds.has(docId)) {
+                                notifiedMessageIds.add(docId);
+                                const isViewingSender = activeFriend && activeFriend.username === data.sender;
+                                if (!isWindowFocused || !isViewingSender) {
+                                    const senderName = accountsMap[data.sender]?.name || data.sender;
+                                    sendSystemNotification("ConectaChat", `${senderName} te mandou mensagem`);
+                                }
+                            }
+                        }
+                    }
+                });
+            }, (error) => {
+                console.debug("Listener de notificações de DM inativo ou offline.", error);
+            });
+
+            // --- CONFIGURAR LISTENER GLOBAL DE NOTIFICAÇÕES (GRUPOS) ---
+            const globalGroupsCol = collection(db, 'artifacts', appId, 'public', 'data', 'group_messages');
+            window.globalGroupsListener = onSnapshot(globalGroupsCol, (snapshot) => {
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === "added") {
+                        const data = change.doc.data();
+                        const docId = change.doc.id;
+                        
+                        // Verificar se pertencemos ao grupo da mensagem
+                        const belongsToMyGroup = activeGroupList && activeGroupList.some(g => g.id === data.groupId);
+                        if (belongsToMyGroup && data.timestamp > sessionStartTime && data.sender !== currentUser.username) {
+                            if (!notifiedMessageIds.has(docId)) {
+                                notifiedMessageIds.add(docId);
+                                const isViewingGroup = activeGroup && activeGroup.id === data.groupId;
+                                if (!isWindowFocused || !isViewingGroup) {
+                                    const senderName = data.senderName || accountsMap[data.sender]?.name || data.sender;
+                                    sendSystemNotification("ConectaChat", `${senderName} mandou mensagem no grupo`);
+                                }
+                            }
+                        }
+                    }
+                });
+            }, (error) => {
+                console.debug("Listener de notificações de grupos inativo ou offline.", error);
             });
         }
 
