@@ -40,7 +40,6 @@
 
     <!-- AUTH SCREEN (Login / Registro) -->
     <div id="auth-screen" class="flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 bg-slate-950 relative overflow-hidden">
-        <!-- Detalhes de luz de fundo modernas -->
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -59,7 +58,7 @@
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10">
             <div class="bg-slate-900/50 backdrop-blur-md border border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
                 <form id="auth-form" class="space-y-5">
-                    <!-- Botão de Entrada Rápida (Última Conta no Dispositivo) -->
+                    <!-- Botão de Entrada Rápida -->
                     <div id="last-account-container" class="hidden">
                         <button type="button" id="last-account-btn" class="flex w-full justify-center items-center gap-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-4 py-3.5 text-sm font-semibold text-indigo-300 shadow-lg shadow-indigo-500/5 transition-all duration-200" aria-label="Entrar com a última conta conectada neste dispositivo">
                             <svg class="w-5 h-5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -77,7 +76,7 @@
                         </div>
                     </div>
 
-                    <!-- Campo de Nome de Exibição (Oculto no Login) -->
+                    <!-- Campo de Nome de Exibição -->
                     <div id="display-name-group" class="hidden">
                         <label for="reg-name" class="block text-sm font-medium text-slate-300">Como quer ser chamado? (Nome de Exibição)</label>
                         <div class="mt-1">
@@ -129,7 +128,7 @@
         </div>
     </div>
 
-    <!-- MAIN INTERFACE (Oculta por padrão até logar) -->
+    <!-- MAIN INTERFACE -->
     <div id="main-app" class="hidden flex-1 flex flex-col overflow-hidden h-full">
         <!-- Topbar / Adicionar Amigos -->
         <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-10 shadow-md">
@@ -174,23 +173,25 @@
         <!-- Corpo Principal do App -->
         <main class="flex-1 flex overflow-hidden relative">
             
-            <!-- LATERAL: Contatos, Amigos e Pedidos -->
+            <!-- LATERAL: Contatos, Amigos, Grupos e Pedidos -->
             <aside id="sidebar-panel" class="w-full md:w-80 bg-slate-900 border-r border-slate-800 flex flex-col h-full shrink-0 z-20">
                 
-                <!-- Abas da barra lateral (Pedidos Pendentes vs Lista de Amigos) -->
-                <div class="flex border-b border-slate-800">
-                    <button id="tab-friends" class="flex-1 py-3 text-center text-xs font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all">
+                <!-- Abas da barra lateral (Amigos, Grupos, Solicitações) -->
+                <div class="flex border-b border-slate-800 bg-slate-900/50">
+                    <button id="tab-friends" class="flex-1 py-3 text-center text-[11px] font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all">
                         Amigos (<span id="count-friends">0</span>)
                     </button>
-                    <button id="tab-requests" class="flex-1 py-3 text-center text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1">
-                        Solicitações
+                    <button id="tab-groups" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all">
+                        Grupos (<span id="count-groups">0</span>)
+                    </button>
+                    <button id="tab-requests" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1">
+                        Solicit.
                         <span id="badge-requests" class="hidden bg-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">0</span>
                     </button>
                 </div>
 
                 <!-- Lista de Amigos -->
                 <div id="panel-friends-list" class="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
-                    <!-- Amigos renderizados aqui via JS -->
                     <div id="friends-empty" class="text-center py-8 text-slate-500 text-xs">
                         <svg class="w-12 h-12 mx-auto text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -200,18 +201,32 @@
                     <div id="friends-container" class="space-y-1"></div>
                 </div>
 
-                <!-- Painel de Pedidos Pendentes (Oculto por padrão) -->
+                <!-- Painel de Grupos -->
+                <div id="panel-groups-list" class="hidden flex-1 overflow-y-auto p-3 space-y-3 no-scrollbar">
+                    <button id="open-create-group-modal" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500 hover:to-teal-500 hover:text-slate-950 border border-emerald-500/30 text-emerald-300 rounded-xl py-2.5 text-xs font-bold transition-all duration-200 shadow-md">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Criar Novo Grupo
+                    </button>
+
+                    <div id="groups-empty" class="text-center py-8 text-slate-500 text-xs">
+                        <svg class="w-12 h-12 mx-auto text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Você não está em nenhum grupo.<br>Crie um agora mesmo!
+                    </div>
+                    <div id="groups-container" class="space-y-1"></div>
+                </div>
+
+                <!-- Painel de Pedidos Pendentes -->
                 <div id="panel-requests-list" class="hidden flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar">
-                    
-                    <!-- Recebidos -->
                     <div>
                         <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Recebidos</h4>
                         <div id="req-received-container" class="space-y-1">
                             <p class="text-xs text-slate-500 py-2 italic text-center">Nenhum pedido pendente</p>
                         </div>
                     </div>
-
-                    <!-- Enviados -->
                     <div>
                         <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Enviados</h4>
                         <div id="req-sent-container" class="space-y-1">
@@ -221,16 +236,22 @@
                 </div>
 
                 <!-- Info Rodapé Usuário -->
-                <div class="bg-slate-950/80 border-t border-slate-800/80 p-3 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-indigo-600 flex items-center justify-center font-bold text-xs text-white uppercase" id="user-avatar">
-                            U
+                <div class="bg-slate-950/80 border-t border-slate-800/80 p-3">
+                    <button id="profile-footer-trigger" class="w-full flex items-center justify-between hover:bg-slate-800/50 p-2 rounded-xl transition-all text-left" title="Personalizar Perfil">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs text-white uppercase relative overflow-hidden" id="user-avatar">
+                                U
+                            </div>
+                            <div>
+                                <p id="user-display-name" class="text-xs font-bold text-white truncate max-w-[120px]"></p>
+                                <p id="user-tag" class="text-[10px] text-slate-500 font-medium truncate max-w-[120px]"></p>
+                            </div>
                         </div>
-                        <div>
-                            <p id="user-display-name" class="text-xs font-bold text-white truncate max-w-[140px]"></p>
-                            <p id="user-tag" class="text-[10px] text-slate-500 font-medium truncate max-w-[140px]"></p>
-                        </div>
-                    </div>
+                        <svg class="w-4 h-4 text-slate-500 hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
                 </div>
             </aside>
 
@@ -246,7 +267,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white" id="active-chat-avatar">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white animate-pulse" id="active-chat-avatar">
                             A
                         </div>
                         <div>
@@ -254,6 +275,14 @@
                             <p id="active-chat-status" class="text-[10px] text-slate-400 font-medium">@username</p>
                         </div>
                     </div>
+
+                    <!-- Botão de Configuração/Membros do Grupo (Só visível em Chat de Grupo) -->
+                    <button id="group-settings-btn" class="hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-semibold border border-slate-700 transition-all">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        Membros
+                    </button>
                 </div>
 
                 <!-- Feed de Mensagens -->
@@ -265,8 +294,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                             </svg>
                         </div>
-                        <h4 class="text-sm font-semibold text-slate-300">Escolha um amigo para conversar</h4>
-                        <p class="text-xs text-slate-500 text-center mt-1">Conecte-se instantaneamente, troque mensagens e divirta-se!</p>
+                        <h4 class="text-sm font-semibold text-slate-300">Escolha uma conversa ou grupo para começar</h4>
+                        <p class="text-xs text-slate-500 text-center mt-1">Troque mensagens e conecte-se instantaneamente!</p>
                     </div>
                     <div id="messages-container" class="space-y-4"></div>
                 </div>
@@ -284,6 +313,131 @@
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- MODAL DE CRIAR GRUPO -->
+    <div id="create-group-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Criar Novo Grupo</h3>
+                <button id="close-create-group-modal" class="text-slate-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="create-group-form" class="space-y-4">
+                <div>
+                    <label for="group-name-input" class="block text-xs font-medium text-slate-300">Nome do Grupo</label>
+                    <input id="group-name-input" type="text" placeholder="Ex: Projeto Integrador, Família" required class="mt-1 block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                </div>
+                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
+                    Criar Grupo
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDITAR PERFIL -->
+    <div id="profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Editar Seu Perfil</h3>
+                <button id="close-profile-modal" class="text-slate-400 hover:text-white" aria-label="Fechar modal de perfil">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="profile-form" class="space-y-4">
+                <div>
+                    <label for="profile-name-input" class="block text-xs font-medium text-slate-300">Seu Nome de Exibição</label>
+                    <input id="profile-name-input" type="text" placeholder="Ex: Luis Henrique" required class="mt-1 block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="profile-avatar-type" class="block text-xs font-medium text-slate-300">Tipo de Foto de Perfil</label>
+                    <select id="profile-avatar-type" class="mt-1 block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none">
+                        <option value="initial">Iniciais Padrão</option>
+                        <option value="emoji">Emoji personalizado</option>
+                        <option value="url">Link de Imagem (URL)</option>
+                    </select>
+                </div>
+                <div id="profile-avatar-value-group">
+                    <label id="profile-avatar-value-label" for="profile-avatar-value" class="block text-xs font-medium text-slate-300">Valor do Emoji ou URL</label>
+                    <input id="profile-avatar-value" type="text" placeholder="Ex: 🚀 ou https://..." class="mt-1 block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                </div>
+                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
+                    Salvar Alterações
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURAÇÕES DE MEMBROS DO GRUPO -->
+    <div id="group-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 id="settings-group-title" class="text-sm font-bold text-white truncate max-w-[250px]">Membros do Grupo</h3>
+                    <p id="settings-group-creator" class="text-[10px] text-slate-400">Criado por @username</p>
+                </div>
+                <button id="close-group-settings-modal" class="text-slate-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- EDITAR DETALHES DO GRUPO (Apenas Criador) -->
+            <div id="admin-group-details-section" class="hidden border-b border-slate-800 pb-4 space-y-3">
+                <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Personalizar Grupo</h4>
+                <form id="edit-group-details-form" class="space-y-2">
+                    <div>
+                        <label for="edit-group-name" class="block text-[10px] text-slate-400">Nome do Grupo</label>
+                        <input id="edit-group-name" type="text" required class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="edit-group-avatar-type" class="block text-[10px] text-slate-400">Tipo de Logo</label>
+                            <select id="edit-group-avatar-type" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-2 py-2 text-xs text-slate-100 focus:outline-none">
+                                <option value="initial">Iniciais</option>
+                                <option value="emoji">Emoji</option>
+                                <option value="url">Link de Imagem (URL)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label id="edit-group-avatar-value-label" for="edit-group-avatar-value" class="block text-[10px] text-slate-400">Emoji ou Link</label>
+                            <input id="edit-group-avatar-value" type="text" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 font-bold py-2 rounded-xl text-xs transition-all border border-emerald-500/30">
+                        Salvar Configurações do Grupo
+                    </button>
+                </form>
+            </div>
+
+            <!-- Formulário para o Criador Adicionar Novos Membros -->
+            <div id="admin-add-member-section" class="hidden border-b border-slate-800 pb-4 space-y-2">
+                <label for="new-member-username" class="block text-xs font-medium text-emerald-400">Convidar Novo Membro</label>
+                <form id="add-member-form" class="flex gap-2">
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-xs">@</span>
+                        <input id="new-member-username" type="text" placeholder="luis_prog" required class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 pl-7 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 focus:outline-none">
+                    </div>
+                    <button type="submit" class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition-all border border-emerald-500/30">
+                        Convidar
+                    </button>
+                </form>
+            </div>
+
+            <!-- Lista de Membros Cadastrados -->
+            <div class="space-y-2">
+                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Membros do Canal</h4>
+                <div id="group-members-container" class="max-h-60 overflow-y-auto space-y-1 pr-1">
+                    <!-- Membros injetados via JS -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Script de lógica do app -->
@@ -324,12 +478,38 @@
             }
         }
 
-        // --- MEMÓRIA DO SIMULADOR OFFLINE (Sincronização entre abas e cache local) ---
+        function setupFavicon() {
+            const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="url(#grad)"/><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><path d="M30 45h.01M50 45h.01M70 45h.01M80 45c0 16.5-13.5 30-30 30a32.8 32.8 0 01-14.2-3.2L16 75l4.6-12.4C17.7 56.8 16 51.1 16 45c0-16.5 13.5-30 30-30s30 13.5 30 30z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>`;
+            const faviconUrl = `data:image/svg+xml;utf8,${encodeURIComponent(faviconSvg)}`;
+            let link = document.querySelector("link[rel*='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            link.href = faviconUrl;
+        }
+
+        function getAvatarHTML(type, value, fallbackInitial, bgGradientClass = 'from-indigo-500 to-indigo-600') {
+            if (type === 'url' && value && value.trim() !== '') {
+                const cleanUrl = value.replace(/"/g, '&quot;');
+                return `<img src="${cleanUrl}" class="w-full h-full object-cover rounded-full" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="hidden w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} items-center justify-center font-bold text-white uppercase">${fallbackInitial}</div>`;
+            } else if (type === 'emoji' && value && value.trim() !== '') {
+                return `<div class="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-lg leading-none" style="display:flex;">${value}</div>`;
+            } else {
+                return `<div class="w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} flex items-center justify-center font-bold text-white uppercase" style="display:flex;">${fallbackInitial}</div>`;
+            }
+        }
+
+        // --- MEMÓRIA DO SIMULADOR OFFLINE (Suporta Grupos Offline!) ---
         const syncChannel = window.BroadcastChannel ? new BroadcastChannel('conectachat-live-fallback') : null;
         let simData = {
             accounts: {},
             friends: {},
-            messages: []
+            messages: [],
+            groups: {},         // groupId -> { id, name, creator, members, avatarType, avatarValue }
+            groupMessages: []   // array de msg de grupos
         };
 
         function loadLocalSimulationData() {
@@ -337,6 +517,8 @@
                 const saved = localStorage.getItem('conectachat_offline_db');
                 if (saved) {
                     simData = JSON.parse(saved);
+                    if (!simData.groups) simData.groups = {};
+                    if (!simData.groupMessages) simData.groupMessages = [];
                 }
             } catch (e) {
                 console.warn("Erro ao ler localStorage:", e);
@@ -354,7 +536,6 @@
             }
         }
 
-        // Se uma aba alterar algo offline, as outras sincronizam no mesmo segundo!
         if (syncChannel) {
             syncChannel.onmessage = (event) => {
                 if (event.data && event.data.type === 'SYNC_STATE') {
@@ -367,16 +548,14 @@
             };
         }
 
-        // Ativação dinâmica do Fallback se houver erro offline
-        function activateOfflineFallback(reason) {
-            if (isOfflineMode) return; // Já está ativado
+        function activateOfflineFallback() {
+            if (isOfflineMode) return;
             isOfflineMode = true;
             loadLocalSimulationData();
             accountsMap = simData.accounts;
-            setStatusBanner('offline', `MODO OFFLINE ATIVO: Navegador bloqueou rede externa. Use o Live Server do VS Code ou continue offline!`);
+            setStatusBanner('offline', `MODO OFFLINE ATIVO: Use localmente ou conecte-se à internet para usar o Firebase!`);
             showToast("Alternando para o banco de dados seguro local offline.", "warning");
             
-            // Re-renderizar dados se o usuário já estiver dentro do app
             if (currentUser) {
                 triggerOfflineCallbacks();
             }
@@ -387,26 +566,28 @@
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
-            // Configurar Firestore com desativação de stream de rede e pooling longo agressivo
             db = initializeFirestore(app, {
                 experimentalForceLongPolling: true,
                 useFetchStreams: false
             });
         } catch (err) {
             console.error("Falha ao configurar Firebase SDK:", err);
-            activateOfflineFallback("Erro na inicialização do Firebase.");
+            activateOfflineFallback();
         }
 
         // Estado do App
         let firebaseAuthenticated = false;
-        let currentUser = null; // Guardará o perfil local `{username, name, uid}`
-        let activeFriend = null; // Guardará o perfil de quem estamos conversando `{username, name}`
-        let accountsMap = {}; // Cache de todos os usuários registrados
-        let lastAccountData = null; // Guardará as credenciais para o login rápido neste dispositivo
+        let currentUser = null; // Perfil local `{username, name, uid, avatarType, avatarValue}`
+        let activeFriend = null; // Amigo ativo `{username, name}`
+        let activeGroup = null;  // Grupo ativo `{id, name, creator, members, avatarType, avatarValue}`
+        let accountsMap = {}; // Cache de contas
+        let lastAccountData = null; // Credenciais para login rápido
         let unsubscribeFriends = null;
+        let unsubscribeGroups = null;
         let unsubscribeMessages = null;
+        let unsubscribeGroupMessages = null;
 
-        // Custom Toast Notification Maker
+        // Custom Toast
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             if (!container) return;
@@ -425,18 +606,13 @@
             `;
             
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
         }
 
-        // Autenticar Anonimamente Antes de Qualquer Ação (Regra 3)
         async function authenticateFirebase() {
             if (isOfflineMode) return;
             try {
@@ -448,12 +624,7 @@
                 }
                 firebaseAuthenticated = true;
                 setStatusBanner('real', 'Conectado ao Firebase Cloud Server');
-                console.log("Autenticação de retaguarda concluída.");
-                
-                // Buscar dados do cache de contas em tempo real
                 startListeningAccounts();
-                
-                // Procurar por atalhos de última conta logada neste dispositivo (Regra 3 - Após Auth)
                 await checkLastAccount();
             } catch (err) {
                 console.warn("Autenticação falhou por bloqueio local. Ativando Modo Offline Simulado:", err);
@@ -461,7 +632,6 @@
             }
         }
 
-        // Buscar dados de login rápido do dispositivo no banco de dados privado (Regra 1)
         async function checkLastAccount() {
             if (isOfflineMode) {
                 const localSavedAcc = localStorage.getItem('conectachat_last_account');
@@ -481,11 +651,10 @@
                     showLastAccountUI(lastAccountData);
                 }
             } catch (err) {
-                console.warn("Não foi possível carregar a última conta deste dispositivo remotamente:", err);
+                console.warn("Não foi possível carregar a última conta remotamente:", err);
             }
         }
 
-        // Exibir botão de login rápido com a última conta conectada
         function showLastAccountUI(data) {
             const container = document.getElementById('last-account-container');
             const userLabel = document.getElementById('last-account-user');
@@ -499,7 +668,6 @@
             }
         }
 
-        // Cachear contas registradas em tempo real
         function startListeningAccounts() {
             if (isOfflineMode) return;
             const accountsCol = collection(db, 'artifacts', appId, 'public', 'data', 'accounts');
@@ -509,15 +677,18 @@
                     accountsMap[doc.id] = doc.data();
                 });
                 console.log("Sincronização de contas concluída.");
+                if (currentUser && accountsMap[currentUser.username]) {
+                    currentUser = accountsMap[currentUser.username];
+                    updateUIPersonalProfile();
+                }
             }, (error) => {
                 if (error.message?.includes('offline') || error.code === 'unavailable' || error.message?.includes('client is offline')) {
                     activateOfflineFallback();
                 }
-                console.error("Aviso: Sincronização de contas suspensa temporariamente.", error);
             });
         }
 
-        // Manipulação do Formulário de Login/Registro
+        // Configurações do formulário
         const authForm = document.getElementById('auth-form');
         const authTitle = document.getElementById('auth-title');
         const displayNameGroup = document.getElementById('display-name-group');
@@ -525,7 +696,6 @@
         const authSubmitBtn = document.getElementById('auth-submit-btn');
         let registerMode = false;
 
-        // Alternar entre login e registro
         toggleAuthModeBtn.addEventListener('click', () => {
             registerMode = !registerMode;
             if (registerMode) {
@@ -547,42 +717,30 @@
             }
         });
 
-        // Configurar evento de clique para o atalho de Entrada Rápida
         document.getElementById('last-account-btn').addEventListener('click', () => {
             if (!lastAccountData) return;
-            
             document.getElementById('auth-username').value = lastAccountData.username;
             document.getElementById('auth-password').value = lastAccountData.password;
-            
-            if (registerMode) {
-                toggleAuthModeBtn.click();
-            }
-            
-            // Submeter automaticamente
+            if (registerMode) toggleAuthModeBtn.click();
             authForm.dispatchEvent(new Event('submit'));
         });
 
-        // Evento de Envio do formulário de autenticação
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const usernameInput = document.getElementById('auth-username').value.trim().toLowerCase();
             const passwordInput = document.getElementById('auth-password').value;
             const displayNameInput = document.getElementById('reg-name').value.trim();
 
-            // Validação de segurança simples
             if (!/^[a-zA-Z0-9_]{3,15}$/.test(usernameInput)) {
                 showToast("O nome de usuário deve conter apenas letras, números ou '_' e ter de 3 a 15 caracteres.", "error");
                 return;
             }
 
             if (registerMode) {
-                // REGISTRO
                 if (isOfflineMode) {
                     executeOfflineRegistration(usernameInput, displayNameInput, passwordInput);
                     return;
                 }
-
                 try {
                     const userCheckRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
                     const docSnap = await getDoc(userCheckRef);
@@ -595,20 +753,18 @@
                         username: usernameInput,
                         name: displayNameInput || usernameInput,
                         password: passwordInput,
-                        uid: auth.currentUser?.uid || crypto.randomUUID()
+                        uid: auth.currentUser?.uid || crypto.randomUUID(),
+                        avatarType: 'initial',
+                        avatarValue: ''
                     };
 
                     await setDoc(userCheckRef, newUserData);
                     showToast("Sua conta foi criada! Faça login agora.");
-                    
-                    // Atualizar cache imediatamente
                     accountsMap[usernameInput] = newUserData;
-                    
-                    // Mudar para tela de login automaticamente
                     toggleAuthModeBtn.click();
                     document.getElementById('auth-password').value = '';
                 } catch (err) {
-                    if (err.code === 'unavailable' || !navigator.onLine || err.message?.toLowerCase().includes('offline') || err.message?.toLowerCase().includes('failed') || err.message?.toLowerCase().includes('client is offline')) {
+                    if (err.code === 'unavailable' || !navigator.onLine || err.message?.toLowerCase().includes('offline') || err.message?.toLowerCase().includes('client is offline')) {
                         activateOfflineFallback();
                         executeOfflineRegistration(usernameInput, displayNameInput, passwordInput);
                     } else {
@@ -617,12 +773,10 @@
                     }
                 }
             } else {
-                // LOGIN
                 if (isOfflineMode) {
                     executeOfflineLogin(usernameInput, passwordInput);
                     return;
                 }
-
                 try {
                     const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
                     const userSnap = await getDoc(userDocRef);
@@ -638,11 +792,9 @@
                         return;
                     }
 
-                    // Definir usuário atual logado
                     currentUser = matchedUser;
                     showToast(`Bem-vindo de volta, ${currentUser.name}!`);
                     
-                    // Persistir credenciais de login rápido localmente via Firestore Privado
                     const userId = auth.currentUser?.uid;
                     if (userId) {
                         try {
@@ -653,22 +805,15 @@
                                 password: passwordInput,
                                 timestamp: Date.now()
                             });
-                            
-                            // Atualizar cache local do script
-                            lastAccountData = {
-                                username: currentUser.username,
-                                name: currentUser.name,
-                                password: passwordInput
-                            };
+                            lastAccountData = { username: currentUser.username, name: currentUser.name, password: passwordInput };
                             showLastAccountUI(lastAccountData);
                         } catch (err) {
                             console.warn("Não foi possível salvar o atalho de login no servidor:", err);
                         }
                     }
-                    
                     enterApplication();
                 } catch (err) {
-                    if (err.code === 'unavailable' || !navigator.onLine || err.message?.toLowerCase().includes('offline') || err.message?.toLowerCase().includes('failed') || err.message?.toLowerCase().includes('client is offline')) {
+                    if (err.code === 'unavailable' || !navigator.onLine || err.message?.toLowerCase().includes('offline') || err.message?.toLowerCase().includes('client is offline')) {
                         activateOfflineFallback();
                         executeOfflineLogin(usernameInput, passwordInput);
                     } else {
@@ -679,7 +824,6 @@
             }
         });
 
-        // Funções de login e cadastro offline inline, garantindo que o fluxo prossiga perfeitamente
         function executeOfflineRegistration(usernameInput, displayNameInput, passwordInput) {
             if (simData.accounts[usernameInput]) {
                 showToast("Este nome de usuário já está sendo usado localmente.", "error");
@@ -689,7 +833,9 @@
                 username: usernameInput,
                 name: displayNameInput || usernameInput,
                 password: passwordInput,
-                uid: crypto.randomUUID()
+                uid: crypto.randomUUID(),
+                avatarType: 'initial',
+                avatarValue: ''
             };
             simData.accounts[usernameInput] = newUserData;
             saveLocalSimulationData();
@@ -707,37 +853,125 @@
             }
             currentUser = matchedUser;
             showToast(`Conectado no Modo Offline como ${currentUser.name}!`);
-            
-            // Salvar login rápido localmente
             const backup = { username: currentUser.username, name: currentUser.name, password: passwordInput };
             localStorage.setItem('conectachat_last_account', JSON.stringify(backup));
             lastAccountData = backup;
             showLastAccountUI(lastAccountData);
-
             enterApplication();
         }
 
-        // Entrar no aplicativo e configurar interface
         function enterApplication() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
 
-            // Configurar Informações Visuais no App
             document.getElementById('user-identity').innerText = `@${currentUser.username}`;
-            document.getElementById('user-display-name').innerText = currentUser.name;
             document.getElementById('user-tag').innerText = `@${currentUser.username}`;
-            document.getElementById('user-avatar').innerText = currentUser.name.charAt(0).toUpperCase();
 
-            // Inicializar escutas de dados do usuário
+            updateUIPersonalProfile();
             startUserSession();
         }
 
-        // Enviar os dados locais aos painéis se estiver offline
+        const profileModal = document.getElementById('profile-modal');
+        const profileForm = document.getElementById('profile-form');
+        const profileNameInput = document.getElementById('profile-name-input');
+        const profileAvatarType = document.getElementById('profile-avatar-type');
+        const profileAvatarValue = document.getElementById('profile-avatar-value');
+        const profileAvatarValueGroup = document.getElementById('profile-avatar-value-group');
+        const profileAvatarValueLabel = document.getElementById('profile-avatar-value-label');
+
+        document.getElementById('profile-footer-trigger').addEventListener('click', () => {
+            if (!currentUser) return;
+            profileNameInput.value = currentUser.name;
+            profileAvatarType.value = currentUser.avatarType || 'initial';
+            profileAvatarValue.value = currentUser.avatarValue || '';
+            
+            toggleProfileAvatarInputs();
+            profileModal.classList.remove('hidden');
+        });
+
+        document.getElementById('close-profile-modal').addEventListener('click', () => {
+            profileModal.classList.add('hidden');
+        });
+
+        profileAvatarType.addEventListener('change', toggleProfileAvatarInputs);
+
+        function toggleProfileAvatarInputs() {
+            const val = profileAvatarType.value;
+            if (val === 'initial') {
+                profileAvatarValueGroup.classList.add('hidden');
+            } else {
+                profileAvatarValueGroup.classList.remove('hidden');
+                if (val === 'emoji') {
+                    profileAvatarValueLabel.innerText = "Emoji personalizado";
+                    profileAvatarValue.placeholder = "Ex: 💬, 🎮, 🦄";
+                } else if (val === 'url') {
+                    profileAvatarValueLabel.innerText = "Link de Imagem (URL)";
+                    profileAvatarValue.placeholder = "Ex: https://dominio.com/foto.jpg";
+                }
+            }
+        }
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newName = profileNameInput.value.trim();
+            const newType = profileAvatarType.value;
+            const newValue = profileAvatarValue.value.trim();
+
+            if (!newName) return;
+
+            const updatedUserData = {
+                ...currentUser,
+                name: newName,
+                avatarType: newType,
+                avatarValue: newValue
+            };
+
+            if (isOfflineMode) {
+                simData.accounts[currentUser.username] = updatedUserData;
+                saveLocalSimulationData();
+                currentUser = updatedUserData;
+                accountsMap = simData.accounts;
+                updateUIPersonalProfile();
+                triggerOfflineCallbacks();
+                showToast("Seu perfil foi atualizado offline!");
+                profileModal.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', currentUser.username);
+                await setDoc(userDocRef, updatedUserData);
+                
+                currentUser = updatedUserData;
+                accountsMap[currentUser.username] = updatedUserData;
+                updateUIPersonalProfile();
+                showToast("Seu perfil foi atualizado!");
+                profileModal.classList.add('hidden');
+            } catch (err) {
+                console.error("Erro ao atualizar perfil:", err);
+                showToast("Erro ao salvar alterações do perfil.", "error");
+            }
+        });
+
+        function updateUIPersonalProfile() {
+            if (!currentUser) return;
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('user-avatar').innerHTML = getAvatarHTML(currentUser.avatarType, currentUser.avatarValue, currentUser.name.charAt(0).toUpperCase());
+            
+            // se o chat atual ativo for o seu próprio, atualize na tela
+            if (activeFriend && activeFriend.username === currentUser.username) {
+                document.getElementById('active-chat-name').innerText = currentUser.name;
+                document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(currentUser.avatarType, currentUser.avatarValue, currentUser.name.charAt(0).toUpperCase());
+            }
+        }
+
         function triggerOfflineCallbacks() {
             const friendsList = [];
             const reqReceived = [];
             const reqSent = [];
+            const groupsList = [];
 
+            // 1. Sincronizar Amizades e Solicitações Offline
             Object.values(simData.friends).forEach(data => {
                 if (data.status === 'accepted') {
                     if (data.sender === currentUser.username) {
@@ -754,10 +988,18 @@
                 }
             });
 
+            // 2. Sincronizar Grupos Offline
+            Object.values(simData.groups).forEach(data => {
+                if (data.members.includes(currentUser.username)) {
+                    groupsList.push(data);
+                }
+            });
+
             renderFriends(friendsList);
             renderRequests(reqReceived, reqSent);
+            renderGroups(groupsList);
 
-            // Atualizar conversa ativa se aberta
+            // 3. Conversa DM Ativa Offline
             if (activeFriend) {
                 const messagesList = simData.messages.filter(msg => {
                     const isFromMeToFriend = (msg.sender === currentUser.username && msg.receiver === activeFriend.username);
@@ -767,21 +1009,37 @@
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
                 renderMessages(messagesList);
             }
+
+            // 4. Conversa de Grupo Ativa Offline
+            if (activeGroup) {
+                // Verificar se ainda sou membro
+                const freshGroup = simData.groups[activeGroup.id];
+                if (!freshGroup || !freshGroup.members.includes(currentUser.username)) {
+                    showToast("Você foi removido deste grupo.", "error");
+                    closeActiveChat();
+                    return;
+                }
+                activeGroup = freshGroup; // atualizar referencial local
+
+                const messagesList = simData.groupMessages.filter(msg => msg.groupId === activeGroup.id);
+                messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                renderGroupMessages(messagesList);
+            }
         }
 
-        // Inicializar canais de escuta após o login do usuário
         function startUserSession() {
             if (unsubscribeFriends) unsubscribeFriends();
+            if (unsubscribeGroups) unsubscribeGroups();
             if (unsubscribeMessages) unsubscribeMessages();
+            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
 
             if (isOfflineMode) {
                 triggerOfflineCallbacks();
                 return;
             }
 
-            // Sincronizar Amigos e Solicitações reais no Firebase
+            // Escutar Amizades no Firebase
             const friendsCol = collection(db, 'artifacts', appId, 'public', 'data', 'friends');
-            
             unsubscribeFriends = onSnapshot(friendsCol, (snapshot) => {
                 const friendsList = [];
                 const reqReceived = [];
@@ -789,7 +1047,6 @@
 
                 snapshot.forEach(doc => {
                     const data = { id: doc.id, ...doc.data() };
-                    
                     if (data.status === 'accepted') {
                         if (data.sender === currentUser.username) {
                             friendsList.push({ requestDocId: data.id, friendUsername: data.receiver });
@@ -799,8 +1056,7 @@
                     } else if (data.status === 'pending') {
                         if (data.receiver === currentUser.username) {
                             reqReceived.push(data);
-                        }
-                        else if (data.sender === currentUser.username) {
+                        } else if (data.sender === currentUser.username) {
                             reqSent.push(data);
                         }
                     }
@@ -811,13 +1067,43 @@
             }, (error) => {
                 if (error.message?.includes('offline') || error.code === 'unavailable' || error.message?.includes('client is offline')) {
                     activateOfflineFallback();
-                } else {
-                    console.error("Erro ao escutar amizades:", error);
+                }
+            });
+
+            // Escutar Grupos do Usuário no Firebase
+            const groupsCol = collection(db, 'artifacts', appId, 'public', 'data', 'groups');
+            unsubscribeGroups = onSnapshot(groupsCol, (snapshot) => {
+                const groupsList = [];
+                snapshot.forEach(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    if (data.members && data.members.includes(currentUser.username)) {
+                        groupsList.push(data);
+                    }
+                });
+
+                renderGroups(groupsList);
+
+                // Se houver canal de grupo ativo, validar se o usuário ainda pertence a ele
+                if (activeGroup) {
+                    const freshGroup = groupsList.find(g => g.id === activeGroup.id);
+                    if (!freshGroup) {
+                        showToast("Você foi removido ou o grupo foi excluído.", "error");
+                        closeActiveChat();
+                    } else {
+                        activeGroup = freshGroup; // atualiza estado
+                        // Atualizar cabeçalho do grupo em tempo real
+                        document.getElementById('active-chat-name').innerText = activeGroup.name;
+                        document.getElementById('active-chat-status').innerText = `${activeGroup.members.length} membros • Criado por @${activeGroup.creator}`;
+                        document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(activeGroup.avatarType, activeGroup.avatarValue, activeGroup.name.charAt(0).toUpperCase(), 'from-emerald-500 to-teal-500');
+                    }
+                }
+            }, (error) => {
+                if (error.message?.includes('offline') || error.code === 'unavailable') {
+                    activateOfflineFallback();
                 }
             });
         }
 
-        // Renderizar amigos confirmados na tela lateral
         function renderFriends(friends) {
             const container = document.getElementById('friends-container');
             const emptyEl = document.getElementById('friends-empty');
@@ -842,12 +1128,19 @@
 
                 const friendItem = document.createElement('div');
                 friendItem.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${activeClass}`;
+                
+                const avatarHTML = getAvatarHTML(
+                    friendData ? friendData.avatarType : 'initial',
+                    friendData ? friendData.avatarValue : '',
+                    displayName.charAt(0).toUpperCase()
+                );
+
                 friendItem.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center font-bold text-xs text-indigo-400 uppercase">
-                            ${displayName.charAt(0)}
+                    <div class="flex items-center gap-3 w-full">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 relative overflow-hidden">
+                            ${avatarHTML}
                         </div>
-                        <div>
+                        <div class="truncate flex-1">
                             <p class="text-xs font-bold truncate max-w-[140px]">${displayName}</p>
                             <p class="text-[10px] text-slate-500 font-medium">@${f.friendUsername}</p>
                         </div>
@@ -862,7 +1155,51 @@
             });
         }
 
-        // Renderizar os pedidos pendentes (com melhorias de acessibilidade em botões)
+        function renderGroups(groups) {
+            const container = document.getElementById('groups-container');
+            const emptyEl = document.getElementById('groups-empty');
+            const countGroupsEl = document.getElementById('count-groups');
+
+            container.innerHTML = '';
+            countGroupsEl.innerText = groups.length;
+
+            if (groups.length === 0) {
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+
+            emptyEl.classList.add('hidden');
+
+            groups.forEach(g => {
+                const activeClass = (activeGroup && activeGroup.id === g.id)
+                    ? 'bg-emerald-600/20 border-emerald-500/40 text-white'
+                    : 'bg-slate-950/40 hover:bg-slate-800/60 border-transparent text-slate-300';
+
+                const groupItem = document.createElement('div');
+                groupItem.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${activeClass}`;
+                
+                const avatarHTML = getAvatarHTML(g.avatarType, g.avatarValue, g.name.charAt(0).toUpperCase(), 'from-emerald-500 to-teal-500');
+
+                groupItem.innerHTML = `
+                    <div class="flex items-center gap-3 w-full">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 relative overflow-hidden">
+                            ${avatarHTML}
+                        </div>
+                        <div class="truncate flex-1">
+                            <p class="text-xs font-bold truncate max-w-[140px]">${g.name}</p>
+                            <p class="text-[10px] text-slate-500 font-medium">${g.members.length} membros</p>
+                        </div>
+                    </div>
+                `;
+
+                groupItem.addEventListener('click', () => {
+                    openGroupChatWith(g);
+                });
+
+                container.appendChild(groupItem);
+            });
+        }
+
         function renderRequests(received, sent) {
             const receivedContainer = document.getElementById('req-received-container');
             const sentContainer = document.getElementById('req-sent-container');
@@ -875,7 +1212,6 @@
                 badgeRequests.classList.add('hidden');
             }
 
-            // Renderizar recebidos
             receivedContainer.innerHTML = '';
             if (received.length === 0) {
                 receivedContainer.innerHTML = '<p class="text-[11px] text-slate-600 py-2 italic text-center">Nenhum pedido recebido</p>';
@@ -902,14 +1238,12 @@
                             </button>
                         </div>
                     `;
-
                     item.querySelector('.accept-btn').addEventListener('click', () => handleAcceptRequest(req.id, req.sender));
                     item.querySelector('.decline-btn').addEventListener('click', () => handleDeleteRequest(req.id));
                     receivedContainer.appendChild(item);
                 });
             }
 
-            // Renderizar enviados
             sentContainer.innerHTML = '';
             if (sent.length === 0) {
                 sentContainer.innerHTML = '<p class="text-[11px] text-slate-600 py-2 italic text-center">Nenhum pedido pendente</p>';
@@ -935,14 +1269,12 @@
             }
         }
 
-        // Formulário de Adição de Amigos
         document.getElementById('add-friend-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('friend-search-input');
             const targetUsername = input.value.trim().toLowerCase();
 
             if (!targetUsername) return;
-
             if (targetUsername === currentUser.username) {
                 showToast("Você não pode adicionar a si mesmo!", "error");
                 return;
@@ -1011,7 +1343,6 @@
             } catch (err) {
                 if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
                     activateOfflineFallback();
-                    // Chamar novamente agora no modo offline
                     document.getElementById('add-friend-form').dispatchEvent(new Event('submit'));
                 } else {
                     console.error("Erro ao enviar pedido de amizade:", err);
@@ -1020,7 +1351,6 @@
             }
         });
 
-        // Aceitar solicitação recebida
         async function handleAcceptRequest(docId, senderUsername) {
             if (isOfflineMode) {
                 if (simData.friends[docId]) {
@@ -1031,11 +1361,8 @@
                 }
                 return;
             }
-
             try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), {
-                    status: 'accepted'
-                });
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), { status: 'accepted' });
                 showToast(`Você agora é amigo de @${senderUsername}!`);
             } catch (err) {
                 if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
@@ -1043,12 +1370,10 @@
                     handleAcceptRequest(docId, senderUsername);
                 } else {
                     console.error("Erro ao aceitar amizade:", err);
-                    showToast("Erro ao aceitar convite.", "error");
                 }
             }
         }
 
-        // Recusar ou Cancelar solicitação
         async function handleDeleteRequest(docId) {
             if (isOfflineMode) {
                 if (simData.friends[docId]) {
@@ -1059,7 +1384,6 @@
                 }
                 return;
             }
-
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
                 showToast("Solicitação de amizade resolvida.");
@@ -1067,16 +1391,119 @@
                 if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
                     activateOfflineFallback();
                     handleDeleteRequest(docId);
-                } else {
-                    console.error("Erro ao remover solicitação:", err);
-                    showToast("Erro ao deletar solicitação.", "error");
                 }
             }
         }
 
-        // Abrir chat ativo com um amigo
+        const createGroupModal = document.getElementById('create-group-modal');
+        document.getElementById('open-create-group-modal').addEventListener('click', () => {
+            createGroupModal.classList.remove('hidden');
+        });
+        document.getElementById('close-create-group-modal').addEventListener('click', () => {
+            createGroupModal.classList.add('hidden');
+        });
+
+        document.getElementById('create-group-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const groupNameInput = document.getElementById('group-name-input');
+            const name = groupNameInput.value.trim();
+
+            if (!name) return;
+
+            const groupId = `group_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+            const groupPayload = {
+                id: groupId,
+                name: name,
+                creator: currentUser.username,
+                members: [currentUser.username],
+                timestamp: Date.now(),
+                avatarType: 'initial',
+                avatarValue: ''
+            };
+
+            if (isOfflineMode) {
+                simData.groups[groupId] = groupPayload;
+                saveLocalSimulationData();
+                triggerOfflineCallbacks();
+                showToast(`Grupo "${name}" criado com sucesso offline!`);
+                groupNameInput.value = '';
+                createGroupModal.classList.add('hidden');
+                openGroupChatWith(groupPayload);
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', groupId), groupPayload);
+                showToast(`Grupo "${name}" criado com sucesso!`);
+                groupNameInput.value = '';
+                createGroupModal.classList.add('hidden');
+                openGroupChatWith(groupPayload);
+            } catch (err) {
+                console.error("Erro ao criar grupo no Firebase:", err);
+                showToast("Erro ao criar grupo.", "error");
+            }
+        });
+
+        function closeActiveChat() {
+            activeFriend = null;
+            activeGroup = null;
+            document.getElementById('chat-panel').classList.add('hidden');
+            document.getElementById('chat-panel').classList.remove('flex');
+            document.getElementById('group-settings-btn').classList.add('hidden');
+        }
+
         function openChatWith(friend) {
             activeFriend = friend;
+            activeGroup = null;
+
+            document.getElementById('chat-panel').classList.remove('hidden');
+            document.getElementById('chat-panel').classList.add('flex');
+            
+            document.getElementById('chat-header').classList.remove('hidden');
+            document.getElementById('chat-input-bar').classList.remove('hidden');
+            document.getElementById('chat-placeholder').classList.add('hidden');
+            document.getElementById('group-settings-btn').classList.add('hidden');
+            
+            document.getElementById('active-chat-name').innerText = friend.name;
+            document.getElementById('active-chat-status').innerText = `@${friend.username}`;
+            
+            const friendData = accountsMap[friend.username] || friend;
+            document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(friendData.avatarType, friendData.avatarValue, friend.name.charAt(0).toUpperCase());
+            document.getElementById('active-chat-avatar').className = "w-9 h-9 rounded-full font-bold text-sm text-white flex items-center justify-center shrink-0 relative overflow-hidden";
+
+            startUserSession();
+
+            if (unsubscribeMessages) unsubscribeMessages();
+            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
+
+            if (isOfflineMode) {
+                triggerOfflineCallbacks();
+                return;
+            }
+
+            const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+            unsubscribeMessages = onSnapshot(messagesCol, (snapshot) => {
+                const messagesList = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
+                    const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
+                    if (isFromMeToFriend || isFromFriendToMe) {
+                        messagesList.push(data);
+                    }
+                });
+                messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                renderMessages(messagesList);
+            }, (error) => {
+                if (error.message?.includes('offline') || error.code === 'unavailable' || error.message?.includes('client is offline')) {
+                    activateOfflineFallback();
+                }
+            });
+        }
+
+        function openGroupChatWith(group) {
+            activeGroup = group;
+            activeFriend = null;
 
             document.getElementById('chat-panel').classList.remove('hidden');
             document.getElementById('chat-panel').classList.add('flex');
@@ -1085,45 +1512,45 @@
             document.getElementById('chat-input-bar').classList.remove('hidden');
             document.getElementById('chat-placeholder').classList.add('hidden');
             
-            document.getElementById('active-chat-name').innerText = friend.name;
-            document.getElementById('active-chat-status').innerText = `@${friend.username}`;
-            document.getElementById('active-chat-avatar').innerText = friend.name.charAt(0).toUpperCase();
+            // Exibir botão de membros
+            document.getElementById('group-settings-btn').classList.remove('hidden');
+            
+            document.getElementById('active-chat-name').innerText = group.name;
+            document.getElementById('active-chat-status').innerText = `${group.members.length} membros • Criado por @${group.creator}`;
+            
+            const avatarHTML = getAvatarHTML(group.avatarType, group.avatarValue, group.name.charAt(0).toUpperCase(), 'from-emerald-500 to-teal-500');
+            document.getElementById('active-chat-avatar').innerHTML = avatarHTML;
+            document.getElementById('active-chat-avatar').className = "w-9 h-9 rounded-full font-bold text-sm text-white flex items-center justify-center shrink-0 relative overflow-hidden";
 
             startUserSession();
 
             if (unsubscribeMessages) unsubscribeMessages();
+            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
 
             if (isOfflineMode) {
                 triggerOfflineCallbacks();
                 return;
             }
 
-            const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-            
-            unsubscribeMessages = onSnapshot(messagesCol, (snapshot) => {
+            // Ouvir Mensagens do Grupo de forma síncrona
+            const groupMessagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'group_messages');
+            unsubscribeGroupMessages = onSnapshot(groupMessagesCol, (snapshot) => {
                 const messagesList = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
-                    const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
-                    
-                    if (isFromMeToFriend || isFromFriendToMe) {
+                    if (data.groupId === activeGroup.id) {
                         messagesList.push(data);
                     }
                 });
-
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
-                renderMessages(messagesList);
+                renderGroupMessages(messagesList);
             }, (error) => {
-                if (error.message?.includes('offline') || error.code === 'unavailable' || error.message?.includes('client is offline')) {
+                if (error.message?.includes('offline') || error.code === 'unavailable') {
                     activateOfflineFallback();
-                } else {
-                    console.error("Erro ao carregar chat:", error);
                 }
             });
         }
 
-        // Renderizar a lista ordenada de mensagens
         function renderMessages(messages) {
             const container = document.getElementById('messages-container');
             container.innerHTML = '';
@@ -1131,7 +1558,7 @@
             if (messages.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-12 text-slate-600 text-xs">
-                        Este é o começo da sua conversa com <strong class="text-slate-400">${activeFriend.name}</strong>.<br>
+                        Este é o começo da sua conversa privada com <strong class="text-slate-400">${activeFriend.name}</strong>.<br>
                         Mande uma mensagem para começar a bater papo!
                     </div>
                 `;
@@ -1164,93 +1591,392 @@
             chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
         }
 
-        // Evento de Envio do Formulário do Chat
+        function renderGroupMessages(messages) {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-600 text-xs">
+                        Este é o início do histórico do grupo #<strong class="text-slate-400">${activeGroup.name}</strong>.<br>
+                        Escreva algo para que todos leiam!
+                    </div>
+                `;
+                return;
+            }
+
+            messages.forEach(msg => {
+                const isMine = msg.sender === currentUser.username;
+                const alignmentClass = isMine ? 'justify-end' : 'justify-start';
+                const bubbleColor = isMine 
+                    ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-br-none shadow-md shadow-emerald-500/10' 
+                    : 'bg-slate-900 border border-slate-800 text-slate-100 rounded-bl-none';
+
+                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const msgElement = document.createElement('div');
+                msgElement.className = `flex ${alignmentClass} w-full`;
+                
+                // Mostrar o nome do remetente acima do balão se for outra pessoa
+                const senderHeader = !isMine 
+                    ? `<p class="text-[10px] font-bold text-slate-400 mb-1">@${msg.senderName || msg.sender}</p>` 
+                    : '';
+
+                msgElement.innerHTML = `
+                    <div class="max-w-[75%] flex flex-col ${isMine ? 'items-end' : 'items-start'}">
+                        ${senderHeader}
+                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor}">
+                            ${msg.text}
+                        </div>
+                        <p class="text-[9px] text-slate-500 mt-1">${time}</p>
+                    </div>
+                `;
+                container.appendChild(msgElement);
+            });
+
+            const chatMessagesDiv = document.getElementById('chat-messages');
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }
+
         document.getElementById('chat-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('message-input');
             const text = input.value.trim();
 
-            if (!text || !activeFriend) return;
+            if (!text) return;
 
-            if (isOfflineMode) {
-                simData.messages.push({
+            // Envio para Canal de Grupo Ativo
+            if (activeGroup) {
+                const messagePayload = {
+                    groupId: activeGroup.id,
                     sender: currentUser.username,
-                    receiver: activeFriend.username,
+                    senderName: currentUser.name,
                     text: text,
                     timestamp: Date.now()
-                });
-                saveLocalSimulationData();
-                triggerOfflineCallbacks();
-                input.value = '';
-                input.focus();
-                return;
-            }
+                };
 
-            try {
-                const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-                await addDoc(messagesCol, {
-                    sender: currentUser.username,
-                    receiver: activeFriend.username,
-                    text: text,
-                    timestamp: Date.now()
-                });
-                
-                input.value = '';
-                input.focus();
-            } catch (err) {
-                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
-                    activateOfflineFallback();
-                    // Re-enviar usando canal offline
-                    simData.messages.push({
-                        sender: currentUser.username,
-                        receiver: activeFriend.username,
-                        text: text,
-                        timestamp: Date.now()
-                    });
+                if (isOfflineMode) {
+                    simData.groupMessages.push(messagePayload);
                     saveLocalSimulationData();
                     triggerOfflineCallbacks();
                     input.value = '';
-                } else {
+                    input.focus();
+                    return;
+                }
+
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'group_messages'), messagePayload);
+                    input.value = '';
+                    input.focus();
+                } catch (err) {
+                    console.error("Erro ao enviar mensagem em grupo:", err);
+                    showToast("Erro ao entregar mensagem de grupo.", "error");
+                }
+                return;
+            }
+
+            // Envio para Canal Privado (DMs)
+            if (activeFriend) {
+                const dmPayload = {
+                    sender: currentUser.username,
+                    receiver: activeFriend.username,
+                    text: text,
+                    timestamp: Date.now()
+                };
+
+                if (isOfflineMode) {
+                    simData.messages.push(dmPayload);
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    input.value = '';
+                    input.focus();
+                    return;
+                }
+
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), dmPayload);
+                    input.value = '';
+                    input.focus();
+                } catch (err) {
                     console.error("Falha ao enviar mensagem:", err);
                     showToast("Erro ao entregar mensagem.", "error");
                 }
             }
         });
 
-        // Controle de Abas da Sidebar
+        const groupSettingsModal = document.getElementById('group-settings-modal');
+        const adminAddSection = document.getElementById('admin-add-member-section');
+        const membersContainer = document.getElementById('group-members-container');
+
+        const editGroupDetailsSection = document.getElementById('admin-group-details-section');
+        const editGroupDetailsForm = document.getElementById('edit-group-details-form');
+        const editGroupName = document.getElementById('edit-group-name');
+        const editGroupAvatarType = document.getElementById('edit-group-avatar-type');
+        const editGroupAvatarValue = document.getElementById('edit-group-avatar-value');
+        const editGroupAvatarValueLabel = document.getElementById('edit-group-avatar-value-label');
+
+        document.getElementById('group-settings-btn').addEventListener('click', () => {
+            if (!activeGroup) return;
+
+            groupSettingsModal.classList.remove('hidden');
+            document.getElementById('settings-group-title').innerText = activeGroup.name;
+            document.getElementById('settings-group-creator').innerText = `Criado por @${activeGroup.creator}`;
+
+            // Exibir painel de adicionar e customizar apenas se for o criador/admin
+            const isCreator = activeGroup.creator === currentUser.username;
+            if (isCreator) {
+                adminAddSection.classList.remove('hidden');
+                editGroupDetailsSection.classList.remove('hidden');
+                
+                editGroupName.value = activeGroup.name;
+                editGroupAvatarType.value = activeGroup.avatarType || 'initial';
+                editGroupAvatarValue.value = activeGroup.avatarValue || '';
+                toggleGroupAvatarInputs();
+            } else {
+                adminAddSection.classList.add('hidden');
+                editGroupDetailsSection.classList.add('hidden');
+            }
+
+            renderGroupMembersList();
+        });
+
+        editGroupAvatarType.addEventListener('change', toggleGroupAvatarInputs);
+
+        function toggleGroupAvatarInputs() {
+            const val = editGroupAvatarType.value;
+            if (val === 'initial') {
+                editGroupAvatarValue.classList.add('hidden');
+                editGroupAvatarValueLabel.classList.add('hidden');
+            } else {
+                editGroupAvatarValue.classList.remove('hidden');
+                editGroupAvatarValueLabel.classList.remove('hidden');
+                if (val === 'emoji') {
+                    editGroupAvatarValueLabel.innerText = "Emoji";
+                    editGroupAvatarValue.placeholder = "Ex: 🧪, ⚛️, 👾";
+                } else if (val === 'url') {
+                    editGroupAvatarValueLabel.innerText = "Link Imagem (URL)";
+                    editGroupAvatarValue.placeholder = "Ex: https://...";
+                }
+            }
+        }
+
+        editGroupDetailsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!activeGroup) return;
+
+            const newName = editGroupName.value.trim();
+            const newType = editGroupAvatarType.value;
+            const newValue = editGroupAvatarValue.value.trim();
+
+            if (!newName) return;
+
+            const updatedGroup = {
+                ...activeGroup,
+                name: newName,
+                avatarType: newType,
+                avatarValue: newValue
+            };
+
+            if (isOfflineMode) {
+                simData.groups[activeGroup.id] = updatedGroup;
+                saveLocalSimulationData();
+                activeGroup = updatedGroup;
+                showToast("Grupo atualizado offline!");
+                groupSettingsModal.classList.add('hidden');
+                openGroupChatWith(updatedGroup);
+                triggerOfflineCallbacks();
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), updatedGroup);
+                activeGroup = updatedGroup;
+                showToast("Grupo atualizado!");
+                groupSettingsModal.classList.add('hidden');
+                openGroupChatWith(updatedGroup);
+            } catch (err) {
+                console.error("Erro ao atualizar grupo:", err);
+                showToast("Erro ao salvar alterações do grupo.", "error");
+            }
+        });
+
+        document.getElementById('close-group-settings-modal').addEventListener('click', () => {
+            groupSettingsModal.classList.add('hidden');
+        });
+
+        function renderGroupMembersList() {
+            membersContainer.innerHTML = '';
+            const isCreator = activeGroup.creator === currentUser.username;
+
+            activeGroup.members.forEach(memberUsername => {
+                const memberData = accountsMap[memberUsername];
+                const displayName = memberData ? memberData.name : memberUsername;
+                
+                const item = document.createElement('div');
+                item.className = 'p-2 rounded-xl bg-slate-950/40 border border-slate-800/50 flex items-center justify-between gap-2 text-xs';
+                
+                const avatarHTML = getAvatarHTML(
+                    memberData ? memberData.avatarType : 'initial',
+                    memberData ? memberData.avatarValue : '',
+                    displayName.charAt(0).toUpperCase()
+                );
+
+                const roleBadge = memberUsername === activeGroup.creator 
+                    ? `<span class="bg-indigo-500/20 text-indigo-400 font-bold px-2 py-0.5 rounded text-[8px] uppercase">Dono</span>` 
+                    : '';
+
+                // Botão de expulsar (só visível para criadores e sobre outros membros)
+                const kickBtn = (isCreator && memberUsername !== activeGroup.creator)
+                    ? `<button class="kick-member-btn px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 transition-all">Expulsar</button>`
+                    : '';
+
+                item.innerHTML = `
+                    <div class="truncate flex items-center gap-2 flex-1">
+                        <div class="w-6 h-6 rounded-full shrink-0 relative overflow-hidden flex items-center justify-center">
+                            ${avatarHTML}
+                        </div>
+                        <span class="truncate font-semibold text-slate-200">${displayName} <strong class="text-[10px] text-slate-500 font-medium">@${memberUsername}</strong></span>
+                        ${roleBadge}
+                    </div>
+                    ${kickBtn}
+                `;
+
+                if (isCreator && memberUsername !== activeGroup.creator) {
+                    item.querySelector('.kick-member-btn').addEventListener('click', () => handleKickMember(memberUsername));
+                }
+
+                membersContainer.appendChild(item);
+            });
+        }
+
+        // Adicionar novo membro por username
+        document.getElementById('add-member-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('new-member-username');
+            const targetUsername = input.value.trim().toLowerCase();
+
+            if (!targetUsername || !activeGroup) return;
+
+            if (activeGroup.members.includes(targetUsername)) {
+                showToast("Este usuário já pertence ao grupo.", "error");
+                return;
+            }
+
+            // Verificar se o usuário existe no cache de contas registradas
+            if (!accountsMap[targetUsername]) {
+                showToast(`Usuário @${targetUsername} não cadastrado no app.`, "error");
+                return;
+            }
+
+            const updatedMembersList = [...activeGroup.members, targetUsername];
+
+            if (isOfflineMode) {
+                simData.groups[activeGroup.id].members = updatedMembersList;
+                saveLocalSimulationData();
+                activeGroup = simData.groups[activeGroup.id];
+                renderGroupMembersList();
+                triggerOfflineCallbacks();
+                showToast(`@${targetUsername} adicionado ao grupo offline!`);
+                input.value = '';
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), {
+                    members: updatedMembersList
+                });
+                activeGroup.members = updatedMembersList; // atualizar cache local
+                renderGroupMembersList();
+                showToast(`@${targetUsername} foi adicionado ao grupo!`);
+                input.value = '';
+            } catch (err) {
+                console.error("Falha ao adicionar membro:", err);
+                showToast("Erro ao convidar membro.", "error");
+            }
+        });
+
+        // Expulsar membro do grupo
+        async function handleKickMember(targetUsername) {
+            if (!activeGroup) return;
+
+            const updatedMembersList = activeGroup.members.filter(m => m !== targetUsername);
+
+            if (isOfflineMode) {
+                simData.groups[activeGroup.id].members = updatedMembersList;
+                saveLocalSimulationData();
+                activeGroup = simData.groups[activeGroup.id];
+                renderGroupMembersList();
+                triggerOfflineCallbacks();
+                showToast(`@${targetUsername} foi removido do grupo offline.`);
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), {
+                    members: updatedMembersList
+                });
+                activeGroup.members = updatedMembersList; // atualizar cache local
+                renderGroupMembersList();
+                showToast(`@${targetUsername} foi removido do grupo.`);
+            } catch (err) {
+                console.error("Erro ao expulsar membro:", err);
+                showToast("Erro ao expulsar membro.", "error");
+            }
+        }
+
         const tabFriends = document.getElementById('tab-friends');
+        const tabGroups = document.getElementById('tab-groups');
         const tabRequests = document.getElementById('tab-requests');
+        
         const panelFriends = document.getElementById('panel-friends-list');
+        const panelGroups = document.getElementById('panel-groups-list');
         const panelRequests = document.getElementById('panel-requests-list');
 
         tabFriends.addEventListener('click', () => {
-            tabFriends.className = "flex-1 py-3 text-center text-xs font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all";
-            tabRequests.className = "flex-1 py-3 text-center text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1";
+            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all";
+            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all";
+            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1";
+            
             panelFriends.classList.remove('hidden');
+            panelGroups.classList.add('hidden');
+            panelRequests.classList.add('hidden');
+        });
+
+        tabGroups.addEventListener('click', () => {
+            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-emerald-400 border-b-2 border-emerald-500 transition-all";
+            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all";
+            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1";
+            
+            panelFriends.classList.add('hidden');
+            panelGroups.classList.remove('hidden');
             panelRequests.classList.add('hidden');
         });
 
         tabRequests.addEventListener('click', () => {
-            tabRequests.className = "flex-1 py-3 text-center text-xs font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all flex items-center justify-center gap-1";
-            tabFriends.className = "flex-1 py-3 text-center text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all";
+            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all flex items-center justify-center gap-1";
+            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all";
+            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all";
+            
             panelFriends.classList.add('hidden');
+            panelGroups.classList.add('hidden');
             panelRequests.classList.remove('hidden');
         });
 
         // Botão de retornar do chat no Mobile
         document.getElementById('chat-back-btn').addEventListener('click', () => {
-            document.getElementById('chat-panel').classList.add('hidden');
-            document.getElementById('chat-panel').classList.remove('flex');
-            activeFriend = null;
+            closeActiveChat();
             startUserSession();
         });
 
         // Logout de Usuário
         document.getElementById('logout-btn').addEventListener('click', () => {
             currentUser = null;
-            activeFriend = null;
+            closeActiveChat();
+
             if (unsubscribeFriends) unsubscribeFriends();
+            if (unsubscribeGroups) unsubscribeGroups();
             if (unsubscribeMessages) unsubscribeMessages();
+            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
 
             document.getElementById('main-app').classList.add('hidden');
             document.getElementById('auth-screen').classList.remove('hidden');
@@ -1264,6 +1990,7 @@
         });
 
         window.onload = function() {
+            setupFavicon();
             authenticateFirebase();
         };
     </script>
