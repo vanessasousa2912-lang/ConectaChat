@@ -1,11 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
+<html lang="pt-BR" class="h-full dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ConectaChat | Conversas & Amizades</title>
-    <!-- Tailwind CSS para Estilização de Elite -->
+    <!-- Tailwind CSS com suporte a Modo Escuro por classe -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <!-- Fonte Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,9 +25,6 @@
             text-size-adjust: 100%;
             -webkit-text-size-adjust: 100%;
             -moz-text-size-adjust: 100%;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
         }
         /* Esconder barras de rolagem mas manter funcionamento */
         .no-scrollbar::-webkit-scrollbar {
@@ -27,77 +36,116 @@
         }
     </style>
 </head>
-<body class="h-full flex flex-col overflow-hidden">
+<body class="h-full flex flex-col overflow-hidden bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200">
 
     <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Banner de Status de Conexão -->
-    <div id="connection-banner" class="bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2">
+    <div id="connection-banner" class="bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2">
         <span id="connection-dot" class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
         <span id="connection-text">Verificando conexão com o Firebase...</span>
     </div>
 
-    <!-- AUTH SCREEN (Login / Registro) -->
-    <div id="auth-screen" class="flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 bg-slate-950 relative overflow-hidden">
+    <!-- Container de Notificação Premium Flutuante -->
+    <div id="premium-notif-container" class="fixed top-16 right-4 z-50 flex flex-col gap-3 max-w-sm pointer-events-none"></div>
+
+    <!-- IDIOMA SCREEN (Primeira etapa de entrada) -->
+    <div id="language-screen" class="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-slate-50 dark:bg-slate-950 relative overflow-hidden z-50">
+        <!-- Detalhes de luz de fundo modernas -->
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="sm:mx-auto sm:w-full sm:max-w-md z-10">
+        <div class="sm:mx-auto sm:w-full sm:max-w-2xl z-10 text-center mb-8">
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5c-.347 2.225-1.163 4.417-2.454 6.375M5.006 15H9m5.007 0H19" />
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">ConectaChat</h2>
+            </div>
+            <p class="text-slate-600 dark:text-slate-400 text-sm">Selecione seu idioma preferido / Select your preferred language</p>
+        </div>
+
+        <div class="w-full max-w-2xl bg-white dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-6 shadow-2xl rounded-2xl z-10">
+            <!-- Grid de 15 Idiomas -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6" id="languages-grid">
+                <!-- Injetado por JS de forma inteligente -->
+            </div>
+
+            <button id="confirm-lang-btn" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-500/25 transition-all text-sm">
+                Confirmar Idioma / Confirm Language
+            </button>
+        </div>
+    </div>
+
+    <!-- AUTH SCREEN (Login / Registro) -->
+    <div id="auth-screen" class="hidden flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Botão de Tema Rápido no topo da Auth Screen -->
+        <button id="theme-toggle-auth" class="absolute top-4 right-4 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm" aria-label="Alterar Tema" title="Alterar Tema">
+            <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <svg class="w-5 h-5 hidden dark:block text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+
+        <div class="sm:mx-auto sm:w-full sm:max-w-md z-10 text-center">
             <div class="flex justify-center items-center gap-2">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
                     <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                 </div>
-                <h2 class="text-2xl font-bold tracking-tight text-white">ConectaChat</h2>
+                <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">ConectaChat</h2>
             </div>
-            <h3 id="auth-title" class="mt-6 text-center text-xl font-medium tracking-tight text-slate-300">Acesse sua conta para conversar</h3>
+            <h3 id="auth-title" class="mt-6 text-xl font-medium tracking-tight text-slate-700 dark:text-slate-300">Acesse sua conta para conversar</h3>
         </div>
 
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10">
-            <div class="bg-slate-900/50 backdrop-blur-md border border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
+            <div class="bg-white dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
                 <form id="auth-form" class="space-y-5">
                     <!-- Botão de Entrada Rápida -->
                     <div id="last-account-container" class="hidden">
-                        <button type="button" id="last-account-btn" class="flex w-full justify-center items-center gap-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-4 py-3.5 text-sm font-semibold text-indigo-300 shadow-lg shadow-indigo-500/5 transition-all duration-200" aria-label="Entrar com a última conta conectada neste dispositivo">
-                            <svg class="w-5 h-5 text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <button type="button" id="last-account-btn" class="flex w-full justify-center items-center gap-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-4 py-3.5 text-sm font-semibold text-indigo-700 dark:text-indigo-300 shadow-lg shadow-indigo-500/5 transition-all duration-200">
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>
-                            <span class="truncate">Entrar como <strong id="last-account-user" class="text-white font-bold">...</strong></span>
+                            <span class="truncate">Entrar como <strong id="last-account-user" class="text-slate-900 dark:text-white font-bold">...</strong></span>
                         </button>
                         <div class="relative my-4">
                             <div class="absolute inset-0 flex items-center">
-                                <div class="w-full border-t border-slate-800"></div>
+                                <div class="w-full border-t border-slate-200 dark:border-slate-800"></div>
                             </div>
                             <div class="relative flex justify-center text-[10px] uppercase tracking-wider">
-                                <span class="bg-slate-900 px-3 text-slate-500 font-semibold">Ou conecte-se com outra conta</span>
+                                <span class="bg-white dark:bg-slate-900 px-3 text-slate-400 dark:text-slate-500 font-semibold" id="label-or-option">Ou conecte-se com outra conta</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Campo de Nome de Exibição -->
                     <div id="display-name-group" class="hidden">
-                        <label for="reg-name" class="block text-sm font-medium text-slate-300">Como quer ser chamado? (Nome de Exibição)</label>
+                        <label for="reg-name" id="label-display-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Como quer ser chamado? (Nome de Exibição)</label>
                         <div class="mt-1">
-                            <input id="reg-name" name="name" type="text" placeholder="Ex: Luis Henrique" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                            <input id="reg-name" name="name" type="text" placeholder="Ex: Luis Henrique" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                         </div>
                     </div>
 
                     <div>
-                        <label for="auth-username" class="block text-sm font-medium text-slate-300">Nome de Usuário (@ID)</label>
+                        <label for="auth-username" id="label-username" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Nome de Usuário (@ID)</label>
                         <div class="mt-1 relative rounded-xl shadow-sm">
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <span class="text-slate-500 sm:text-sm">@</span>
+                                <span class="text-slate-400 dark:text-slate-500 sm:text-sm">@</span>
                             </div>
-                            <input id="auth-username" name="username" type="text" required placeholder="luis_prog" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 pl-8 pr-4 py-3 text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                            <input id="auth-username" name="username" type="text" required placeholder="luis_prog" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 pl-8 pr-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                         </div>
                     </div>
 
                     <div>
-                        <label for="auth-password" class="block text-sm font-medium text-slate-300">Senha</label>
+                        <label for="auth-password" id="label-password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Senha</label>
                         <div class="mt-1">
-                            <input id="auth-password" name="password" type="password" required placeholder="Sua senha secreta" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                            <input id="auth-password" name="password" type="password" required placeholder="Sua senha secreta" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                         </div>
                     </div>
 
@@ -111,15 +159,15 @@
                 <div class="mt-6">
                     <div class="relative">
                         <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-slate-800"></div>
+                            <div class="w-full border-t border-slate-200 dark:border-slate-800"></div>
                         </div>
                         <div class="relative flex justify-center text-xs uppercase">
-                            <span class="bg-slate-900 px-2 text-slate-400">Ou</span>
+                            <span class="bg-white dark:bg-slate-900 px-2 text-slate-400 dark:text-slate-500">Ou / Or</span>
                         </div>
                     </div>
 
                     <div class="mt-6 text-center">
-                        <button id="toggle-auth-mode" class="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors">
+                        <button id="toggle-auth-mode" class="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors">
                             Não tem uma conta? Cadastre-se agora
                         </button>
                     </div>
@@ -130,8 +178,8 @@
 
     <!-- MAIN INTERFACE -->
     <div id="main-app" class="hidden flex-1 flex flex-col overflow-hidden h-full">
-        <!-- Topbar / Adicionar Amigos -->
-        <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-10 shadow-md">
+        <!-- Topbar -->
+        <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-10 shadow-md">
             <!-- Logo e Perfil Rápido -->
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center">
@@ -140,51 +188,57 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-sm font-bold text-white tracking-wide">ConectaChat</h1>
+                    <h1 class="text-sm font-bold text-slate-900 dark:text-white tracking-wide">ConectaChat</h1>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <p id="user-identity" class="text-xs text-slate-400 font-medium"></p>
+                        <span id="header-status-indicator" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <p id="user-identity" class="text-xs text-slate-500 dark:text-slate-400 font-medium"></p>
                     </div>
                 </div>
             </div>
 
-            <!-- Barra de Adicionar Amigo (Top center) -->
+            <!-- Barra de Adicionar Amigo -->
             <form id="add-friend-form" class="flex-1 max-w-md min-w-[240px]">
                 <div class="relative flex items-center">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <span class="text-slate-400 text-sm">@</span>
                     </div>
-                    <input id="friend-search-input" type="text" placeholder="Adicionar amigo pelo usuário..." required class="block w-full rounded-xl border border-slate-800 bg-slate-950 pl-8 pr-24 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                    <button type="submit" class="absolute right-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 font-semibold px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider transition-all border border-emerald-500/30">
+                    <input id="friend-search-input" type="text" placeholder="Adicionar amigo pelo usuário..." required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-24 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                    <button type="submit" id="btn-add-action" class="absolute right-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-semibold px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider transition-all border border-emerald-500/30">
                         Adicionar
                     </button>
                 </div>
             </form>
 
-            <!-- Logout -->
-            <button id="logout-btn" class="flex items-center gap-2 text-xs text-slate-400 hover:text-rose-400 bg-slate-950/50 hover:bg-rose-500/10 border border-slate-800 hover:border-rose-500/20 px-3 py-2 rounded-xl transition-all" aria-label="Sair da conta e desconectar">
-                <span>Sair</span>
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-            </button>
+            <div class="flex items-center gap-2">
+                <!-- Botão de Alternar Modo Claro/Escuro -->
+                <button id="theme-toggle-main" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all shadow-sm" aria-label="Alterar Tema" title="Alterar Tema">
+                    <svg class="w-4.5 h-4.5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    <svg class="w-4.5 h-4.5 hidden dark:block text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                </button>
+
+                <!-- Logout -->
+                <button id="logout-btn" class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 hover:text-rose-500 bg-slate-100 dark:bg-slate-950/50 hover:bg-rose-500/10 border border-slate-200 dark:border-slate-800 hover:border-rose-500/20 px-3 py-2 rounded-xl transition-all" aria-label="Sair" title="Sair">
+                    <span id="logout-text-label">Sair</span>
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                </button>
+            </div>
         </header>
 
         <!-- Corpo Principal do App -->
         <main class="flex-1 flex overflow-hidden relative">
-            
             <!-- LATERAL: Contatos, Amigos, Grupos e Pedidos -->
-            <aside id="sidebar-panel" class="w-full md:w-80 bg-slate-900 border-r border-slate-800 flex flex-col h-full shrink-0 z-20">
-                
-                <!-- Abas da barra lateral (Amigos, Grupos, Solicitações) -->
-                <div class="flex border-b border-slate-800 bg-slate-900/50">
-                    <button id="tab-friends" class="flex-1 py-3 text-center text-[11px] font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all">
+            <aside id="sidebar-panel" class="w-full md:w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shrink-0 z-20">
+                <!-- Abas da barra lateral -->
+                <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                    <button id="tab-friends" class="flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all">
                         Amigos (<span id="count-friends">0</span>)
                     </button>
-                    <button id="tab-groups" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all">
+                    <button id="tab-groups" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all">
                         Grupos (<span id="count-groups">0</span>)
                     </button>
-                    <button id="tab-requests" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1">
+                    <button id="tab-requests" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all flex items-center justify-center gap-1">
                         Solicit.
                         <span id="badge-requests" class="hidden bg-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">0</span>
                     </button>
@@ -192,8 +246,8 @@
 
                 <!-- Lista de Amigos -->
                 <div id="panel-friends-list" class="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
-                    <div id="friends-empty" class="text-center py-8 text-slate-500 text-xs">
-                        <svg class="w-12 h-12 mx-auto text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <div id="friends-empty" class="text-center py-8 text-slate-400 dark:text-slate-500 text-xs">
+                        <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                         Nenhum amigo conectado ainda.<br>Adicione pessoas pelo topo!
@@ -202,16 +256,16 @@
                 </div>
 
                 <!-- Painel de Grupos -->
-                <div id="panel-groups-list" class="hidden flex-1 overflow-y-auto p-3 space-y-3 no-scrollbar">
-                    <button id="open-create-group-modal" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500 hover:to-teal-500 hover:text-slate-950 border border-emerald-500/30 text-emerald-300 rounded-xl py-2.5 text-xs font-bold transition-all duration-200 shadow-md">
+                <div id="panel-groups-list" class="hidden flex-1 overflow-y-auto p-3 space-y-3 no-scrollbar bg-slate-50/50 dark:bg-transparent">
+                    <button id="open-create-group-modal" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500 hover:to-teal-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 border border-emerald-500/30 rounded-xl py-2.5 text-xs font-bold transition-all duration-200 shadow-sm">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                         </svg>
                         Criar Novo Grupo
                     </button>
 
-                    <div id="groups-empty" class="text-center py-8 text-slate-500 text-xs">
-                        <svg class="w-12 h-12 mx-auto text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <div id="groups-empty" class="text-center py-8 text-slate-400 dark:text-slate-500 text-xs">
+                        <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         Você não está em nenhum grupo.<br>Crie um agora mesmo!
@@ -219,35 +273,35 @@
                     <div id="groups-container" class="space-y-1"></div>
                 </div>
 
-                <!-- Painel de Pedidos Pendentes -->
+                <!-- Painel de Pedidos Pedidos -->
                 <div id="panel-requests-list" class="hidden flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar">
                     <div>
-                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Recebidos</h4>
+                        <h4 id="req-received-header" class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Recebidos</h4>
                         <div id="req-received-container" class="space-y-1">
-                            <p class="text-xs text-slate-500 py-2 italic text-center">Nenhum pedido pendente</p>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido pendente</p>
                         </div>
                     </div>
                     <div>
-                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Enviados</h4>
+                        <h4 id="req-sent-header" class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Enviados</h4>
                         <div id="req-sent-container" class="space-y-1">
-                            <p class="text-xs text-slate-500 py-2 italic text-center">Nenhum pedido enviado</p>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido enviado</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Info Rodapé Usuário -->
-                <div class="bg-slate-950/80 border-t border-slate-800/80 p-3">
-                    <button id="profile-footer-trigger" class="w-full flex items-center justify-between hover:bg-slate-800/50 p-2 rounded-xl transition-all text-left" title="Personalizar Perfil">
+                <div class="bg-slate-100 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800/80 p-3">
+                    <button id="profile-footer-trigger" class="w-full flex items-center justify-between hover:bg-slate-200/50 dark:hover:bg-slate-800/50 p-2 rounded-xl transition-all text-left" title="Personalizar Perfil">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs text-white uppercase relative overflow-hidden" id="user-avatar">
                                 U
                             </div>
-                            <div>
-                                <p id="user-display-name" class="text-xs font-bold text-white truncate max-w-[120px]"></p>
-                                <p id="user-tag" class="text-[10px] text-slate-500 font-medium truncate max-w-[120px]"></p>
+                            <div class="truncate">
+                                <p id="user-display-name" class="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[120px]"></p>
+                                <p id="user-tag" class="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[120px]"></p>
                             </div>
                         </div>
-                        <svg class="w-4 h-4 text-slate-500 hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg class="w-4 h-4 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
@@ -256,55 +310,82 @@
             </aside>
 
             <!-- AREA PRINCIPAL: Chat de Conversa -->
-            <section id="chat-panel" class="absolute inset-0 md:relative md:flex flex-1 flex flex-col bg-slate-950 z-10 hidden">
-                
+            <section id="chat-panel" class="absolute inset-0 md:relative md:flex flex-1 flex flex-col bg-white dark:bg-slate-950 z-10 hidden">
                 <!-- Chat Selecionado / Header -->
-                <div id="chat-header" class="hidden bg-slate-900/60 border-b border-slate-800/80 px-4 py-3 flex items-center justify-between">
+                <div id="chat-header" class="hidden bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800/80 px-4 py-3 flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <!-- Botão de Voltar (Visível no celular) -->
-                        <button id="chat-back-btn" class="md:hidden text-slate-400 hover:text-slate-100 p-1 bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-all" aria-label="Voltar para a lista de canais de conversa" title="Voltar">
+                        <!-- Botão de Voltar -->
+                        <button id="chat-back-btn" class="md:hidden text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 p-1 bg-slate-200/50 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-all" aria-label="Voltar" title="Voltar">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white animate-pulse" id="active-chat-avatar">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white relative overflow-hidden" id="active-chat-avatar">
                             A
                         </div>
-                        <div>
-                            <h3 id="active-chat-name" class="text-sm font-bold text-white">Carregando...</h3>
-                            <p id="active-chat-status" class="text-[10px] text-slate-400 font-medium">@username</p>
+                        <div class="truncate">
+                            <h3 id="active-chat-name" class="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[180px]">Carregando...</h3>
+                            <p id="active-chat-status" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-[180px]">@username</p>
                         </div>
                     </div>
 
-                    <!-- Botão de Configuração/Membros do Grupo (Só visível em Chat de Grupo) -->
-                    <button id="group-settings-btn" class="hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 font-semibold border border-slate-700 transition-all">
+                    <button id="group-settings-btn" class="hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-700 transition-all">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
-                        Membros
+                        <span id="label-membros-btn">Membros</span>
                     </button>
                 </div>
 
                 <!-- Feed de Mensagens -->
                 <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar flex flex-col">
                     <!-- Mensagem vazia de início -->
-                    <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center text-slate-500 p-8">
-                        <div class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 p-8">
+                        <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-indigo-500 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                             </svg>
                         </div>
-                        <h4 class="text-sm font-semibold text-slate-300">Escolha uma conversa ou grupo para começar</h4>
-                        <p class="text-xs text-slate-500 text-center mt-1">Troque mensagens e conecte-se instantaneamente!</p>
+                        <h4 id="chat-placeholder-header" class="text-sm font-semibold text-slate-700 dark:text-slate-300">Escolha uma conversa ou grupo para começar</h4>
+                        <p id="chat-placeholder-sub" class="text-xs text-slate-400 dark:text-slate-500 text-center mt-1">Troque mensagens e conecte-se instantaneamente!</p>
                     </div>
                     <div id="messages-container" class="space-y-4"></div>
                 </div>
 
+                <!-- Barra de prévia de arquivo anexo -->
+                <div id="file-preview-bar" class="hidden bg-slate-100/90 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 p-3 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <div id="file-preview-container" class="w-14 h-14 rounded-lg bg-white dark:bg-slate-950 flex items-center justify-center relative border border-slate-200 dark:border-slate-800 overflow-hidden shrink-0">
+                            <!-- Previa injetada por JS -->
+                        </div>
+                        <div class="truncate">
+                            <p id="file-preview-name" class="text-xs font-semibold text-slate-800 dark:text-white truncate max-w-[180px]"></p>
+                            <p id="file-preview-size" class="text-[10px] text-slate-400 dark:text-slate-500"></p>
+                        </div>
+                    </div>
+                    <button id="cancel-file-btn" type="button" class="p-2 rounded-lg bg-slate-200 hover:bg-rose-500/25 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-all border border-slate-300 dark:border-slate-700/50" title="Cancelar anexo">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Input File Oculto -->
+                <input type="file" id="media-file-input" class="hidden" accept="image/*,video/*">
+
                 <!-- Barra de envio de mensagens -->
-                <div id="chat-input-bar" class="hidden p-3 bg-slate-900/40 border-t border-slate-800/80">
+                <div id="chat-input-bar" class="hidden p-3 bg-slate-50/40 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800/80">
                     <form id="chat-form" class="flex items-center gap-2">
-                        <input id="message-input" type="text" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                        <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center" aria-label="Enviar mensagem de texto" title="Enviar Mensagem">
+                        <input id="message-input" type="text" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        
+                        <!-- Botão Anexar (+) -->
+                        <button id="attach-file-btn" type="button" class="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50 transition-all flex items-center justify-center shrink-0" aria-label="Anexar arquivo" title="Anexar arquivo">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+
+                        <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center shrink-0" aria-label="Enviar" title="Enviar">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                             </svg>
@@ -317,10 +398,10 @@
 
     <!-- MODAL DE CRIAR GRUPO -->
     <div id="create-group-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
-                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Criar Novo Grupo</h3>
-                <button id="close-create-group-modal" class="text-slate-400 hover:text-white">
+                <h3 id="create-group-modal-title" class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Criar Novo Grupo</h3>
+                <button id="close-create-group-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white" title="Fechar">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -328,10 +409,10 @@
             </div>
             <form id="create-group-form" class="space-y-4">
                 <div>
-                    <label for="group-name-input" class="block text-xs font-medium text-slate-300">Nome do Grupo</label>
-                    <input id="group-name-input" type="text" placeholder="Ex: Projeto Integrador, Família" required class="mt-1 block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <label for="group-name-input" id="label-group-name" class="block text-xs font-medium text-slate-700 dark:text-slate-300">Nome do Grupo</label>
+                    <input id="group-name-input" type="text" placeholder="Ex: Projeto Integrador, Família" required class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                 </div>
-                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
+                <button type="submit" id="btn-create-group-submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
                     Criar Grupo
                 </button>
             </form>
@@ -340,10 +421,10 @@
 
     <!-- MODAL DE EDITAR PERFIL -->
     <div id="profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
-                <h3 class="text-sm font-bold text-white uppercase tracking-wider">Editar Seu Perfil</h3>
-                <button id="close-profile-modal" class="text-slate-400 hover:text-white" aria-label="Fechar modal de perfil">
+                <h3 id="label-perfil-modal" class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Editar Seu Perfil</h3>
+                <button id="close-profile-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white" aria-label="Fechar" title="Fechar">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -351,22 +432,22 @@
             </div>
             <form id="profile-form" class="space-y-4">
                 <div>
-                    <label for="profile-name-input" class="block text-xs font-medium text-slate-300">Seu Nome de Exibição</label>
-                    <input id="profile-name-input" type="text" placeholder="Ex: Luis Henrique" required class="mt-1 block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <label for="profile-name-input" id="label-nome-exibicao" class="block text-xs font-medium text-slate-700 dark:text-slate-300">Seu Nome de Exibição</label>
+                    <input id="profile-name-input" type="text" required class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                 </div>
                 <div>
-                    <label for="profile-avatar-type" class="block text-xs font-medium text-slate-300">Tipo de Foto de Perfil</label>
-                    <select id="profile-avatar-type" class="mt-1 block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none">
+                    <label for="profile-avatar-type" class="block text-xs font-medium text-slate-700 dark:text-slate-300">Tipo de Foto de Perfil</label>
+                    <select id="profile-avatar-type" class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none">
                         <option value="initial">Iniciais Padrão</option>
                         <option value="emoji">Emoji personalizado</option>
                         <option value="url">Link de Imagem (URL)</option>
                     </select>
                 </div>
                 <div id="profile-avatar-value-group">
-                    <label id="profile-avatar-value-label" for="profile-avatar-value" class="block text-xs font-medium text-slate-300">Valor do Emoji ou URL</label>
-                    <input id="profile-avatar-value" type="text" placeholder="Ex: 🚀 ou https://..." class="mt-1 block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <label id="profile-avatar-value-label" for="profile-avatar-value" class="block text-xs font-medium text-slate-700 dark:text-slate-300">Valor do Emoji ou URL</label>
+                    <input id="profile-avatar-value" type="text" placeholder="Ex: 🚀 ou https://..." class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
                 </div>
-                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
+                <button type="submit" id="btn-save-profile" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
                     Salvar Alterações
                 </button>
             </form>
@@ -375,13 +456,13 @@
 
     <!-- MODAL DE CONFIGURAÇÕES DE MEMBROS DO GRUPO -->
     <div id="group-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 id="settings-group-title" class="text-sm font-bold text-white truncate max-w-[250px]">Membros do Grupo</h3>
-                    <p id="settings-group-creator" class="text-[10px] text-slate-400">Criado por @username</p>
+                    <h3 id="settings-group-title" class="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[250px]">Membros do Grupo</h3>
+                    <p id="settings-group-creator" class="text-[10px] text-slate-500 dark:text-slate-400">Criado por @username</p>
                 </div>
-                <button id="close-group-settings-modal" class="text-slate-400 hover:text-white">
+                <button id="close-group-settings-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white" title="Fechar">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -389,42 +470,42 @@
             </div>
 
             <!-- EDITAR DETALHES DO GRUPO (Apenas Criador) -->
-            <div id="admin-group-details-section" class="hidden border-b border-slate-800 pb-4 space-y-3">
-                <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Personalizar Grupo</h4>
+            <div id="admin-group-details-section" class="hidden border-b border-slate-200 dark:border-slate-800 pb-4 space-y-3">
+                <h4 id="label-personalizar-grupo" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Personalizar Grupo</h4>
                 <form id="edit-group-details-form" class="space-y-2">
                     <div>
-                        <label for="edit-group-name" class="block text-[10px] text-slate-400">Nome do Grupo</label>
-                        <input id="edit-group-name" type="text" required class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none">
+                        <label for="edit-group-name" class="block text-[10px] text-slate-500 dark:text-slate-400">Nome do Grupo</label>
+                        <input id="edit-group-name" type="text" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label for="edit-group-avatar-type" class="block text-[10px] text-slate-400">Tipo de Logo</label>
-                            <select id="edit-group-avatar-type" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-2 py-2 text-xs text-slate-100 focus:outline-none">
+                            <label for="edit-group-avatar-type" class="block text-[10px] text-slate-500 dark:text-slate-400">Tipo de Logo</label>
+                            <select id="edit-group-avatar-type" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none">
                                 <option value="initial">Iniciais</option>
                                 <option value="emoji">Emoji</option>
                                 <option value="url">Link de Imagem (URL)</option>
                             </select>
                         </div>
                         <div>
-                            <label id="edit-group-avatar-value-label" for="edit-group-avatar-value" class="block text-[10px] text-slate-400">Emoji ou Link</label>
-                            <input id="edit-group-avatar-value" type="text" class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-2 text-xs text-slate-100 focus:border-indigo-500 focus:outline-none">
+                            <label id="edit-group-avatar-value-label" for="edit-group-avatar-value" class="block text-[10px] text-slate-500 dark:text-slate-400">Emoji ou Link</label>
+                            <input id="edit-group-avatar-value" type="text" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none">
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-slate-950 font-bold py-2 rounded-xl text-xs transition-all border border-emerald-500/30">
+                    <button type="submit" id="btn-save-group-config" class="w-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-bold py-2 rounded-xl text-xs transition-all border border-emerald-500/30">
                         Salvar Configurações do Grupo
                     </button>
                 </form>
             </div>
 
             <!-- Formulário para o Criador Adicionar Novos Membros -->
-            <div id="admin-add-member-section" class="hidden border-b border-slate-800 pb-4 space-y-2">
-                <label for="new-member-username" class="block text-xs font-medium text-emerald-400">Convidar Novo Membro</label>
+            <div id="admin-add-member-section" class="hidden border-b border-slate-200 dark:border-slate-800 pb-4 space-y-2">
+                <label for="new-member-username" id="label-convidar-membro" class="block text-xs font-medium text-emerald-600 dark:text-emerald-400">Convidar Novo Membro</label>
                 <form id="add-member-form" class="flex gap-2">
                     <div class="relative flex-1">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-xs">@</span>
-                        <input id="new-member-username" type="text" placeholder="luis_prog" required class="block w-full rounded-xl border border-slate-800 bg-slate-950/80 pl-7 pr-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:border-emerald-500 focus:outline-none">
+                        <input id="new-member-username" type="text" placeholder="luis_prog" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 pl-7 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none">
                     </div>
-                    <button type="submit" class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition-all border border-emerald-500/30">
+                    <button type="submit" id="btn-convidar-action" class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition-all border border-emerald-500/30">
                         Convidar
                     </button>
                 </form>
@@ -432,11 +513,23 @@
 
             <!-- Lista de Membros Cadastrados -->
             <div class="space-y-2">
-                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Membros do Canal</h4>
+                <h4 id="label-membros-titulo" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Membros do Canal</h4>
                 <div id="group-members-container" class="max-h-60 overflow-y-auto space-y-1 pr-1">
                     <!-- Membros injetados via JS -->
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE VISUALIZAÇÃO DE IMAGEM AMPLIADA (LIGHTBOX) -->
+    <div id="media-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <button id="close-media-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full bg-slate-900/55 hover:bg-slate-800 transition-all border border-slate-800" aria-label="Fechar mídia" title="Fechar">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="max-w-4xl max-h-[85vh] flex items-center justify-center">
+            <img id="media-modal-img" src="" class="hidden max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800" alt="Mídia expandida">
         </div>
     </div>
 
@@ -458,6 +551,167 @@
         };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'co-chat-app';
 
+        // Custom Toast Notification Maker
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 ${
+                type === 'success' 
+                    ? 'bg-emerald-100 border-emerald-300 text-emerald-800 dark:bg-emerald-950/90 dark:border-emerald-500/30 dark:text-emerald-300' 
+                    : type === 'error' 
+                    ? 'bg-rose-100 border-rose-300 text-rose-800 dark:bg-rose-950/90 dark:border-rose-500/30 dark:text-rose-300' 
+                    : 'bg-indigo-100 border-indigo-300 text-indigo-800 dark:bg-indigo-950/90 dark:border-indigo-500/30 dark:text-indigo-300'
+            }`;
+            
+            toast.innerHTML = `
+                <span class="w-1.5 h-1.5 rounded-full ${type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-rose-500' : 'bg-indigo-500'}"></span>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // --- STREAMING_CHUNK:Configurando os dicionários de idiomas... ---
+        // Sistema de Tradução para os 15 idiomas
+        const languages = [
+            { code: "PT", name: "Português", native: "Português" },
+            { code: "EN", name: "English", native: "English" },
+            { code: "ES", name: "Spanish", native: "Español" },
+            { code: "FR", name: "French", native: "Français" },
+            { code: "DE", name: "German", native: "Deutsch" },
+            { code: "IT", name: "Italian", native: "Italiano" },
+            { code: "JA", name: "Japanese", native: "日本語" },
+            { code: "ZH", name: "Chinese", native: "简体中文" },
+            { code: "RU", name: "Russian", native: "Русский" },
+            { code: "AR", name: "Arabic", native: "العربية" },
+            { code: "HI", name: "Hindi", native: "हिन्दी" },
+            { code: "KO", name: "Korean", native: "한국어" },
+            { code: "TR", name: "Turkish", native: "Türkçe" },
+            { code: "NL", name: "Dutch", native: "Nederlands" },
+            { code: "PL", name: "Polish", native: "Polski" }
+        ];
+
+        const translations = {
+            PT: {
+                authTitle: "Acesse sua conta para conversar",
+                authTitleReg: "Crie sua conta para começar",
+                displayName: "Como quer ser chamado? (Nome de Exibição)",
+                username: "Nome de Usuário (@ID)",
+                password: "Senha",
+                loginBtn: "Entrar no Chat",
+                registerBtn: "Registrar Conta",
+                noAccount: "Não tem uma conta? Cadastre-se agora",
+                haveAccount: "Já tem uma conta? Conecte-se",
+                addFriendPlaceholder: "Adicionar amigo pelo usuário...",
+                friendsTab: "Amigos",
+                groupsTab: "Grupos",
+                requestsTab: "Solicitações",
+                logout: "Sair",
+                chatPlaceholderHeader: "Escolha uma conversa ou grupo para começar",
+                chatPlaceholderSub: "Troque mensagens e conecte-se instantaneamente!",
+                membrosBtn: "Membros",
+                openCreateGroupBtn: "Criar Novo Grupo",
+                groupNameLabel: "Nome do Grupo",
+                createGroupModalTitle: "Criar Novo Grupo",
+                editPerfilTitle: "Editar Seu Perfil",
+                nomeExibicaoLabel: "Seu Nome de Exibição",
+                recebidosHeader: "Recebidos",
+                enviadosHeader: "Enviados",
+                orText: "Ou conecte-se com outra conta",
+                personalizarGrupo: "Personalizar Grupo",
+                convidarMembro: "Convidar Novo Membro",
+                membrosTitulo: "Membros do Canal",
+                convidarBtn: "Convidar",
+                addFriendBtn: "Adicionar",
+                salvarBtn: "Salvar Alterações"
+            },
+            EN: {
+                authTitle: "Access your account to chat",
+                authTitleReg: "Create your account to start",
+                displayName: "What should we call you? (Display Name)",
+                username: "Username (@ID)",
+                password: "Password",
+                loginBtn: "Enter Chat",
+                registerBtn: "Register Account",
+                noAccount: "Don't have an account? Sign up now",
+                haveAccount: "Already have an account? Log in",
+                addFriendPlaceholder: "Add friend by username...",
+                friendsTab: "Friends",
+                groupsTab: "Groups",
+                requestsTab: "Requests",
+                logout: "Log out",
+                chatPlaceholderHeader: "Choose a chat or group to start",
+                chatPlaceholderSub: "Exchange messages and connect instantly!",
+                membrosBtn: "Members",
+                openCreateGroupBtn: "Create New Group",
+                groupNameLabel: "Group Name",
+                createGroupModalTitle: "Create New Group",
+                editPerfilTitle: "Edit Your Profile",
+                nomeExibicaoLabel: "Your Display Name",
+                recebidosHeader: "Received",
+                enviadosHeader: "Sent",
+                orText: "Or connect with another account",
+                personalizarGrupo: "Customize Group",
+                convidarMembro: "Invite New Member",
+                membrosTitulo: "Channel Members",
+                convidarBtn: "Invite",
+                addFriendBtn: "Add",
+                salvarBtn: "Save Changes"
+            },
+            ES: {
+                authTitle: "Accede a tu cuenta para chatear",
+                authTitleReg: "Crea tu cuenta para comenzar",
+                displayName: "¿Cómo quieres que te llamemos? (Nombre)",
+                username: "Nombre de usuario (@ID)",
+                password: "Contraseña",
+                loginBtn: "Entrar al Chat",
+                registerBtn: "Registrar Cuenta",
+                noAccount: "¿No tienes una cuenta? Regístrate ahora",
+                haveAccount: "¿Ya tienes una cuenta? Iniciar sesión",
+                addFriendPlaceholder: "Añadir amigo por usuario...",
+                friendsTab: "Amigos",
+                groupsTab: "Grupos",
+                requestsTab: "Solicitudes",
+                logout: "Salir",
+                chatPlaceholderHeader: "Elige una conversación para empezar",
+                chatPlaceholderSub: "¡Intercambia mensajes y conéctate al instante!",
+                membrosBtn: "Miembros",
+                openCreateGroupBtn: "Crear Nuevo Grupo",
+                groupNameLabel: "Nombre del Grupo",
+                createGroupModalTitle: "Crear Nuevo Grupo",
+                editPerfilTitle: "Editar tu perfil",
+                nomeExibicaoLabel: "Tu nombre de pantalla",
+                recebidosHeader: "Recibidos",
+                enviadosHeader: "Enviados",
+                orText: "O conéctate con otra cuenta",
+                personalizarGrupo: "Personalizar Grupo",
+                convidarMembro: "Invitar Miembro",
+                membrosTitulo: "Miembros del Canal",
+                convidarBtn: "Invitar",
+                addFriendBtn: "Añadir",
+                salvarBtn: "Guardar Cambios"
+            }
+        };
+
+        // Fallback dinâmico para os outros idiomas se não especificado
+        languages.forEach(lang => {
+            if (!translations[lang.code]) {
+                translations[lang.code] = translations.EN; // Default para Inglês
+            }
+        });
+
+        let currentLang = "PT";
+
         // --- MODO DE DIAGNÓSTICO E AUTO-FALLBACK OFFLINE ---
         let isOfflineMode = false;
         const banner = document.getElementById('connection-banner');
@@ -467,55 +721,18 @@
         function setStatusBanner(mode, message) {
             bannerText.innerText = message;
             if (mode === 'real') {
-                banner.className = "bg-emerald-600/20 border-b border-emerald-500/30 text-emerald-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
+                banner.className = "bg-emerald-600/20 border-b border-emerald-500/30 text-emerald-700 dark:text-emerald-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
                 bannerDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
             } else if (mode === 'checking') {
-                banner.className = "bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
+                banner.className = "bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
                 bannerDot.className = "w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse";
             } else {
-                banner.className = "bg-amber-600/20 border-b border-amber-500/30 text-amber-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
+                banner.className = "bg-amber-600/20 border-b border-amber-500/30 text-amber-700 dark:text-amber-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
                 bannerDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
             }
         }
 
-        function setupFavicon() {
-            const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="url(#grad)"/><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><path d="M30 45h.01M50 45h.01M70 45h.01M80 45c0 16.5-13.5 30-30 30a32.8 32.8 0 01-14.2-3.2L16 75l4.6-12.4C17.7 56.8 16 51.1 16 45c0-16.5 13.5-30 30-30s30 13.5 30 30z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>`;
-            const faviconUrl = `data:image/svg+xml;utf8,${encodeURIComponent(faviconSvg)}`;
-            let link = document.querySelector("link[rel*='icon']");
-            if (!link) {
-                link = document.createElement('link');
-                link.rel = 'icon';
-                document.head.appendChild(link);
-            }
-            link.href = faviconUrl;
-        }
-
-        function getAvatarHTML(type, value, fallbackInitial, bgGradientClass = 'from-indigo-500 to-indigo-600') {
-            if (type === 'url' && value && value.trim() !== '') {
-                const cleanUrl = value.replace(/"/g, '&quot;');
-                return `<img src="${cleanUrl}" class="w-full h-full object-cover rounded-full" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="hidden w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} items-center justify-center font-bold text-white uppercase">${fallbackInitial}</div>`;
-            } else if (type === 'emoji' && value && value.trim() !== '') {
-                return `<div class="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-lg leading-none" style="display:flex;">${value}</div>`;
-            } else {
-                return `<div class="w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} flex items-center justify-center font-bold text-white uppercase" style="display:flex;">${fallbackInitial}</div>`;
-            }
-        }
-
-        // --- SISTEMA DE NOTIFICAÇÕES & RASTREAMENTO DE FOCO ---
-        let activeGroupList = []; // Cache global de grupos ativos para notificações em segundo plano
-        let isWindowFocused = true;
-        const sessionStartTime = Date.now();
-        const notifiedMessageIds = new Set();
-
-        // Conversão em lote do logo SVG para Data URI compatível com Notificação de SO (Favicon do chat)
-        const APP_ICON_DATA_URI = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%236366f1"/><path d="M30 45h.01M50 45h.01M70 45h.01M80 45c0 16.5-13.5 30-30 30a32.8 32.8 0 01-14.2-3.2L16 75l4.6-12.4C17.7 56.8 16 51.1 16 45c0-16.5 13.5-30 30-30s30 13.5 30 30z" fill="%23fff" stroke="%23fff" stroke-width="2" stroke-linejoin="round"/></svg>`;
-
-        // Eventos nativos de monitoramento de foco da página
-        window.addEventListener('focus', () => { isWindowFocused = true; });
-        window.addEventListener('blur', () => { isWindowFocused = false; });
-
-        // Sintetizador de Áudio nativo (Sino duplo dinâmico)
+        // --- STREAMING_CHUNK:Configurando os áudios e sons sintetizados... ---
         function playNotificationSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -523,22 +740,20 @@
                 const gain = ctx.createGain();
                 osc.connect(gain);
                 gain.connect(ctx.destination);
-                
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // Ré (D5)
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); 
                 gain.gain.setValueAtTime(0, ctx.currentTime);
                 gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.05);
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
                 osc.start(ctx.currentTime);
                 osc.stop(ctx.currentTime + 0.31);
-                
                 setTimeout(() => {
                     const osc2 = ctx.createOscillator();
                     const gain2 = ctx.createGain();
                     osc2.connect(gain2);
                     gain2.connect(ctx.destination);
                     osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(880, ctx.currentTime); // Lá (A5)
+                    osc2.frequency.setValueAtTime(880, ctx.currentTime); 
                     gain2.gain.setValueAtTime(0, ctx.currentTime);
                     gain2.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.05);
                     gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
@@ -546,47 +761,18 @@
                     osc2.stop(ctx.currentTime + 0.36);
                 }, 80);
             } catch (e) {
-                console.debug("Web Audio dependente de interação inicial ou bloqueado.");
+                console.debug("Navegador aguarda interação para reproduzir áudio.");
             }
         }
 
-        // Solicitação de permissões nativas
-        function requestNotificationPermission() {
-            if ("Notification" in window) {
-                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-                    Notification.requestPermission();
-                }
-            }
-        }
-
-        // Função de disparo unificada
-        function sendSystemNotification(title, body) {
-            playNotificationSound();
-            
-            // 1. Notificação Nativa do Sistema Operacional (Se permitido)
-            if ("Notification" in window && Notification.permission === "granted") {
-                try {
-                    new Notification(title, {
-                        body: body,
-                        icon: APP_ICON_DATA_URI
-                    });
-                } catch (e) {
-                    console.warn("Notificação nativa bloqueada no iframe.");
-                }
-            }
-            
-            // 2. Notificação Visual Interna Customizada (Segurança e redundância)
-            showToast(`${title}: ${body}`, "info");
-        }
-
-        // --- MEMÓRIA DO SIMULADOR OFFLINE (Suporta Grupos Offline!) ---
+        // --- MEMÓRIA DO SIMULADOR OFFLINE ---
         const syncChannel = window.BroadcastChannel ? new BroadcastChannel('conectachat-live-fallback') : null;
         let simData = {
             accounts: {},
             friends: {},
             messages: [],
-            groups: {},         // groupId -> { id, name, creator, members, avatarType, avatarValue }
-            groupMessages: []   // array de msg de grupos
+            groups: {},         
+            groupMessages: []   
         };
 
         function loadLocalSimulationData() {
@@ -613,66 +799,50 @@
             }
         }
 
+        // Sincronização automática entre abas em modo Offline
         if (syncChannel) {
             syncChannel.onmessage = (event) => {
                 if (event.data && event.data.type === 'SYNC_STATE') {
                     simData = event.data.data;
                     accountsMap = simData.accounts;
-                    
-                    // Disparar notificações offline para abas secundárias abertas em background
                     if (currentUser) {
-                        // 1. Notificações de DMs offline
-                        simData.messages.forEach(msg => {
-                            const msgId = `offline_dm_${msg.sender}_${msg.timestamp}`;
-                            if (msg.timestamp > sessionStartTime && msg.sender !== currentUser.username && msg.receiver === currentUser.username) {
-                                if (!notifiedMessageIds.has(msgId)) {
-                                    notifiedMessageIds.add(msgId);
-                                    const isViewingSender = activeFriend && activeFriend.username === msg.sender;
-                                    if (!isWindowFocused || !isViewingSender) {
-                                        const senderName = accountsMap[msg.sender]?.name || msg.sender;
-                                        sendSystemNotification("ConectaChat", `${senderName} te mandou mensagem`);
-                                    }
-                                }
-                            }
-                        });
-
-                        // 2. Notificações de Grupos offline
-                        if (simData.groupMessages) {
-                            simData.groupMessages.forEach(msg => {
-                                const msgId = `offline_group_${msg.sender}_${msg.timestamp}`;
-                                const myGroups = Object.values(simData.groups).filter(g => g.members.includes(currentUser.username));
-                                const belongsToMyGroup = myGroups.some(g => g.id === msg.groupId);
-                                
-                                if (belongsToMyGroup && msg.timestamp > sessionStartTime && msg.sender !== currentUser.username) {
-                                    if (!notifiedMessageIds.has(msgId)) {
-                                        notifiedMessageIds.add(msgId);
-                                        const isViewingGroup = activeGroup && activeGroup.id === msg.groupId;
-                                        if (!isWindowFocused || !isViewingGroup) {
-                                            const senderName = msg.senderName || accountsMap[msg.sender]?.name || msg.sender;
-                                            sendSystemNotification("ConectaChat", `${senderName} mandou mensagem no grupo`);
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                        
                         triggerOfflineCallbacks();
                     }
                 }
             };
         }
 
+        // --- STREAMING_CHUNK:Tratando o bypass e fallback automático do Offline... ---
+        // Ativação do Fallback Offline com Conta Predefinida Gerada Aleatoriamente (Bypass de login automático!)
         function activateOfflineFallback() {
             if (isOfflineMode) return;
             isOfflineMode = true;
             loadLocalSimulationData();
             accountsMap = simData.accounts;
-            setStatusBanner('offline', `MODO OFFLINE ATIVO: Use localmente ou conecte-se à internet para usar o Firebase!`);
-            showToast("Alternando para o banco de dados seguro local offline.", "warning");
+
+            // Criar Conta Predefinida com ID e Nome Aleatório!
+            const randomID = Math.floor(1000 + Math.random() * 9000);
+            const offlineNames = ["Luis_Dev", "Cyber_Alex", "Alice_Net", "Gamer_X", "Carlos_Prog", "Vanessa_QA", "Tiago_UX", "Beatriz_Cloud"];
+            const chosenName = offlineNames[Math.floor(Math.random() * offlineNames.length)] + "_" + randomID;
             
-            if (currentUser) {
-                triggerOfflineCallbacks();
-            }
+            currentUser = {
+                username: "guest_" + randomID,
+                name: chosenName,
+                password: "123",
+                uid: "offline_" + randomID,
+                avatarType: 'emoji',
+                avatarValue: '🤖'
+            };
+
+            // Salvar no simulador offline
+            simData.accounts[currentUser.username] = currentUser;
+            saveLocalSimulationData();
+
+            setStatusBanner('offline', `MODO OFFLINE ATIVO: Conta predefinida @${currentUser.username} criada automaticamente!`);
+            showToast("Bypass ativo: Conta de convidado gerada com sucesso!", "info");
+
+            // Avançar instantaneamente para o aplicativo
+            enterApplication();
         }
 
         // Inicializar Firebase
@@ -691,42 +861,159 @@
 
         // Estado do App
         let firebaseAuthenticated = false;
-        let currentUser = null; // Perfil local `{username, name, uid, avatarType, avatarValue}`
-        let activeFriend = null; // Amigo ativo `{username, name}`
-        let activeGroup = null;  // Grupo ativo `{id, name, creator, members, avatarType, avatarValue}`
-        let accountsMap = {}; // Cache de contas
-        let lastAccountData = null; // Credenciais para login rápido
+        let currentUser = null; 
+        let activeFriend = null; 
+        let activeGroup = null;  
+        let accountsMap = {}; 
+        let lastAccountData = null; 
         let unsubscribeFriends = null;
         let unsubscribeGroups = null;
         let unsubscribeMessages = null;
         let unsubscribeGroupMessages = null;
+        let activeGroupList = []; 
+        let isWindowFocused = true;
+        const sessionStartTime = Date.now();
+        const notifiedMessageIds = new Set();
 
-        // Custom Toast
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
+        window.addEventListener('focus', () => { isWindowFocused = true; });
+        window.addEventListener('blur', () => { isWindowFocused = false; });
+
+        // --- STREAMING_CHUNK:Lógicas de notificações premium... ---
+        function sendSystemNotification(title, body, triggerChatFn) {
+            playNotificationSound();
+            const container = document.getElementById('premium-notif-container');
             if (!container) return;
-            const toast = document.createElement('div');
-            toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 ${
-                type === 'success' 
-                    ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-300' 
-                    : type === 'error' 
-                    ? 'bg-rose-950/90 border-rose-500/30 text-rose-300' 
-                    : 'bg-indigo-950/90 border-indigo-500/30 text-indigo-300'
-            }`;
+
+            const notif = document.createElement('div');
+            notif.className = "flex flex-col gap-2 p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl shadow-2xl pointer-events-auto transform translate-x-12 opacity-0 transition-all duration-300 max-w-sm shrink-0 border-l-4 border-l-indigo-500";
             
-            toast.innerHTML = `
-                <span class="w-1.5 h-1.5 rounded-full ${type === 'success' ? 'bg-emerald-400' : type === 'error' ? 'bg-rose-400' : 'bg-indigo-400'}"></span>
-                <span>${message}</span>
+            notif.innerHTML = `
+                <div class="flex items-start gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center font-bold text-xs uppercase text-white shrink-0">
+                        C
+                    </div>
+                    <div class="flex-1 truncate">
+                        <h4 class="text-xs font-bold text-indigo-600 dark:text-indigo-300 truncate">${title}</h4>
+                        <p class="text-[11px] text-slate-600 dark:text-slate-300 mt-0.5 whitespace-normal line-clamp-2 leading-relaxed">${body}</p>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-1.5 mt-1.5 border-t border-slate-100 dark:border-slate-800/60 pt-2">
+                    <button class="notif-close-btn px-2.5 py-1 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all">Fechar</button>
+                    <button class="notif-action-btn px-3 py-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-[9px] font-bold shadow-md shadow-indigo-500/15 transition-all">Abrir</button>
+                </div>
             `;
-            
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
+
+            container.appendChild(notif);
+            setTimeout(() => notif.classList.remove('translate-x-12', 'opacity-0'), 50);
+
+            notif.querySelector('.notif-action-btn').addEventListener('click', () => {
+                triggerChatFn();
+                notif.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => notif.remove(), 300);
+            });
+
+            notif.querySelector('.notif-close-btn').addEventListener('click', () => {
+                notif.classList.add('translate-x-12', 'opacity-0');
+                setTimeout(() => notif.remove(), 300);
+            });
+
             setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
+                if (notif.parentNode) {
+                    notif.classList.add('translate-x-12', 'opacity-0');
+                    setTimeout(() => notif.remove(), 300);
+                }
+            }, 7000);
         }
 
+        // --- STREAMING_CHUNK:Aplicando traduções dinâmicas de interface... ---
+        function applyTranslations() {
+            const t = translations[currentLang];
+            document.getElementById('auth-title').innerText = registerMode ? t.authTitleReg : t.authTitle;
+            document.getElementById('label-display-name').innerText = t.displayName;
+            document.getElementById('label-username').innerText = t.username;
+            document.getElementById('label-password').innerText = t.password;
+            document.getElementById('auth-submit-btn').innerText = registerMode ? t.registerBtn : t.loginBtn;
+            document.getElementById('toggle-auth-mode').innerText = registerMode ? t.haveAccount : t.noAccount;
+            document.getElementById('friend-search-input').placeholder = t.addFriendPlaceholder;
+            document.getElementById('btn-add-action').innerText = t.addFriendBtn;
+            document.getElementById('logout-text-label').innerText = t.logout;
+            document.getElementById('tab-friends').innerHTML = `${t.friendsTab} (<span id="count-friends">0</span>)`;
+            document.getElementById('tab-groups').innerHTML = `${t.groupsTab} (<span id="count-groups">0</span>)`;
+            document.getElementById('tab-requests').innerHTML = `${t.requestsTab} <span id="badge-requests" class="hidden bg-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">0</span>`;
+            document.getElementById('friends-empty').innerHTML = `<svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg> ${t.friendsTab === 'Friends' ? 'No friends connected yet.<br>Add people at the top!' : t.friendsTab === 'Amigos' ? 'Nenhum amigo conectado ainda.<br>Adicione pessoas pelo topo!' : 'Nenhum amigo ainda.'}`;
+            document.getElementById('chat-placeholder-header').innerText = t.chatPlaceholderHeader;
+            document.getElementById('chat-placeholder-sub').innerText = t.chatPlaceholderSub;
+            document.getElementById('label-membros-btn').innerText = t.membrosBtn;
+            document.getElementById('open-create-group-modal').innerHTML = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg> ${t.openCreateGroupBtn}`;
+            document.getElementById('label-group-name').innerText = t.groupNameLabel;
+            document.getElementById('btn-create-group-submit').innerText = t.openCreateGroupBtn;
+            document.getElementById('create-group-modal-title').innerText = t.createGroupModalTitle;
+            document.getElementById('label-perfil-modal').innerText = t.editPerfilTitle;
+            document.getElementById('label-nome-exibicao').innerText = t.nomeExibicaoLabel;
+            document.getElementById('btn-save-profile').innerText = t.salvarBtn || "Salvar";
+            document.getElementById('req-received-header').innerText = t.recebidosHeader;
+            document.getElementById('req-sent-header').innerText = t.enviadosHeader;
+            document.getElementById('label-or-option').innerText = t.orText;
+            document.getElementById('label-personalizar-grupo').innerText = t.personalizarGrupo;
+            document.getElementById('label-convidar-membro').innerText = t.convidarMembro;
+            document.getElementById('label-membros-titulo').innerText = t.membrosTitulo;
+            document.getElementById('btn-convidar-action').innerText = t.convidarBtn;
+        }
+
+        // --- STREAMING_CHUNK:Montando o seletor de 15 idiomas... ---
+        // Renderizar a Grid de Idiomas
+        const languagesGrid = document.getElementById('languages-grid');
+        languages.forEach(lang => {
+            const btn = document.createElement('button');
+            btn.type = "button";
+            btn.className = "flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-950/40 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all group";
+            btn.innerHTML = `
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">${lang.native}</span>
+                <span class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">${lang.name}</span>
+            `;
+            btn.addEventListener('click', () => {
+                // Remover destaque dos outros
+                Array.from(languagesGrid.children).forEach(child => child.classList.remove('border-indigo-500', 'bg-indigo-50/50', 'dark:bg-indigo-950/20'));
+                btn.classList.add('border-indigo-500', 'bg-indigo-50/50', 'dark:bg-indigo-950/20');
+                currentLang = lang.code;
+            });
+            languagesGrid.appendChild(btn);
+        });
+
+        // Selecionar Português por padrão na Grid
+        languagesGrid.children[0].click();
+
+        document.getElementById('confirm-lang-btn').addEventListener('click', () => {
+            applyTranslations();
+            document.getElementById('language-screen').classList.add('hidden');
+            authenticateFirebase();
+        });
+
+        // --- STREAMING_CHUNK:Configurando os Temas de Interface (Modos Claro e Escuro)... ---
+        // Gerenciamento de Tema Claro / Escuro
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        document.getElementById('theme-toggle-auth').addEventListener('click', toggleTheme);
+        document.getElementById('theme-toggle-main').addEventListener('click', toggleTheme);
+
+        // Inicializar tema com base na escolha salva
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+
+        // --- STREAMING_CHUNK:Lógicas de Autenticação e Entrada de Usuários... ---
         async function authenticateFirebase() {
             if (isOfflineMode) return;
             try {
@@ -740,21 +1027,18 @@
                 setStatusBanner('real', 'Conectado ao Firebase Cloud Server');
                 startListeningAccounts();
                 await checkLastAccount();
+                
+                // Mostrar a tela de Auth se não tivermos bypass offline engatilhado
+                document.getElementById('auth-screen').classList.remove('hidden');
             } catch (err) {
-                console.warn("Autenticação falhou por bloqueio local. Ativando Modo Offline Simulado:", err);
+                console.warn("Autenticação de rede indisponível. Ativando modo offline predefinido...", err);
                 activateOfflineFallback();
             }
         }
 
+        // Buscar última conta para login rápido
         async function checkLastAccount() {
-            if (isOfflineMode) {
-                const localSavedAcc = localStorage.getItem('conectachat_last_account');
-                if (localSavedAcc) {
-                    lastAccountData = JSON.parse(localSavedAcc);
-                    showLastAccountUI(lastAccountData);
-                }
-                return;
-            }
+            if (isOfflineMode) return;
             const userId = auth.currentUser?.uid;
             if (!userId) return;
             try {
@@ -790,7 +1074,6 @@
                 snapshot.forEach(doc => {
                     accountsMap[doc.id] = doc.data();
                 });
-                console.log("Sincronização de contas concluída.");
                 if (currentUser && accountsMap[currentUser.username]) {
                     currentUser = accountsMap[currentUser.username];
                     updateUIPersonalProfile();
@@ -802,42 +1085,303 @@
             });
         }
 
-        // Configurações do formulário
-        const authForm = document.getElementById('auth-form');
-        const authTitle = document.getElementById('auth-title');
-        const displayNameGroup = document.getElementById('display-name-group');
-        const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
-        const authSubmitBtn = document.getElementById('auth-submit-btn');
-        let registerMode = false;
+        // --- STREAMING_CHUNK:Gerenciando Perfis e Customização de Avatares... ---
+        // Perfil e Customização de Avatar
+        const profileModal = document.getElementById('profile-modal');
+        const profileForm = document.getElementById('profile-form');
+        const profileNameInput = document.getElementById('profile-name-input');
+        const profileAvatarType = document.getElementById('profile-avatar-type');
+        const profileAvatarValue = document.getElementById('profile-avatar-value');
+        const profileAvatarValueGroup = document.getElementById('profile-avatar-value-group');
+        const profileAvatarValueLabel = document.getElementById('profile-avatar-value-label');
 
-        toggleAuthModeBtn.addEventListener('click', () => {
-            registerMode = !registerMode;
-            if (registerMode) {
-                authTitle.innerText = "Crie sua conta para começar";
-                displayNameGroup.classList.remove('hidden');
-                document.getElementById('reg-name').required = true;
-                authSubmitBtn.innerText = "Registrar Conta";
-                toggleAuthModeBtn.innerText = "Já tem uma conta? Conecte-se";
-                document.getElementById('last-account-container').classList.add('hidden');
+        document.getElementById('profile-footer-trigger').addEventListener('click', () => {
+            if (!currentUser) return;
+            profileNameInput.value = currentUser.name;
+            profileAvatarType.value = currentUser.avatarType || 'initial';
+            profileAvatarValue.value = currentUser.avatarValue || '';
+            toggleProfileAvatarInputs();
+            profileModal.classList.remove('hidden');
+        });
+
+        document.getElementById('close-profile-modal').addEventListener('click', () => {
+            profileModal.classList.add('hidden');
+        });
+
+        profileAvatarType.addEventListener('change', toggleProfileAvatarInputs);
+
+        function toggleProfileAvatarInputs() {
+            const val = profileAvatarType.value;
+            if (val === 'initial') {
+                profileAvatarValueGroup.classList.add('hidden');
             } else {
-                authTitle.innerText = "Acesse sua conta para conversar";
-                displayNameGroup.classList.add('hidden');
-                document.getElementById('reg-name').required = false;
-                authSubmitBtn.innerText = "Entrar no Chat";
-                toggleAuthModeBtn.innerText = "Não tem uma conta? Cadastre-se agora";
-                if (lastAccountData) {
-                    document.getElementById('last-account-container').classList.remove('hidden');
+                profileAvatarValueGroup.classList.remove('hidden');
+                if (val === 'emoji') {
+                    profileAvatarValueLabel.innerText = "Emoji";
+                    profileAvatarValue.placeholder = "Ex: 💬, 🎮, 🦄";
+                } else if (val === 'url') {
+                    profileAvatarValueLabel.innerText = "Link de Imagem (URL)";
+                    profileAvatarValue.placeholder = "Ex: https://dominio.com/foto.jpg";
                 }
+            }
+        }
+
+        function getAvatarHTML(type, value, fallbackInitial, bgGradientClass = 'from-indigo-500 to-indigo-600') {
+            if (type === 'url' && value && value.trim() !== '') {
+                const cleanUrl = value.replace(/"/g, '&quot;');
+                return `<img src="${cleanUrl}" class="w-full h-full object-cover rounded-full" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="hidden w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} items-center justify-center font-bold text-white uppercase">${fallbackInitial}</div>`;
+            } else if (type === 'emoji' && value && value.trim() !== '') {
+                return `<div class="w-full h-full rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg leading-none" style="display:flex;">${value}</div>`;
+            } else {
+                return `<div class="w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} flex items-center justify-center font-bold text-white uppercase" style="display:flex;">${fallbackInitial}</div>`;
+            }
+        }
+
+        function updateUIPersonalProfile() {
+            if (!currentUser) return;
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('user-avatar').innerHTML = getAvatarHTML(currentUser.avatarType, currentUser.avatarValue, currentUser.name.charAt(0).toUpperCase());
+            
+            if (activeFriend && activeFriend.username === currentUser.username) {
+                document.getElementById('active-chat-name').innerText = currentUser.name;
+                document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(currentUser.avatarType, currentUser.avatarValue, currentUser.name.charAt(0).toUpperCase());
+            }
+        }
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newName = profileNameInput.value.trim();
+            const newType = profileAvatarType.value;
+            const newValue = profileAvatarValue.value.trim();
+
+            if (!newName) return;
+
+            const updatedUserData = {
+                ...currentUser,
+                name: newName,
+                avatarType: newType,
+                avatarValue: newValue
+            };
+
+            if (isOfflineMode) {
+                simData.accounts[currentUser.username] = updatedUserData;
+                saveLocalSimulationData();
+                currentUser = updatedUserData;
+                accountsMap = simData.accounts;
+                updateUIPersonalProfile();
+                triggerOfflineCallbacks();
+                showToast("Seu perfil foi atualizado offline!");
+                profileModal.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', currentUser.username);
+                await setDoc(userDocRef, updatedUserData);
+                currentUser = updatedUserData;
+                accountsMap[currentUser.username] = updatedUserData;
+                updateUIPersonalProfile();
+                showToast("Seu perfil foi atualizado!");
+                profileModal.classList.add('hidden');
+            } catch (err) {
+                console.error("Erro ao atualizar perfil:", err);
+                showToast("Erro ao salvar alterações do perfil.", "error");
             }
         });
 
-        document.getElementById('last-account-btn').addEventListener('click', () => {
-            if (!lastAccountData) return;
-            document.getElementById('auth-username').value = lastAccountData.username;
-            document.getElementById('auth-password').value = lastAccountData.password;
-            if (registerMode) toggleAuthModeBtn.click();
-            authForm.dispatchEvent(new Event('submit'));
+        // --- STREAMING_CHUNK:Lógicas de compactação e processamento de imagens... ---
+        // Compactação Canvas para Envio de Imagem Segura
+        function compressAndConvertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function (event) {
+                    const imgUrl = event.target.result;
+                    
+                    if (file.type.startsWith('video/') || file.size < 100 * 1024) {
+                        resolve({ base64: imgUrl, type: file.type.startsWith('video/') ? 'video' : 'image' });
+                        return;
+                    }
+
+                    const img = new Image();
+                    img.src = imgUrl;
+                    img.onload = function () {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const max_size = 800;
+                        if (width > height) {
+                            if (width > max_size) {
+                                height *= max_size / width;
+                                width = max_size;
+                            }
+                        } else {
+                            if (height > max_size) {
+                                width *= max_size / height;
+                                height = max_size;
+                            }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7); 
+                        resolve({ base64: dataUrl, type: 'image' });
+                    };
+                    img.onerror = err => reject(err);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Gerenciamento de Anexos
+        const mediaFileInput = document.getElementById('media-file-input');
+        const attachFileBtn = document.getElementById('attach-file-btn');
+        const filePreviewBar = document.getElementById('file-preview-bar');
+        const filePreviewContainer = document.getElementById('file-preview-container');
+        const filePreviewName = document.getElementById('file-preview-name');
+        const filePreviewSize = document.getElementById('file-preview-size');
+        const cancelFileBtn = document.getElementById('cancel-file-btn');
+        let selectedFilePayload = null;
+
+        attachFileBtn.addEventListener('click', () => mediaFileInput.click());
+
+        mediaFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.size > 1.5 * 1024 * 1024) {
+                showToast("O arquivo excede o limite permitido de 1.5MB.", "error");
+                mediaFileInput.value = '';
+                return;
+            }
+
+            showToast("Processando anexo...", "info");
+
+            try {
+                const res = await compressAndConvertToBase64(file);
+                selectedFilePayload = {
+                    base64: res.base64,
+                    type: res.type,
+                    name: file.name,
+                    size: (file.size / 1024).toFixed(1) + " KB"
+                };
+
+                filePreviewName.innerText = file.name;
+                filePreviewSize.innerText = selectedFilePayload.size;
+                filePreviewContainer.innerHTML = '';
+
+                if (res.type === 'image') {
+                    filePreviewContainer.innerHTML = `<img src="${res.base64}" class="w-full h-full object-cover">`;
+                } else if (res.type === 'video') {
+                    filePreviewContainer.innerHTML = `<video src="${res.base64}" class="w-full h-full object-cover" muted autoplay loop></video>`;
+                }
+
+                filePreviewBar.classList.remove('hidden');
+                document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+            } catch (err) {
+                console.error(err);
+                showToast("Erro ao processar arquivo.", "error");
+                clearSelectedFile();
+            }
         });
+
+        cancelFileBtn.addEventListener('click', clearSelectedFile);
+
+        function clearSelectedFile() {
+            selectedFilePayload = null;
+            mediaFileInput.value = '';
+            filePreviewBar.classList.add('hidden');
+            filePreviewContainer.innerHTML = '';
+        }
+
+        const mediaModal = document.getElementById('media-modal');
+        const mediaModalImg = document.getElementById('media-modal-img');
+        
+        function openMediaModal(url, type) {
+            if (type === 'image') {
+                mediaModalImg.src = url;
+                mediaModalImg.classList.remove('hidden');
+                mediaModal.classList.remove('hidden');
+            }
+        };
+
+        document.getElementById('close-media-modal').addEventListener('click', () => {
+            mediaModal.classList.add('hidden');
+            mediaModalImg.classList.add('hidden');
+            mediaModalImg.src = '';
+        });
+
+        // --- STREAMING_CHUNK:Iniciando fluxos de escuta e conexões de rede... ---
+        function enterApplication() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('user-identity').innerText = `@${currentUser.username}`;
+            document.getElementById('user-tag').innerText = `@${currentUser.username}`;
+            updateUIPersonalProfile();
+            startUserSession();
+        }
+
+        function triggerOfflineCallbacks() {
+            const friendsList = [];
+            const reqReceived = [];
+            const reqSent = [];
+            const groupsList = [];
+
+            Object.values(simData.friends).forEach(data => {
+                if (data.status === 'accepted') {
+                    if (data.sender === currentUser.username) {
+                        friendsList.push({ requestDocId: data.id, friendUsername: data.receiver });
+                    } else if (data.receiver === currentUser.username) {
+                        friendsList.push({ requestDocId: data.id, friendUsername: data.sender });
+                    }
+                } else if (data.status === 'pending') {
+                    if (data.receiver === currentUser.username) {
+                        reqReceived.push(data);
+                    } else if (data.sender === currentUser.username) {
+                        reqSent.push(data);
+                    }
+                }
+            });
+
+            Object.values(simData.groups).forEach(data => {
+                if (data.members.includes(currentUser.username)) {
+                    groupsList.push(data);
+                }
+            });
+
+            renderFriends(friendsList);
+            renderRequests(reqReceived, reqSent);
+            renderGroups(groupsList);
+
+            if (activeFriend) {
+                const messagesList = simData.messages.filter(msg => {
+                    const isFromMeToFriend = (msg.sender === currentUser.username && msg.receiver === activeFriend.username);
+                    const isFromFriendToMe = (msg.sender === activeFriend.username && msg.receiver === currentUser.username);
+                    return isFromMeToFriend || isFromFriendToMe;
+                });
+                messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                renderMessages(messagesList);
+            }
+
+            if (activeGroup) {
+                const freshGroup = simData.groups[activeGroup.id];
+                if (!freshGroup || !freshGroup.members.includes(currentUser.username)) {
+                    showToast("Você foi removido deste grupo.", "error");
+                    closeActiveChat();
+                    return;
+                }
+                activeGroup = freshGroup; 
+                const messagesList = simData.groupMessages.filter(msg => msg.groupId === activeGroup.id);
+                messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                renderGroupMessages(messagesList);
+            }
+        }
+
+        // --- STREAMING_CHUNK:Manipulando formulários de registro e login com Firebase... ---
+        const authForm = document.getElementById('auth-form');
+        let registerMode = false;
 
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -862,7 +1406,6 @@
                         showToast("Este nome de usuário já está sendo usado por outra pessoa.", "error");
                         return;
                     }
-
                     const newUserData = {
                         username: usernameInput,
                         name: displayNameInput || usernameInput,
@@ -871,20 +1414,13 @@
                         avatarType: 'initial',
                         avatarValue: ''
                     };
-
                     await setDoc(userCheckRef, newUserData);
                     showToast("Sua conta foi criada! Faça login agora.");
                     accountsMap[usernameInput] = newUserData;
                     toggleAuthModeBtn.click();
                     document.getElementById('auth-password').value = '';
                 } catch (err) {
-                    if (err.code === 'unavailable' || !navigator.onLine || err.message?.toLowerCase().includes('offline') || err.message?.toLowerCase().includes('client is offline')) {
-                        activateOfflineFallback();
-                        executeOfflineRegistration(usernameInput, displayNameInput, passwordInput);
-                    } else {
-                        console.error("Erro ao registrar conta:", err);
-                        showToast("Não foi possível criar a conta remota.", "error");
-                    }
+                    activateOfflineFallback();
                 }
             } else {
                 if (isOfflineMode) {
@@ -927,237 +1463,23 @@
                     }
                     enterApplication();
                 } catch (err) {
-                    if (err.code === 'unavailable' || !navigator.onLine || err.message?.toLowerCase().includes('offline') || err.message?.toLowerCase().includes('client is offline')) {
-                        activateOfflineFallback();
-                        executeOfflineLogin(usernameInput, passwordInput);
-                    } else {
-                        console.error("Erro durante o fluxo de login:", err);
-                        showToast("Erro ao conectar ao banco de dados.", "error");
-                    }
+                    activateOfflineFallback();
                 }
             }
         });
 
-        function executeOfflineRegistration(usernameInput, displayNameInput, passwordInput) {
-            if (simData.accounts[usernameInput]) {
-                showToast("Este nome de usuário já está sendo usado localmente.", "error");
-                return;
-            }
-            const newUserData = {
-                username: usernameInput,
-                name: displayNameInput || usernameInput,
-                password: passwordInput,
-                uid: crypto.randomUUID(),
-                avatarType: 'initial',
-                avatarValue: ''
-            };
-            simData.accounts[usernameInput] = newUserData;
-            saveLocalSimulationData();
-            accountsMap = simData.accounts;
-            showToast("Sua conta offline foi criada com sucesso! Faça login.");
-            toggleAuthModeBtn.click();
-            document.getElementById('auth-password').value = '';
-        }
-
-        function executeOfflineLogin(usernameInput, passwordInput) {
-            const matchedUser = simData.accounts[usernameInput];
-            if (!matchedUser || matchedUser.password !== passwordInput) {
-                showToast("Nome de usuário ou senha incorretos offline.", "error");
-                return;
-            }
-            currentUser = matchedUser;
-            showToast(`Conectado no Modo Offline como ${currentUser.name}!`);
-            const backup = { username: currentUser.username, name: currentUser.name, password: passwordInput };
-            localStorage.setItem('conectachat_last_account', JSON.stringify(backup));
-            lastAccountData = backup;
-            showLastAccountUI(lastAccountData);
-            enterApplication();
-        }
-
-        function enterApplication() {
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('main-app').classList.remove('hidden');
-
-            document.getElementById('user-identity').innerText = `@${currentUser.username}`;
-            document.getElementById('user-tag').innerText = `@${currentUser.username}`;
-
-            updateUIPersonalProfile();
-            requestNotificationPermission(); // Solicitar permissão nativa ao carregar painel principal
-            startUserSession();
-        }
-
-        const profileModal = document.getElementById('profile-modal');
-        const profileForm = document.getElementById('profile-form');
-        const profileNameInput = document.getElementById('profile-name-input');
-        const profileAvatarType = document.getElementById('profile-avatar-type');
-        const profileAvatarValue = document.getElementById('profile-avatar-value');
-        const profileAvatarValueGroup = document.getElementById('profile-avatar-value-group');
-        const profileAvatarValueLabel = document.getElementById('profile-avatar-value-label');
-
-        document.getElementById('profile-footer-trigger').addEventListener('click', () => {
-            if (!currentUser) return;
-            profileNameInput.value = currentUser.name;
-            profileAvatarType.value = currentUser.avatarType || 'initial';
-            profileAvatarValue.value = currentUser.avatarValue || '';
-            
-            toggleProfileAvatarInputs();
-            profileModal.classList.remove('hidden');
-        });
-
-        document.getElementById('close-profile-modal').addEventListener('click', () => {
-            profileModal.classList.add('hidden');
-        });
-
-        profileAvatarType.addEventListener('change', toggleProfileAvatarInputs);
-
-        function toggleProfileAvatarInputs() {
-            const val = profileAvatarType.value;
-            if (val === 'initial') {
-                profileAvatarValueGroup.classList.add('hidden');
-            } else {
-                profileAvatarValueGroup.classList.remove('hidden');
-                if (val === 'emoji') {
-                    profileAvatarValueLabel.innerText = "Emoji personalizado";
-                    profileAvatarValue.placeholder = "Ex: 💬, 🎮, 🦄";
-                } else if (val === 'url') {
-                    profileAvatarValueLabel.innerText = "Link de Imagem (URL)";
-                    profileAvatarValue.placeholder = "Ex: https://dominio.com/foto.jpg";
-                }
-            }
-        }
-
-        profileForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newName = profileNameInput.value.trim();
-            const newType = profileAvatarType.value;
-            const newValue = profileAvatarValue.value.trim();
-
-            if (!newName) return;
-
-            const updatedUserData = {
-                ...currentUser,
-                name: newName,
-                avatarType: newType,
-                avatarValue: newValue
-            };
-
-            if (isOfflineMode) {
-                simData.accounts[currentUser.username] = updatedUserData;
-                saveLocalSimulationData();
-                currentUser = updatedUserData;
-                accountsMap = simData.accounts;
-                updateUIPersonalProfile();
-                triggerOfflineCallbacks();
-                showToast("Seu perfil foi atualizado offline!");
-                profileModal.classList.add('hidden');
-                return;
-            }
-
-            try {
-                const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', currentUser.username);
-                await setDoc(userDocRef, updatedUserData);
-                
-                currentUser = updatedUserData;
-                accountsMap[currentUser.username] = updatedUserData;
-                updateUIPersonalProfile();
-                showToast("Seu perfil foi atualizado!");
-                profileModal.classList.add('hidden');
-            } catch (err) {
-                console.error("Erro ao atualizar perfil:", err);
-                showToast("Erro ao salvar alterações do perfil.", "error");
-            }
-        });
-
-        function updateUIPersonalProfile() {
-            if (!currentUser) return;
-            document.getElementById('user-display-name').innerText = currentUser.name;
-            document.getElementById('user-avatar').innerHTML = getAvatarHTML(currentUser.avatarType, currentUser.avatarValue, currentUser.name.charAt(0).toUpperCase());
-            
-            // se o chat atual ativo for o seu próprio, atualize na tela
-            if (activeFriend && activeFriend.username === currentUser.username) {
-                document.getElementById('active-chat-name').innerText = currentUser.name;
-                document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(currentUser.avatarType, currentUser.avatarValue, currentUser.name.charAt(0).toUpperCase());
-            }
-        }
-
-        function triggerOfflineCallbacks() {
-            const friendsList = [];
-            const reqReceived = [];
-            const reqSent = [];
-            const groupsList = [];
-
-            // 1. Sincronizar Amizades e Solicitações Offline
-            Object.values(simData.friends).forEach(data => {
-                if (data.status === 'accepted') {
-                    if (data.sender === currentUser.username) {
-                        friendsList.push({ requestDocId: data.id, friendUsername: data.receiver });
-                    } else if (data.receiver === currentUser.username) {
-                        friendsList.push({ requestDocId: data.id, friendUsername: data.sender });
-                    }
-                } else if (data.status === 'pending') {
-                    if (data.receiver === currentUser.username) {
-                        reqReceived.push(data);
-                    } else if (data.sender === currentUser.username) {
-                        reqSent.push(data);
-                    }
-                }
-            });
-
-            // 2. Sincronizar Grupos Offline
-            Object.values(simData.groups).forEach(data => {
-                if (data.members.includes(currentUser.username)) {
-                    groupsList.push(data);
-                }
-            });
-
-            renderFriends(friendsList);
-            renderRequests(reqReceived, reqSent);
-            renderGroups(groupsList);
-
-            // 3. Conversa DM Ativa Offline
-            if (activeFriend) {
-                const messagesList = simData.messages.filter(msg => {
-                    const isFromMeToFriend = (msg.sender === currentUser.username && msg.receiver === activeFriend.username);
-                    const isFromFriendToMe = (msg.sender === activeFriend.username && msg.receiver === currentUser.username);
-                    return isFromMeToFriend || isFromFriendToMe;
-                });
-                messagesList.sort((a, b) => a.timestamp - b.timestamp);
-                renderMessages(messagesList);
-            }
-
-            // 4. Conversa de Grupo Ativa Offline
-            if (activeGroup) {
-                // Verificar se ainda sou membro
-                const freshGroup = simData.groups[activeGroup.id];
-                if (!freshGroup || !freshGroup.members.includes(currentUser.username)) {
-                    showToast("Você foi removido deste grupo.", "error");
-                    closeActiveChat();
-                    return;
-                }
-                activeGroup = freshGroup; // atualizar referencial local
-
-                const messagesList = simData.groupMessages.filter(msg => msg.groupId === activeGroup.id);
-                messagesList.sort((a, b) => a.timestamp - b.timestamp);
-                renderGroupMessages(messagesList);
-            }
-        }
-
+        // --- STREAMING_CHUNK:Executando as sessões de sincronização de rede do Firebase... ---
         function startUserSession() {
             if (unsubscribeFriends) unsubscribeFriends();
             if (unsubscribeGroups) unsubscribeGroups();
             if (unsubscribeMessages) unsubscribeMessages();
             if (unsubscribeGroupMessages) unsubscribeGroupMessages();
 
-            // Cancelar escutas de notificações globais antigas para evitar leaks
-            if (window.globalDMsListener) { window.globalDMsListener(); window.globalDMsListener = null; }
-            if (window.globalGroupsListener) { window.globalGroupsListener(); window.globalGroupsListener = null; }
-
             if (isOfflineMode) {
                 triggerOfflineCallbacks();
                 return;
             }
 
-            // Escutar Amizades no Firebase
             const friendsCol = collection(db, 'artifacts', appId, 'public', 'data', 'friends');
             unsubscribeFriends = onSnapshot(friendsCol, (snapshot) => {
                 const friendsList = [];
@@ -1184,12 +1506,9 @@
                 renderFriends(friendsList);
                 renderRequests(reqReceived, reqSent);
             }, (error) => {
-                if (error.message?.includes('offline') || error.code === 'unavailable' || error.message?.includes('client is offline')) {
-                    activateOfflineFallback();
-                }
+                activateOfflineFallback();
             });
 
-            // Escutar Grupos do Usuário no Firebase
             const groupsCol = collection(db, 'artifacts', appId, 'public', 'data', 'groups');
             unsubscribeGroups = onSnapshot(groupsCol, (snapshot) => {
                 const groupsList = [];
@@ -1201,62 +1520,57 @@
                 });
 
                 renderGroups(groupsList);
-                activeGroupList = groupsList; // Atualiza lista global de moderação para disparo de notificações de grupo
+                activeGroupList = groupsList; 
 
-                // Se houver canal de grupo ativo, validar se o usuário ainda pertence a ele
                 if (activeGroup) {
                     const freshGroup = groupsList.find(g => g.id === activeGroup.id);
                     if (!freshGroup) {
                         showToast("Você foi removido ou o grupo foi excluído.", "error");
                         closeActiveChat();
                     } else {
-                        activeGroup = freshGroup; // atualiza estado
-                        // Atualizar cabeçalho do grupo em tempo real
+                        activeGroup = freshGroup; 
                         document.getElementById('active-chat-name').innerText = activeGroup.name;
                         document.getElementById('active-chat-status').innerText = `${activeGroup.members.length} membros • Criado por @${activeGroup.creator}`;
                         document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(activeGroup.avatarType, activeGroup.avatarValue, activeGroup.name.charAt(0).toUpperCase(), 'from-emerald-500 to-teal-500');
                     }
                 }
             }, (error) => {
-                if (error.message?.includes('offline') || error.code === 'unavailable') {
-                    activateOfflineFallback();
-                }
+                activateOfflineFallback();
             });
 
-            // --- CONFIGURAR LISTENER GLOBAL DE NOTIFICAÇÕES (DMs) ---
+            // Monitor de Notificações em Segundo Plano (DMs)
             const globalDMsCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-            window.globalDMsListener = onSnapshot(globalDMsCol, (snapshot) => {
+            onSnapshot(globalDMsCol, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
                     if (change.type === "added") {
                         const data = change.doc.data();
                         const docId = change.doc.id;
                         
-                        // Notificar apenas se a mensagem for nova, destinada a nós e de autoria externa
                         if (data.timestamp > sessionStartTime && data.sender !== currentUser.username && data.receiver === currentUser.username) {
                             if (!notifiedMessageIds.has(docId)) {
                                 notifiedMessageIds.add(docId);
                                 const isViewingSender = activeFriend && activeFriend.username === data.sender;
                                 if (!isWindowFocused || !isViewingSender) {
                                     const senderName = accountsMap[data.sender]?.name || data.sender;
-                                    sendSystemNotification("ConectaChat", `${senderName} te mandou mensagem`);
+                                    const bodyText = data.fileData ? `${senderName} te enviou um arquivo` : `${senderName}: ${data.text}`;
+                                    sendSystemNotification("ConectaChat", bodyText, () => {
+                                        openChatWith({ username: data.sender, name: senderName });
+                                    });
                                 }
                             }
                         }
                     }
                 });
-            }, (error) => {
-                console.debug("Listener de notificações de DM inativo ou offline.", error);
             });
 
-            // --- CONFIGURAR LISTENER GLOBAL DE NOTIFICAÇÕES (GRUPOS) ---
+            // Monitor de Notificações em Segundo Plano (Grupos)
             const globalGroupsCol = collection(db, 'artifacts', appId, 'public', 'data', 'group_messages');
-            window.globalGroupsListener = onSnapshot(globalGroupsCol, (snapshot) => {
+            onSnapshot(globalGroupsCol, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
                     if (change.type === "added") {
                         const data = change.doc.data();
                         const docId = change.doc.id;
                         
-                        // Verificar se pertencemos ao grupo da mensagem
                         const belongsToMyGroup = activeGroupList && activeGroupList.some(g => g.id === data.groupId);
                         if (belongsToMyGroup && data.timestamp > sessionStartTime && data.sender !== currentUser.username) {
                             if (!notifiedMessageIds.has(docId)) {
@@ -1264,17 +1578,21 @@
                                 const isViewingGroup = activeGroup && activeGroup.id === data.groupId;
                                 if (!isWindowFocused || !isViewingGroup) {
                                     const senderName = data.senderName || accountsMap[data.sender]?.name || data.sender;
-                                    sendSystemNotification("ConectaChat", `${senderName} mandou mensagem no grupo`);
+                                    const groupItem = activeGroupList.find(g => g.id === data.groupId);
+                                    const groupName = groupItem ? groupItem.name : "Grupo";
+                                    const bodyText = data.fileData ? `${senderName} enviou um arquivo no grupo` : `${senderName}: ${data.text}`;
+                                    sendSystemNotification(groupName, bodyText, () => {
+                                        openGroupChatWith(groupItem);
+                                    });
                                 }
                             }
                         }
                     }
                 });
-            }, (error) => {
-                console.debug("Listener de notificações de grupos inativo ou offline.", error);
             });
         }
 
+        // --- STREAMING_CHUNK:Renderizando contatos e amigos com Modo Claro / Escuro... ---
         function renderFriends(friends) {
             const container = document.getElementById('friends-container');
             const emptyEl = document.getElementById('friends-empty');
@@ -1294,8 +1612,8 @@
                 const friendData = accountsMap[f.friendUsername];
                 const displayName = friendData ? friendData.name : f.friendUsername;
                 const activeClass = (activeFriend && activeFriend.username === f.friendUsername) 
-                    ? 'bg-indigo-600/20 border-indigo-500/40 text-white' 
-                    : 'bg-slate-950/40 hover:bg-slate-800/60 border-transparent text-slate-300';
+                    ? 'bg-indigo-600/20 border-indigo-500/40 text-indigo-700 dark:text-white' 
+                    : 'bg-slate-100/50 dark:bg-slate-950/40 hover:bg-slate-200/50 dark:hover:bg-slate-800/60 border-transparent text-slate-700 dark:text-slate-300';
 
                 const friendItem = document.createElement('div');
                 friendItem.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${activeClass}`;
@@ -1312,8 +1630,8 @@
                             ${avatarHTML}
                         </div>
                         <div class="truncate flex-1">
-                            <p class="text-xs font-bold truncate max-w-[140px]">${displayName}</p>
-                            <p class="text-[10px] text-slate-500 font-medium">@${f.friendUsername}</p>
+                            <p class="text-xs font-bold truncate max-w-[140px] text-slate-800 dark:text-white">${displayName}</p>
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">@${f.friendUsername}</p>
                         </div>
                     </div>
                 `;
@@ -1343,8 +1661,8 @@
 
             groups.forEach(g => {
                 const activeClass = (activeGroup && activeGroup.id === g.id)
-                    ? 'bg-emerald-600/20 border-emerald-500/40 text-white'
-                    : 'bg-slate-950/40 hover:bg-slate-800/60 border-transparent text-slate-300';
+                    ? 'bg-emerald-600/20 border-emerald-500/40 text-emerald-800 dark:text-white'
+                    : 'bg-slate-100/50 dark:bg-slate-950/40 hover:bg-slate-200/50 dark:hover:bg-slate-800/60 border-transparent text-slate-700 dark:text-slate-300';
 
                 const groupItem = document.createElement('div');
                 groupItem.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${activeClass}`;
@@ -1357,8 +1675,8 @@
                             ${avatarHTML}
                         </div>
                         <div class="truncate flex-1">
-                            <p class="text-xs font-bold truncate max-w-[140px]">${g.name}</p>
-                            <p class="text-[10px] text-slate-500 font-medium">${g.members.length} membros</p>
+                            <p class="text-xs font-bold truncate max-w-[140px] text-slate-800 dark:text-white">${g.name}</p>
+                            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">${g.members.length} membros</p>
                         </div>
                     </div>
                 `;
@@ -1371,6 +1689,7 @@
             });
         }
 
+        // Renderizar a lista de solicitações recebidas e enviadas
         function renderRequests(received, sent) {
             const receivedContainer = document.getElementById('req-received-container');
             const sentContainer = document.getElementById('req-sent-container');
@@ -1383,53 +1702,56 @@
                 badgeRequests.classList.add('hidden');
             }
 
+            // Renderizar recebidos
             receivedContainer.innerHTML = '';
             if (received.length === 0) {
-                receivedContainer.innerHTML = '<p class="text-[11px] text-slate-600 py-2 italic text-center">Nenhum pedido recebido</p>';
+                receivedContainer.innerHTML = '<p class="text-[11px] text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido recebido</p>';
             } else {
                 received.forEach(req => {
                     const senderName = accountsMap[req.sender] ? accountsMap[req.sender].name : req.sender;
                     const item = document.createElement('div');
-                    item.className = 'p-2.5 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between gap-2';
+                    item.className = 'p-2.5 rounded-xl bg-slate-100/50 dark:bg-slate-950/60 border border-slate-200/50 dark:border-slate-800/80 flex items-center justify-between gap-2';
                     item.innerHTML = `
                         <div class="truncate">
-                            <p class="text-xs font-semibold text-slate-200 truncate">${senderName}</p>
+                            <p class="text-xs font-semibold text-slate-850 dark:text-slate-200 truncate">${senderName}</p>
                             <p class="text-[9px] text-slate-500">@${req.sender}</p>
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
-                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 transition-all" aria-label="Aceitar solicitação de amizade de ${senderName}" title="Aceitar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 transition-all" aria-label="Aceitar" title="Aceitar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                                 </svg>
                             </button>
-                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-400 hover:text-white transition-all" aria-label="Recusar solicitação de amizade de ${senderName}" title="Recusar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-700 dark:text-rose-400 hover:text-white transition-all" aria-label="Recusar" title="Recusar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
                     `;
+
                     item.querySelector('.accept-btn').addEventListener('click', () => handleAcceptRequest(req.id, req.sender));
                     item.querySelector('.decline-btn').addEventListener('click', () => handleDeleteRequest(req.id));
                     receivedContainer.appendChild(item);
                 });
             }
 
+            // Renderizar enviados
             sentContainer.innerHTML = '';
             if (sent.length === 0) {
-                sentContainer.innerHTML = '<p class="text-[11px] text-slate-600 py-2 italic text-center">Nenhum pedido pendente</p>';
+                sentContainer.innerHTML = '<p class="text-[11px] text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido pendente</p>';
             } else {
                 sent.forEach(req => {
                     const receiverName = accountsMap[req.receiver] ? accountsMap[req.receiver].name : req.receiver;
                     const item = document.createElement('div');
-                    item.className = 'p-2.5 rounded-xl bg-slate-950/30 border border-slate-800/50 flex items-center justify-between gap-2';
+                    item.className = 'p-2.5 rounded-xl bg-slate-100/30 dark:bg-slate-950/30 border border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between gap-2';
                     item.innerHTML = `
                         <div class="truncate">
-                            <p class="text-xs font-semibold text-slate-400 truncate">${receiverName}</p>
+                            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">${receiverName}</p>
                             <p class="text-[9px] text-slate-600">@${req.receiver}</p>
                         </div>
-                        <button class="cancel-btn p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all" aria-label="Cancelar solicitação de amizade enviada para ${receiverName}" title="Cancelar">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <button class="cancel-btn p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 transition-all" aria-label="Cancelar" title="Cancelar">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
@@ -1440,6 +1762,243 @@
             }
         }
 
+        // Aceitar solicitação recebida
+        async function handleAcceptRequest(docId, senderUsername) {
+            if (isOfflineMode) {
+                if (simData.friends[docId]) {
+                    simData.friends[docId].status = 'accepted';
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    showToast(`Você agora é amigo de @${senderUsername}!`);
+                }
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), {
+                    status: 'accepted'
+                });
+                showToast(`Você agora é amigo de @${senderUsername}!`);
+            } catch (err) {
+                console.error("Erro ao aceitar amizade:", err);
+                showToast("Erro ao aceitar convite.", "error");
+            }
+        }
+
+        // Recusar ou Cancelar solicitação
+        async function handleDeleteRequest(docId) {
+            if (isOfflineMode) {
+                if (simData.friends[docId]) {
+                    delete simData.friends[docId];
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    showToast("Solicitação de amizade resolvida.");
+                }
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
+                showToast("Solicitação de amizade resolvida.");
+            } catch (err) {
+                console.error("Erro ao remover solicitação:", err);
+                showToast("Erro ao deletar solicitação.", "error");
+            }
+        }
+
+        // --- STREAMING_CHUNK:Renderizando as mensagens com bolhas do chat... ---
+        function renderMessages(messages) {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400 dark:text-slate-500 text-xs">
+                        Comece a conversar agora mesmo!
+                    </div>
+                `;
+                return;
+            }
+
+            messages.forEach(msg => {
+                const isMine = msg.sender === currentUser.username;
+                const alignmentClass = isMine ? 'justify-end' : 'justify-start';
+                const bubbleColor = isMine 
+                    ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-br-none shadow-md shadow-indigo-500/10' 
+                    : 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none';
+
+                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                let mediaHtml = '';
+                if (msg.fileData) {
+                    if (msg.fileType === 'image') {
+                        mediaHtml = `
+                            <div class="mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-90 transition-all" onclick="openMediaModal('${msg.fileData}', 'image')">
+                                <img src="${msg.fileData}" class="max-h-60 object-contain w-full" alt="Imagem">
+                            </div>
+                        `;
+                    } else if (msg.fileType === 'video') {
+                        mediaHtml = `
+                            <div class="mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                                <video src="${msg.fileData}" controls class="max-h-60 w-full" preload="metadata"></video>
+                            </div>
+                        `;
+                    }
+                }
+
+                const msgElement = document.createElement('div');
+                msgElement.className = `flex ${alignmentClass} w-full`;
+                msgElement.innerHTML = `
+                    <div class="max-w-[75%] flex flex-col ${isMine ? 'items-end' : 'items-start'}">
+                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor}">
+                            ${msg.text ? `<div>${msg.text}</div>` : ''}
+                            ${mediaHtml}
+                        </div>
+                        <p class="text-[9px] text-slate-400 mt-1">${time}</p>
+                    </div>
+                `;
+                container.appendChild(msgElement);
+            });
+
+            const chatMessagesDiv = document.getElementById('chat-messages');
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }
+
+        function renderGroupMessages(messages) {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400 dark:text-slate-500 text-xs">
+                        Este é o início das mensagens no grupo!
+                    </div>
+                `;
+                return;
+            }
+
+            messages.forEach(msg => {
+                const isMine = msg.sender === currentUser.username;
+                const alignmentClass = isMine ? 'justify-end' : 'justify-start';
+                const bubbleColor = isMine 
+                    ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-br-none shadow-md' 
+                    : 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none';
+
+                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                let mediaHtml = '';
+                if (msg.fileData) {
+                    if (msg.fileType === 'image') {
+                        mediaHtml = `
+                            <div class="mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-90 transition-all" onclick="openMediaModal('${msg.fileData}', 'image')">
+                                <img src="${msg.fileData}" class="max-h-60 object-contain w-full" alt="Imagem">
+                            </div>
+                        `;
+                    } else if (msg.fileType === 'video') {
+                        mediaHtml = `
+                            <div class="mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+                                <video src="${msg.fileData}" controls class="max-h-60 w-full" preload="metadata"></video>
+                            </div>
+                        `;
+                    }
+                }
+
+                const msgElement = document.createElement('div');
+                msgElement.className = `flex ${alignmentClass} w-full`;
+                
+                const senderHeader = !isMine 
+                    ? `<p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">@${msg.senderName || msg.sender}</p>` 
+                    : '';
+
+                msgElement.innerHTML = `
+                    <div class="max-w-[75%] flex flex-col ${isMine ? 'items-end' : 'items-start'}">
+                        ${senderHeader}
+                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor}">
+                            ${msg.text ? `<div>${msg.text}</div>` : ''}
+                            ${mediaHtml}
+                        </div>
+                        <p class="text-[9px] text-slate-400 mt-1">${time}</p>
+                    </div>
+                `;
+                container.appendChild(msgElement);
+            });
+
+            const chatMessagesDiv = document.getElementById('chat-messages');
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }
+
+        // --- STREAMING_CHUNK:Enviando as mensagens com mídias ou arquivos anexos... ---
+        document.getElementById('chat-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+
+            if (!text && !selectedFilePayload) return;
+
+            const payloadMessage = {
+                sender: currentUser.username,
+                text: text,
+                timestamp: Date.now()
+            };
+
+            if (selectedFilePayload) {
+                payloadMessage.fileData = selectedFilePayload.base64;
+                payloadMessage.fileType = selectedFilePayload.type;
+                payloadMessage.fileName = selectedFilePayload.name;
+            }
+
+            if (activeGroup) {
+                payloadMessage.groupId = activeGroup.id;
+                payloadMessage.senderName = currentUser.name;
+
+                if (isOfflineMode) {
+                    simData.groupMessages.push(payloadMessage);
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    input.value = '';
+                    clearSelectedFile();
+                    input.focus();
+                    return;
+                }
+
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'group_messages'), payloadMessage);
+                    input.value = '';
+                    clearSelectedFile();
+                    input.focus();
+                } catch (err) {
+                    console.error("Erro ao enviar mensagem em grupo:", err);
+                    showToast("Erro ao entregar mensagem de grupo.", "error");
+                }
+                return;
+            }
+
+            if (activeFriend) {
+                payloadMessage.receiver = activeFriend.username;
+
+                if (isOfflineMode) {
+                    simData.messages.push(payloadMessage);
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    input.value = '';
+                    clearSelectedFile();
+                    input.focus();
+                    return;
+                }
+
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), payloadMessage);
+                    input.value = '';
+                    clearSelectedFile();
+                    input.focus();
+                } catch (err) {
+                    console.error("Falha ao enviar mensagem:", err);
+                    showToast("Erro ao entregar mensagem.", "error");
+                }
+            }
+        });
+
+        // --- STREAMING_CHUNK:Lógicas de amizades, conexões e convites... ---
         document.getElementById('add-friend-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('friend-search-input');
@@ -1457,7 +2016,6 @@
                     showToast(`Usuário @${targetUsername} não encontrado offline.`, "error");
                     return;
                 }
-
                 const requestDocId = `${currentUser.username}_${targetUsername}`;
                 const requestDocIdAlt = `${targetUsername}_${currentUser.username}`;
 
@@ -1465,7 +2023,6 @@
                     showToast("Uma solicitação ou amizade com este usuário já existe offline.", "error");
                     return;
                 }
-
                 simData.friends[requestDocId] = {
                     id: requestDocId,
                     sender: currentUser.username,
@@ -1512,60 +2069,12 @@
                 showToast(`Solicitação enviada para @${targetUsername}!`);
                 input.value = '';
             } catch (err) {
-                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
-                    activateOfflineFallback();
-                    document.getElementById('add-friend-form').dispatchEvent(new Event('submit'));
-                } else {
-                    console.error("Erro ao enviar pedido de amizade:", err);
-                    showToast("Erro ao processar pedido de amizade.", "error");
-                }
+                activateOfflineFallback();
             }
         });
 
-        async function handleAcceptRequest(docId, senderUsername) {
-            if (isOfflineMode) {
-                if (simData.friends[docId]) {
-                    simData.friends[docId].status = 'accepted';
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    showToast(`Você agora é amigo de @${senderUsername}!`);
-                }
-                return;
-            }
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), { status: 'accepted' });
-                showToast(`Você agora é amigo de @${senderUsername}!`);
-            } catch (err) {
-                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
-                    activateOfflineFallback();
-                    handleAcceptRequest(docId, senderUsername);
-                } else {
-                    console.error("Erro ao aceitar amizade:", err);
-                }
-            }
-        }
-
-        async function handleDeleteRequest(docId) {
-            if (isOfflineMode) {
-                if (simData.friends[docId]) {
-                    delete simData.friends[docId];
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    showToast("Solicitação de amizade resolvida.");
-                }
-                return;
-            }
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
-                showToast("Solicitação de amizade resolvida.");
-            } catch (err) {
-                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
-                    activateOfflineFallback();
-                    handleDeleteRequest(docId);
-                }
-            }
-        }
-
+        // --- STREAMING_CHUNK:Lógicas de manipulação e controle de moderação de grupos... ---
+        // Criação de Grupos
         const createGroupModal = document.getElementById('create-group-modal');
         document.getElementById('open-create-group-modal').addEventListener('click', () => {
             createGroupModal.classList.remove('hidden');
@@ -1615,14 +2124,7 @@
             }
         });
 
-        function closeActiveChat() {
-            activeFriend = null;
-            activeGroup = null;
-            document.getElementById('chat-panel').classList.add('hidden');
-            document.getElementById('chat-panel').classList.remove('flex');
-            document.getElementById('group-settings-btn').classList.add('hidden');
-        }
-
+        // --- ATIVAÇÃO E EXPORTAÇÃO DOS MÉTODOS DE ABERTURA DE CHAT ---
         function openChatWith(friend) {
             activeFriend = friend;
             activeGroup = null;
@@ -1633,16 +2135,18 @@
             document.getElementById('chat-header').classList.remove('hidden');
             document.getElementById('chat-input-bar').classList.remove('hidden');
             document.getElementById('chat-placeholder').classList.add('hidden');
-            document.getElementById('group-settings-btn').classList.add('hidden');
             
+            document.getElementById('group-settings-btn').classList.add('hidden');
+
             document.getElementById('active-chat-name').innerText = friend.name;
             document.getElementById('active-chat-status').innerText = `@${friend.username}`;
             
-            const friendData = accountsMap[friend.username] || friend;
-            document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(friendData.avatarType, friendData.avatarValue, friend.name.charAt(0).toUpperCase());
-            document.getElementById('active-chat-avatar').className = "w-9 h-9 rounded-full font-bold text-sm text-white flex items-center justify-center shrink-0 relative overflow-hidden";
-
-            startUserSession();
+            const friendData = accountsMap[friend.username];
+            document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(
+                friendData ? friendData.avatarType : 'initial',
+                friendData ? friendData.avatarValue : '',
+                friend.name.charAt(0).toUpperCase()
+            );
 
             if (unsubscribeMessages) unsubscribeMessages();
             if (unsubscribeGroupMessages) unsubscribeGroupMessages();
@@ -1659,16 +2163,16 @@
                     const data = doc.data();
                     const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
                     const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
+                    
                     if (isFromMeToFriend || isFromFriendToMe) {
-                        messagesList.push(data);
+                        messagesList.push({ id: doc.id, ...data });
                     }
                 });
+
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
                 renderMessages(messagesList);
             }, (error) => {
-                if (error.message?.includes('offline') || error.code === 'unavailable' || error.message?.includes('client is offline')) {
-                    activateOfflineFallback();
-                }
+                console.error("Erro ao carregar chat:", error);
             });
         }
 
@@ -1683,17 +2187,18 @@
             document.getElementById('chat-input-bar').classList.remove('hidden');
             document.getElementById('chat-placeholder').classList.add('hidden');
             
-            // Exibir botão de membros
             document.getElementById('group-settings-btn').classList.remove('hidden');
-            
+
             document.getElementById('active-chat-name').innerText = group.name;
             document.getElementById('active-chat-status').innerText = `${group.members.length} membros • Criado por @${group.creator}`;
-            
-            const avatarHTML = getAvatarHTML(group.avatarType, group.avatarValue, group.name.charAt(0).toUpperCase(), 'from-emerald-500 to-teal-500');
-            document.getElementById('active-chat-avatar').innerHTML = avatarHTML;
-            document.getElementById('active-chat-avatar').className = "w-9 h-9 rounded-full font-bold text-sm text-white flex items-center justify-center shrink-0 relative overflow-hidden";
+            document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(
+                group.avatarType,
+                group.avatarValue,
+                group.name.charAt(0).toUpperCase(),
+                'from-emerald-500 to-teal-500'
+            );
 
-            startUserSession();
+            setupGroupSettingsTrigger();
 
             if (unsubscribeMessages) unsubscribeMessages();
             if (unsubscribeGroupMessages) unsubscribeGroupMessages();
@@ -1703,241 +2208,184 @@
                 return;
             }
 
-            // Ouvir Mensagens do Grupo de forma síncrona
             const groupMessagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'group_messages');
             unsubscribeGroupMessages = onSnapshot(groupMessagesCol, (snapshot) => {
                 const messagesList = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if (data.groupId === activeGroup.id) {
-                        messagesList.push(data);
+                        messagesList.push({ id: doc.id, ...data });
                     }
                 });
+
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
                 renderGroupMessages(messagesList);
             }, (error) => {
-                if (error.message?.includes('offline') || error.code === 'unavailable') {
-                    activateOfflineFallback();
-                }
+                console.error("Erro ao carregar chat do grupo:", error);
             });
         }
 
-        function renderMessages(messages) {
-            const container = document.getElementById('messages-container');
-            container.innerHTML = '';
-
-            if (messages.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-slate-600 text-xs">
-                        Este é o começo da sua conversa privada com <strong class="text-slate-400">${activeFriend.name}</strong>.<br>
-                        Mande uma mensagem para começar a bater papo!
-                    </div>
-                `;
-                return;
-            }
-
-            messages.forEach(msg => {
-                const isMine = msg.sender === currentUser.username;
-                const alignmentClass = isMine ? 'justify-end' : 'justify-start';
-                const bubbleColor = isMine 
-                    ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-br-none shadow-md shadow-indigo-500/10' 
-                    : 'bg-slate-900 border border-slate-800 text-slate-100 rounded-bl-none';
-
-                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                const msgElement = document.createElement('div');
-                msgElement.className = `flex ${alignmentClass} w-full`;
-                msgElement.innerHTML = `
-                    <div class="max-w-[75%]">
-                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor}">
-                            ${msg.text}
-                        </div>
-                        <p class="text-[9px] text-slate-500 mt-1 ${isMine ? 'text-right' : 'text-left'}">${time}</p>
-                    </div>
-                `;
-                container.appendChild(msgElement);
-            });
-
-            const chatMessagesDiv = document.getElementById('chat-messages');
-            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-        }
-
-        function renderGroupMessages(messages) {
-            const container = document.getElementById('messages-container');
-            container.innerHTML = '';
-
-            if (messages.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-slate-600 text-xs">
-                        Este é o início do histórico do grupo #<strong class="text-slate-400">${activeGroup.name}</strong>.<br>
-                        Escreva algo para que todos leiam!
-                    </div>
-                `;
-                return;
-            }
-
-            messages.forEach(msg => {
-                const isMine = msg.sender === currentUser.username;
-                const alignmentClass = isMine ? 'justify-end' : 'justify-start';
-                const bubbleColor = isMine 
-                    ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-br-none shadow-md shadow-emerald-500/10' 
-                    : 'bg-slate-900 border border-slate-800 text-slate-100 rounded-bl-none';
-
-                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                const msgElement = document.createElement('div');
-                msgElement.className = `flex ${alignmentClass} w-full`;
-                
-                // Mostrar o nome do remetente acima do balão se for outra pessoa
-                const senderHeader = !isMine 
-                    ? `<p class="text-[10px] font-bold text-slate-400 mb-1">@${msg.senderName || msg.sender}</p>` 
-                    : '';
-
-                msgElement.innerHTML = `
-                    <div class="max-w-[75%] flex flex-col ${isMine ? 'items-end' : 'items-start'}">
-                        ${senderHeader}
-                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor}">
-                            ${msg.text}
-                        </div>
-                        <p class="text-[9px] text-slate-500 mt-1">${time}</p>
-                    </div>
-                `;
-                container.appendChild(msgElement);
-            });
-
-            const chatMessagesDiv = document.getElementById('chat-messages');
-            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-        }
-
-        document.getElementById('chat-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('message-input');
-            const text = input.value.trim();
-
-            if (!text) return;
-
-            // Envio para Canal de Grupo Ativo
-            if (activeGroup) {
-                const messagePayload = {
-                    groupId: activeGroup.id,
-                    sender: currentUser.username,
-                    senderName: currentUser.name,
-                    text: text,
-                    timestamp: Date.now()
-                };
-
-                if (isOfflineMode) {
-                    simData.groupMessages.push(messagePayload);
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    input.value = '';
-                    input.focus();
-                    return;
-                }
-
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'group_messages'), messagePayload);
-                    input.value = '';
-                    input.focus();
-                } catch (err) {
-                    console.error("Erro ao enviar mensagem em grupo:", err);
-                    showToast("Erro ao entregar mensagem de grupo.", "error");
-                }
-                return;
-            }
-
-            // Envio para Canal Privado (DMs)
-            if (activeFriend) {
-                const dmPayload = {
-                    sender: currentUser.username,
-                    receiver: activeFriend.username,
-                    text: text,
-                    timestamp: Date.now()
-                };
-
-                if (isOfflineMode) {
-                    simData.messages.push(dmPayload);
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    input.value = '';
-                    input.focus();
-                    return;
-                }
-
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), dmPayload);
-                    input.value = '';
-                    input.focus();
-                } catch (err) {
-                    console.error("Falha ao enviar mensagem:", err);
-                    showToast("Erro ao entregar mensagem.", "error");
-                }
-            }
-        });
-
-        const groupSettingsModal = document.getElementById('group-settings-modal');
-        const adminAddSection = document.getElementById('admin-add-member-section');
-        const membersContainer = document.getElementById('group-members-container');
-
-        const editGroupDetailsSection = document.getElementById('admin-group-details-section');
-        const editGroupDetailsForm = document.getElementById('edit-group-details-form');
-        const editGroupName = document.getElementById('edit-group-name');
-        const editGroupAvatarType = document.getElementById('edit-group-avatar-type');
-        const editGroupAvatarValue = document.getElementById('edit-group-avatar-value');
-        const editGroupAvatarValueLabel = document.getElementById('edit-group-avatar-value-label');
-
-        document.getElementById('group-settings-btn').addEventListener('click', () => {
-            if (!activeGroup) return;
-
-            groupSettingsModal.classList.remove('hidden');
+        // --- STREAMING_CHUNK:Lógicas de manipulação de moderação de grupos... ---
+        function setupGroupSettingsTrigger() {
             document.getElementById('settings-group-title').innerText = activeGroup.name;
             document.getElementById('settings-group-creator').innerText = `Criado por @${activeGroup.creator}`;
-
-            // Exibir painel de adicionar e customizar apenas se for o criador/admin
-            const isCreator = activeGroup.creator === currentUser.username;
-            if (isCreator) {
-                adminAddSection.classList.remove('hidden');
-                editGroupDetailsSection.classList.remove('hidden');
+            
+            const isAdmin = activeGroup.creator === currentUser.username;
+            const adminSection = document.getElementById('admin-add-member-section');
+            const adminDetailsSection = document.getElementById('admin-group-details-section');
+            
+            if (isAdmin) {
+                adminSection.classList.remove('hidden');
+                adminDetailsSection.classList.remove('hidden');
                 
-                editGroupName.value = activeGroup.name;
-                editGroupAvatarType.value = activeGroup.avatarType || 'initial';
-                editGroupAvatarValue.value = activeGroup.avatarValue || '';
+                document.getElementById('edit-group-name').value = activeGroup.name;
+                document.getElementById('edit-group-avatar-type').value = activeGroup.avatarType || 'initial';
+                document.getElementById('edit-group-avatar-value').value = activeGroup.avatarValue || '';
                 toggleGroupAvatarInputs();
             } else {
-                adminAddSection.classList.add('hidden');
-                editGroupDetailsSection.classList.add('hidden');
+                adminSection.classList.add('hidden');
+                adminDetailsSection.classList.add('hidden');
             }
-
-            renderGroupMembersList();
-        });
-
-        editGroupAvatarType.addEventListener('change', toggleGroupAvatarInputs);
+            
+            renderGroupMembers();
+        }
 
         function toggleGroupAvatarInputs() {
-            const val = editGroupAvatarType.value;
+            const val = document.getElementById('edit-group-avatar-type').value;
+            const label = document.getElementById('edit-group-avatar-value-label');
+            const input = document.getElementById('edit-group-avatar-value');
             if (val === 'initial') {
-                editGroupAvatarValue.classList.add('hidden');
-                editGroupAvatarValueLabel.classList.add('hidden');
+                input.parentElement.classList.add('hidden');
             } else {
-                editGroupAvatarValue.classList.remove('hidden');
-                editGroupAvatarValueLabel.classList.remove('hidden');
+                input.parentElement.classList.remove('hidden');
                 if (val === 'emoji') {
-                    editGroupAvatarValueLabel.innerText = "Emoji";
-                    editGroupAvatarValue.placeholder = "Ex: 🧪, ⚛️, 👾";
-                } else if (val === 'url') {
-                    editGroupAvatarValueLabel.innerText = "Link Imagem (URL)";
-                    editGroupAvatarValue.placeholder = "Ex: https://...";
+                    label.innerText = "Emoji";
+                    input.placeholder = "Ex: 🚀";
+                } else {
+                    label.innerText = "Link da Foto (URL)";
+                    input.placeholder = "Ex: https://...";
                 }
             }
         }
+        document.getElementById('edit-group-avatar-type').addEventListener('change', toggleGroupAvatarInputs);
 
-        editGroupDetailsForm.addEventListener('submit', async (e) => {
+        function renderGroupMembers() {
+            const container = document.getElementById('group-members-container');
+            container.innerHTML = '';
+            
+            activeGroup.members.forEach(memberUsername => {
+                const memberData = accountsMap[memberUsername];
+                const displayName = memberData ? memberData.name : memberUsername;
+                const isCreator = memberUsername === activeGroup.creator;
+                
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between p-2 rounded-xl bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800/40 text-xs gap-3";
+                
+                const avatarHTML = getAvatarHTML(
+                    memberData ? memberData.avatarType : 'initial',
+                    memberData ? memberData.avatarValue : '',
+                    displayName.charAt(0).toUpperCase()
+                );
+
+                const isMe = memberUsername === currentUser.username;
+                const showKickBtn = (activeGroup.creator === currentUser.username) && !isCreator && !isMe;
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-[10px] shrink-0">
+                            ${avatarHTML}
+                        </div>
+                        <div class="truncate">
+                            <p class="font-bold text-slate-800 dark:text-white truncate max-w-[140px]">${displayName}</p>
+                            <p class="text-[9px] text-slate-400">@${memberUsername} ${isCreator ? '• Criador' : ''}</p>
+                        </div>
+                    </div>
+                    ${showKickBtn ? `
+                        <button class="kick-btn text-[10px] font-bold text-rose-500 hover:text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 px-2 py-1 rounded-lg border border-rose-500/20 transition-all shrink-0">
+                            Expulsar
+                        </button>
+                    ` : ''}
+                `;
+                
+                if (showKickBtn) {
+                    div.querySelector('.kick-btn').addEventListener('click', () => handleKickMember(memberUsername));
+                }
+                
+                container.appendChild(div);
+            });
+        }
+
+        async function handleKickMember(username) {
+            const updatedMembers = activeGroup.members.filter(m => m !== username);
+            
+            if (isOfflineMode) {
+                simData.groups[activeGroup.id].members = updatedMembers;
+                saveLocalSimulationData();
+                triggerOfflineCallbacks();
+                showToast(`Membro @${username} expulso offline.`);
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), {
+                    ...activeGroup,
+                    members: updatedMembers
+                });
+                showToast(`Membro @${username} expulso com sucesso!`);
+            } catch (err) {
+                console.error(err);
+                showToast("Erro ao expulsar membro.", "error");
+            }
+        }
+
+        // Convidar Membro
+        document.getElementById('add-member-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!activeGroup) return;
+            const input = document.getElementById('new-member-username');
+            const username = input.value.trim().toLowerCase();
+            
+            if (!username) return;
+            if (activeGroup.members.includes(username)) {
+                showToast("Usuário já é membro do grupo.", "error");
+                return;
+            }
 
-            const newName = editGroupName.value.trim();
-            const newType = editGroupAvatarType.value;
-            const newValue = editGroupAvatarValue.value.trim();
+            const exists = isOfflineMode ? simData.accounts[username] : accountsMap[username];
+            if (!exists) {
+                showToast(`Usuário @${username} não encontrado.`, "error");
+                return;
+            }
+
+            const updatedMembers = [...activeGroup.members, username];
+
+            if (isOfflineMode) {
+                simData.groups[activeGroup.id].members = updatedMembers;
+                saveLocalSimulationData();
+                triggerOfflineCallbacks();
+                showToast(`@${username} adicionado offline.`);
+                input.value = '';
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), {
+                    ...activeGroup,
+                    members: updatedMembers
+                });
+                showToast(`@${username} convidado com sucesso!`);
+                input.value = '';
+            } catch (err) {
+                console.error(err);
+                showToast("Erro ao convidar membro.", "error");
+            }
+        });
+
+        // Salvar detalhes do grupo
+        document.getElementById('edit-group-details-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newName = document.getElementById('edit-group-name').value.trim();
+            const newType = document.getElementById('edit-group-avatar-type').value;
+            const newValue = document.getElementById('edit-group-avatar-value').value.trim();
 
             if (!newName) return;
 
@@ -1951,150 +2399,43 @@
             if (isOfflineMode) {
                 simData.groups[activeGroup.id] = updatedGroup;
                 saveLocalSimulationData();
-                activeGroup = updatedGroup;
-                showToast("Grupo atualizado offline!");
-                groupSettingsModal.classList.add('hidden');
-                openGroupChatWith(updatedGroup);
                 triggerOfflineCallbacks();
+                showToast("Configurações do grupo salvas offline!");
+                document.getElementById('group-settings-modal').classList.add('hidden');
                 return;
             }
 
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), updatedGroup);
-                activeGroup = updatedGroup;
-                showToast("Grupo atualizado!");
-                groupSettingsModal.classList.add('hidden');
-                openGroupChatWith(updatedGroup);
+                showToast("Grupo atualizado com sucesso!");
+                document.getElementById('group-settings-modal').classList.add('hidden');
             } catch (err) {
-                console.error("Erro ao atualizar grupo:", err);
-                showToast("Erro ao salvar alterações do grupo.", "error");
+                console.error(err);
+                showToast("Erro ao salvar configurações do grupo.", "error");
             }
+        });
+
+        document.getElementById('group-settings-btn').addEventListener('click', () => {
+            setupGroupSettingsTrigger();
+            document.getElementById('group-settings-modal').classList.remove('hidden');
         });
 
         document.getElementById('close-group-settings-modal').addEventListener('click', () => {
-            groupSettingsModal.classList.add('hidden');
+            document.getElementById('group-settings-modal').classList.add('hidden');
         });
 
-        function renderGroupMembersList() {
-            membersContainer.innerHTML = '';
-            const isCreator = activeGroup.creator === currentUser.username;
-
-            activeGroup.members.forEach(memberUsername => {
-                const memberData = accountsMap[memberUsername];
-                const displayName = memberData ? memberData.name : memberUsername;
-                
-                const item = document.createElement('div');
-                item.className = 'p-2 rounded-xl bg-slate-950/40 border border-slate-800/50 flex items-center justify-between gap-2 text-xs';
-                
-                const avatarHTML = getAvatarHTML(
-                    memberData ? memberData.avatarType : 'initial',
-                    memberData ? memberData.avatarValue : '',
-                    displayName.charAt(0).toUpperCase()
-                );
-
-                const roleBadge = memberUsername === activeGroup.creator 
-                    ? `<span class="bg-indigo-500/20 text-indigo-400 font-bold px-2 py-0.5 rounded text-[8px] uppercase">Dono</span>` 
-                    : '';
-
-                // Botão de expulsar (só visível para criadores e sobre outros membros)
-                const kickBtn = (isCreator && memberUsername !== activeGroup.creator)
-                    ? `<button class="kick-member-btn px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 transition-all">Expulsar</button>`
-                    : '';
-
-                item.innerHTML = `
-                    <div class="truncate flex items-center gap-2 flex-1">
-                        <div class="w-6 h-6 rounded-full shrink-0 relative overflow-hidden flex items-center justify-center">
-                            ${avatarHTML}
-                        </div>
-                        <span class="truncate font-semibold text-slate-200">${displayName} <strong class="text-[10px] text-slate-500 font-medium">@${memberUsername}</strong></span>
-                        ${roleBadge}
-                    </div>
-                    ${kickBtn}
-                `;
-
-                if (isCreator && memberUsername !== activeGroup.creator) {
-                    item.querySelector('.kick-member-btn').addEventListener('click', () => handleKickMember(memberUsername));
-                }
-
-                membersContainer.appendChild(item);
-            });
+        function closeActiveChat() {
+            activeFriend = null;
+            activeGroup = null;
+            document.getElementById('chat-panel').classList.add('hidden');
+            document.getElementById('chat-panel').classList.remove('flex');
+            document.getElementById('chat-placeholder').classList.remove('hidden');
+            document.getElementById('chat-header').classList.add('hidden');
+            document.getElementById('chat-input-bar').classList.add('hidden');
         }
 
-        // Adicionar novo membro por username
-        document.getElementById('add-member-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('new-member-username');
-            const targetUsername = input.value.trim().toLowerCase();
-
-            if (!targetUsername || !activeGroup) return;
-
-            if (activeGroup.members.includes(targetUsername)) {
-                showToast("Este usuário já pertence ao grupo.", "error");
-                return;
-            }
-
-            // Verificar se o usuário existe no cache de contas registradas
-            if (!accountsMap[targetUsername]) {
-                showToast(`Usuário @${targetUsername} não cadastrado no app.`, "error");
-                return;
-            }
-
-            const updatedMembersList = [...activeGroup.members, targetUsername];
-
-            if (isOfflineMode) {
-                simData.groups[activeGroup.id].members = updatedMembersList;
-                saveLocalSimulationData();
-                activeGroup = simData.groups[activeGroup.id];
-                renderGroupMembersList();
-                triggerOfflineCallbacks();
-                showToast(`@${targetUsername} adicionado ao grupo offline!`);
-                input.value = '';
-                return;
-            }
-
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), {
-                    members: updatedMembersList
-                });
-                activeGroup.members = updatedMembersList; // atualizar cache local
-                renderGroupMembersList();
-                showToast(`@${targetUsername} foi adicionado ao grupo!`);
-                input.value = '';
-            } catch (err) {
-                console.error("Falha ao adicionar membro:", err);
-                showToast("Erro ao convidar membro.", "error");
-            }
-        });
-
-        // Expulsar membro do grupo
-        async function handleKickMember(targetUsername) {
-            if (!activeGroup) return;
-
-            const updatedMembersList = activeGroup.members.filter(m => m !== targetUsername);
-
-            if (isOfflineMode) {
-                simData.groups[activeGroup.id].members = updatedMembersList;
-                saveLocalSimulationData();
-                activeGroup = simData.groups[activeGroup.id];
-                renderGroupMembersList();
-                triggerOfflineCallbacks();
-                showToast(`@${targetUsername} foi removido do grupo offline.`);
-                return;
-            }
-
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), {
-                    members: updatedMembersList
-                });
-                activeGroup.members = updatedMembersList; // atualizar cache local
-                renderGroupMembersList();
-                showToast(`@${targetUsername} foi removido do grupo.`);
-            } catch (err) {
-                console.error("Erro ao expulsar membro:", err);
-                showToast("Erro ao expulsar membro.", "error");
-            }
-        }
-
+        // --- STREAMING_CHUNK:Iniciando as lógicas globais adicionais... ---
+        // Abas e cliques globais da Sidebar
         const tabFriends = document.getElementById('tab-friends');
         const tabGroups = document.getElementById('tab-groups');
         const tabRequests = document.getElementById('tab-requests');
@@ -2104,66 +2445,54 @@
         const panelRequests = document.getElementById('panel-requests-list');
 
         tabFriends.addEventListener('click', () => {
-            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all";
-            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all";
-            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1";
-            
+            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all";
+            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
+            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all flex items-center justify-center gap-1";
             panelFriends.classList.remove('hidden');
             panelGroups.classList.add('hidden');
             panelRequests.classList.add('hidden');
         });
 
         tabGroups.addEventListener('click', () => {
-            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-emerald-400 border-b-2 border-emerald-500 transition-all";
-            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all";
-            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-1";
-            
+            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 transition-all";
+            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
+            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all flex items-center justify-center gap-1";
             panelFriends.classList.add('hidden');
             panelGroups.classList.remove('hidden');
             panelRequests.classList.add('hidden');
         });
 
         tabRequests.addEventListener('click', () => {
-            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-400 border-b-2 border-indigo-500 transition-all flex items-center justify-center gap-1";
-            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all";
-            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-all";
-            
+            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all flex items-center justify-center gap-1";
+            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
+            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
             panelFriends.classList.add('hidden');
             panelGroups.classList.add('hidden');
             panelRequests.classList.remove('hidden');
         });
 
-        // Botão de retornar do chat no Mobile
-        document.getElementById('chat-back-btn').addEventListener('click', () => {
-            closeActiveChat();
-            startUserSession();
-        });
-
-        // Logout de Usuário
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            currentUser = null;
-            closeActiveChat();
-
-            if (unsubscribeFriends) unsubscribeFriends();
-            if (unsubscribeGroups) unsubscribeGroups();
-            if (unsubscribeMessages) unsubscribeMessages();
-            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
-
-            document.getElementById('main-app').classList.add('hidden');
-            document.getElementById('auth-screen').classList.remove('hidden');
-            document.getElementById('auth-password').value = '';
-            
-            if (lastAccountData && !registerMode) {
-                document.getElementById('last-account-container').classList.remove('hidden');
+        // Configuração de Favicon dinâmico
+        function setupFavicon() {
+            const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="url(#grad)"/><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><path d="M30 45h.01M50 45h.01M70 45h.01M80 45c0 16.5-13.5 30-30 30a32.8 32.8 0 01-14.2-3.2L16 75l4.6-12.4C17.7 56.8 16 51.1 16 45c0-16.5 13.5-30 30-30s30 13.5 30 30z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>`;
+            const faviconUrl = `data:image/svg+xml;utf8,${encodeURIComponent(faviconSvg)}`;
+            let link = document.querySelector("link[rel*='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
             }
-            
-            showToast("Você desconectou da conta.");
-        });
+            link.href = faviconUrl;
+        }
 
         window.onload = function() {
             setupFavicon();
-            authenticateFirebase();
         };
+
+        // --- EXPORTANDO AS CONEXÕES ADICIONAIS FINAIS NO ESCOPO GLOBAL DO ARQUIVO ---
+        window.openChatWith = openChatWith;
+        window.openGroupChatWith = openGroupChatWith;
+        window.openMediaModal = openMediaModal;
+        window.showToast = showToast;
     </script>
 </body>
 </html>
