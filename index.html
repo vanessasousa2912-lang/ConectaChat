@@ -1072,7 +1072,18 @@
         }
 
         async function checkLastAccount() {
-            if (isOfflineMode) return;
+            if (isOfflineMode) {
+                try {
+                    const saved = localStorage.getItem('conectachat_last_account');
+                    if (saved) {
+                        lastAccountData = JSON.parse(saved);
+                        showLastAccountUI(lastAccountData);
+                    }
+                } catch (e) {
+                    console.warn("Erro ao ler última conta offline:", e);
+                }
+                return;
+            }
             const userId = auth.currentUser?.uid;
             if (!userId) return;
             try {
@@ -1409,6 +1420,46 @@
 
         const authForm = document.getElementById('auth-form');
         let registerMode = false;
+        const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
+
+        // Configurando a alternância de tela entre Login e Registro
+        toggleAuthModeBtn.addEventListener('click', () => {
+            registerMode = !registerMode;
+            
+            const displayNameGroup = document.getElementById('display-name-group');
+            const lastAccountContainer = document.getElementById('last-account-container');
+            
+            if (registerMode) {
+                displayNameGroup.classList.remove('hidden');
+                lastAccountContainer.classList.add('hidden');
+            } else {
+                displayNameGroup.classList.add('hidden');
+                if (lastAccountData) {
+                    lastAccountContainer.classList.remove('hidden');
+                }
+            }
+            applyTranslations();
+        });
+
+        // Configurando o clique no botão de usar a última conta para entrar automaticamente
+        const lastAccountBtn = document.getElementById('last-account-btn');
+        if (lastAccountBtn) {
+            lastAccountBtn.addEventListener('click', () => {
+                if (!lastAccountData) return;
+                
+                // Preenche os campos visualmente para dar feedback ao usuário
+                document.getElementById('auth-username').value = lastAccountData.username;
+                document.getElementById('auth-password').value = lastAccountData.password;
+                
+                // Caso o usuário esteja na tela de Registro, volta para a tela de Login
+                if (registerMode) {
+                    toggleAuthModeBtn.click();
+                }
+                
+                // Dispara o evento de submit de forma automática
+                authForm.dispatchEvent(new Event('submit'));
+            });
+        }
 
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
