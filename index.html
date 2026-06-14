@@ -13,6 +13,30 @@
                 extend: {
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'pop-in': 'popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                        'slide-up': 'slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                        'slide-down': 'slideDown 0.2s ease-in forwards',
+                        'fade-in': 'fadeIn 0.2s ease-out forwards',
+                    },
+                    keyframes: {
+                        popIn: {
+                            '0%': { transform: 'scale(0.85); opacity: 0;' },
+                            '100%': { transform: 'scale(1); opacity: 1;' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(2rem); opacity: 0;' },
+                            '100%': { transform: 'translateY(0); opacity: 1;' },
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(0); opacity: 1;' },
+                            '100%': { transform: 'translateY(1rem); opacity: 0;' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
                     }
                 }
             }
@@ -36,13 +60,13 @@
         }
     </style>
 </head>
-<body class="h-full flex flex-col overflow-hidden bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200">
+<body class="h-full flex flex-col overflow-hidden bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Banner de Status de Conexão -->
-    <div id="connection-banner" class="bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2">
+    <div id="connection-banner" class="bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2 transition-all duration-300">
         <span id="connection-dot" class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
         <span id="connection-text">Verificando conexão com o Firebase...</span>
     </div>
@@ -51,13 +75,13 @@
     <div id="premium-notif-container" class="fixed top-16 right-4 z-50 flex flex-col gap-3 max-w-sm pointer-events-none"></div>
 
     <!-- IDIOMA SCREEN (Primeira etapa de entrada) -->
-    <div id="language-screen" class="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-slate-50 dark:bg-slate-950 relative overflow-hidden z-50">
+    <div id="language-screen" class="flex-1 flex flex-col justify-start md:justify-center items-center px-4 py-8 sm:px-6 sm:py-12 bg-slate-50 dark:bg-slate-950 relative overflow-y-auto z-50 no-scrollbar">
         <!-- Detalhes de luz de fundo modernas -->
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="sm:mx-auto sm:w-full sm:max-w-2xl z-10 text-center mb-8">
-            <div class="flex justify-center items-center gap-2 mb-4">
+        <div class="sm:mx-auto sm:w-full sm:max-w-2xl z-10 text-center mb-6 shrink-0 animate-pop-in">
+            <div class="flex justify-center items-center gap-2 mb-3">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
                     <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5c-.347 2.225-1.163 4.417-2.454 6.375M5.006 15H9m5.007 0H19" />
@@ -68,13 +92,13 @@
             <p class="text-slate-600 dark:text-slate-400 text-sm">Selecione seu idioma preferido / Select your preferred language</p>
         </div>
 
-        <div class="w-full max-w-2xl bg-white dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-6 shadow-2xl rounded-2xl z-10">
+        <div class="w-full max-w-2xl bg-white dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-6 shadow-2xl rounded-2xl z-10 shrink-0 animate-slide-up">
             <!-- Grid de 15 Idiomas -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6" id="languages-grid">
                 <!-- Injetado por JS de forma inteligente -->
             </div>
 
-            <button id="confirm-lang-btn" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-500/25 transition-all text-sm">
+            <button id="confirm-lang-btn" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 text-sm active:scale-95">
                 Confirmar Idioma / Confirm Language
             </button>
         </div>
@@ -86,12 +110,12 @@
         <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <!-- Botão de Tema Rápido no topo da Auth Screen -->
-        <button id="theme-toggle-auth" class="absolute top-4 right-4 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm" aria-label="Alterar Tema" title="Alterar Tema">
+        <button id="theme-toggle-auth" class="absolute top-4 right-4 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm active:scale-90" aria-label="Alterar Tema" title="Alterar Tema">
             <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             <svg class="w-5 h-5 hidden dark:block text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
         </button>
 
-        <div class="sm:mx-auto sm:w-full sm:max-w-md z-10 text-center">
+        <div class="sm:mx-auto sm:w-full sm:max-w-md z-10 text-center animate-pop-in">
             <div class="flex justify-center items-center gap-2">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
                     <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -103,12 +127,12 @@
             <h3 id="auth-title" class="mt-6 text-xl font-medium tracking-tight text-slate-700 dark:text-slate-300">Acesse sua conta para conversar</h3>
         </div>
 
-        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10">
+        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10 animate-slide-up">
             <div class="bg-white dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
                 <form id="auth-form" class="space-y-5">
                     <!-- Botão de Entrada Rápida -->
                     <div id="last-account-container" class="hidden">
-                        <button type="button" id="last-account-btn" class="flex w-full justify-center items-center gap-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-4 py-3.5 text-sm font-semibold text-indigo-700 dark:text-indigo-300 shadow-lg shadow-indigo-500/5 transition-all duration-200">
+                        <button type="button" id="last-account-btn" class="flex w-full justify-center items-center gap-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-4 py-3.5 text-sm font-semibold text-indigo-700 dark:text-indigo-300 shadow-lg shadow-indigo-500/5 transition-all duration-300 active:scale-95">
                             <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>
@@ -125,10 +149,10 @@
                     </div>
 
                     <!-- Campo de Nome de Exibição -->
-                    <div id="display-name-group" class="hidden">
+                    <div id="display-name-group" class="hidden transition-all duration-300">
                         <label for="reg-name" id="label-display-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Como quer ser chamado? (Nome de Exibição)</label>
                         <div class="mt-1">
-                            <input id="reg-name" name="name" type="text" placeholder="Ex: Luis Henrique" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                            <input id="reg-name" name="name" type="text" placeholder="Ex: Luis Henrique" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-all duration-300">
                         </div>
                     </div>
 
@@ -138,19 +162,19 @@
                             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                 <span class="text-slate-400 dark:text-slate-500 sm:text-sm">@</span>
                             </div>
-                            <input id="auth-username" name="username" type="text" required placeholder="luis_prog" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 pl-8 pr-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                            <input id="auth-username" name="username" type="text" required placeholder="luis_prog" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 pl-8 pr-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-all duration-300">
                         </div>
                     </div>
 
                     <div>
                         <label for="auth-password" id="label-password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Senha</label>
                         <div class="mt-1">
-                            <input id="auth-password" name="password" type="password" required placeholder="Sua senha secreta" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+                            <input id="auth-password" name="password" type="password" required placeholder="Sua senha secreta" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-all duration-300">
                         </div>
                     </div>
 
                     <div>
-                        <button type="submit" id="auth-submit-btn" class="flex w-full justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 hover:from-indigo-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all duration-200">
+                        <button type="submit" id="auth-submit-btn" class="flex w-full justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 hover:from-indigo-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all duration-300 active:scale-[0.98]">
                             Entrar no Chat
                         </button>
                     </div>
@@ -167,7 +191,7 @@
                     </div>
 
                     <div class="mt-6 text-center">
-                        <button id="toggle-auth-mode" class="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors">
+                        <button id="toggle-auth-mode" class="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors duration-300">
                             Não tem uma conta? Cadastre-se agora
                         </button>
                     </div>
@@ -182,7 +206,7 @@
         <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-10 shadow-md">
             <!-- Logo e Perfil Rápido -->
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center animate-pop-in">
                     <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
@@ -190,7 +214,7 @@
                 <div>
                     <h1 class="text-sm font-bold text-slate-900 dark:text-white tracking-wide">ConectaChat</h1>
                     <div class="flex items-center gap-1.5">
-                        <span id="header-status-indicator" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span id="header-status-indicator" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors duration-300"></span>
                         <p id="user-identity" class="text-xs text-slate-500 dark:text-slate-400 font-medium"></p>
                     </div>
                 </div>
@@ -202,8 +226,8 @@
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <span class="text-slate-400 text-sm">@</span>
                     </div>
-                    <input id="friend-search-input" type="text" placeholder="Adicionar amigo pelo usuário..." required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-24 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                    <button type="submit" id="btn-add-action" class="absolute right-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-semibold px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider transition-all border border-emerald-500/30">
+                    <input id="friend-search-input" type="text" placeholder="Adicionar amigo pelo usuário..." required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-24 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300">
+                    <button type="submit" id="btn-add-action" class="absolute right-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-semibold px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider border border-emerald-500/30 transition-all duration-300 active:scale-95">
                         Adicionar
                     </button>
                 </div>
@@ -211,13 +235,13 @@
 
             <div class="flex items-center gap-2">
                 <!-- Botão de Alternar Modo Claro/Escuro -->
-                <button id="theme-toggle-main" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all shadow-sm" aria-label="Alterar Tema" title="Alterar Tema">
+                <button id="theme-toggle-main" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 shadow-sm transition-all duration-300 active:scale-90" aria-label="Alterar Tema" title="Alterar Tema">
                     <svg class="w-4.5 h-4.5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     <svg class="w-4.5 h-4.5 hidden dark:block text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                 </button>
 
                 <!-- Logout -->
-                <button id="logout-btn" class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 hover:text-rose-500 bg-slate-100 dark:bg-slate-950/50 hover:bg-rose-500/10 border border-slate-200 dark:border-slate-800 hover:border-rose-500/20 px-3 py-2 rounded-xl transition-all" aria-label="Sair" title="Sair">
+                <button id="logout-btn" class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 hover:text-rose-500 bg-slate-100 dark:bg-slate-950/50 hover:bg-rose-500/10 border border-slate-200 dark:border-slate-800 hover:border-rose-500/20 px-3 py-2 rounded-xl transition-all duration-300 active:scale-95" aria-label="Sair" title="Sair">
                     <span id="logout-text-label">Sair</span>
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -229,16 +253,16 @@
         <!-- Corpo Principal do App -->
         <main class="flex-1 flex overflow-hidden relative">
             <!-- LATERAL: Contatos, Amigos, Grupos e Pedidos -->
-            <aside id="sidebar-panel" class="w-full md:w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shrink-0 z-20">
+            <aside id="sidebar-panel" class="w-full md:w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shrink-0 z-20 transition-all duration-300">
                 <!-- Abas da barra lateral -->
                 <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-                    <button id="tab-friends" class="flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all">
+                    <button id="tab-friends" class="flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all duration-300">
                         Amigos (<span id="count-friends">0</span>)
                     </button>
-                    <button id="tab-groups" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all">
+                    <button id="tab-groups" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300">
                         Grupos (<span id="count-groups">0</span>)
                     </button>
-                    <button id="tab-requests" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all flex items-center justify-center gap-1">
+                    <button id="tab-requests" class="flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300 flex items-center justify-center gap-1">
                         Solicit.
                         <span id="badge-requests" class="hidden bg-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">0</span>
                     </button>
@@ -247,7 +271,7 @@
                 <!-- Lista de Amigos -->
                 <div id="panel-friends-list" class="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
                     <div id="friends-empty" class="text-center py-8 text-slate-400 dark:text-slate-500 text-xs">
-                        <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                         Nenhum amigo conectado ainda.<br>Adicione pessoas pelo topo!
@@ -257,7 +281,7 @@
 
                 <!-- Painel de Grupos -->
                 <div id="panel-groups-list" class="hidden flex-1 overflow-y-auto p-3 space-y-3 no-scrollbar bg-slate-50/50 dark:bg-transparent">
-                    <button id="open-create-group-modal" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500 hover:to-teal-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 border border-emerald-500/30 rounded-xl py-2.5 text-xs font-bold transition-all duration-200 shadow-sm">
+                    <button id="open-create-group-modal" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500 hover:to-teal-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 border border-emerald-500/30 rounded-xl py-2.5 text-xs font-bold transition-all duration-300 shadow-sm active:scale-95">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                         </svg>
@@ -291,13 +315,13 @@
 
                 <!-- Info Rodapé Usuário -->
                 <div class="bg-slate-100 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800/80 p-3">
-                    <button id="profile-footer-trigger" class="w-full flex items-center justify-between hover:bg-slate-200/50 dark:hover:bg-slate-800/50 p-2 rounded-xl transition-all text-left" title="Personalizar Perfil">
+                    <button id="profile-footer-trigger" class="w-full flex items-center justify-between hover:bg-slate-200/50 dark:hover:bg-slate-800/50 p-2 rounded-xl transition-all text-left active:scale-95" title="Personalizar Perfil">
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs text-white uppercase relative overflow-hidden" id="user-avatar">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs text-white uppercase relative overflow-hidden transition-all duration-300" id="user-avatar">
                                 U
                             </div>
                             <div class="truncate">
-                                <p id="user-display-name" class="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[120px]"></p>
+                                <p id="user-display-name" class="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[120px] transition-all duration-350"></p>
                                 <p id="user-tag" class="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[120px]"></p>
                             </div>
                         </div>
@@ -310,17 +334,17 @@
             </aside>
 
             <!-- AREA PRINCIPAL: Chat de Conversa -->
-            <section id="chat-panel" class="absolute inset-0 md:relative md:flex flex-1 flex flex-col bg-white dark:bg-slate-950 z-10 hidden">
+            <section id="chat-panel" class="absolute inset-0 md:relative md:flex flex-1 flex flex-col bg-white dark:bg-slate-950 z-10 hidden transition-all duration-300">
                 <!-- Chat Selecionado / Header -->
-                <div id="chat-header" class="hidden bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800/80 px-4 py-3 flex items-center justify-between">
+                <div id="chat-header" class="hidden bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800/80 px-4 py-3 flex items-center justify-between animate-fade-in">
                     <div class="flex items-center gap-3">
                         <!-- Botão de Voltar -->
-                        <button id="chat-back-btn" class="md:hidden text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 p-1 bg-slate-200/50 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-all" aria-label="Voltar" title="Voltar">
+                        <button id="chat-back-btn" class="md:hidden text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 p-1 bg-slate-200/50 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-all active:scale-90" aria-label="Voltar" title="Voltar">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white relative overflow-hidden" id="active-chat-avatar">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white relative overflow-hidden transition-all duration-300" id="active-chat-avatar">
                             A
                         </div>
                         <div class="truncate">
@@ -329,7 +353,7 @@
                         </div>
                     </div>
 
-                    <button id="group-settings-btn" class="hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-700 transition-all">
+                    <button id="group-settings-btn" class="hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-700 transition-all active:scale-95">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
@@ -340,7 +364,7 @@
                 <!-- Feed de Mensagens -->
                 <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar flex flex-col">
                     <!-- Mensagem vazia de início -->
-                    <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 p-8">
+                    <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 p-8 animate-pop-in">
                         <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mb-4">
                             <svg class="w-8 h-8 text-indigo-500 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
@@ -353,7 +377,7 @@
                 </div>
 
                 <!-- Barra de prévia de arquivo anexo -->
-                <div id="file-preview-bar" class="hidden bg-slate-100/90 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 p-3 flex items-center justify-between gap-3">
+                <div id="file-preview-bar" class="hidden bg-slate-100/90 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 p-3 flex items-center justify-between gap-3 animate-slide-up">
                     <div class="flex items-center gap-3">
                         <div id="file-preview-container" class="w-14 h-14 rounded-lg bg-white dark:bg-slate-950 flex items-center justify-center relative border border-slate-200 dark:border-slate-800 overflow-hidden shrink-0">
                             <!-- Previa injetada por JS -->
@@ -374,18 +398,18 @@
                 <input type="file" id="media-file-input" class="hidden" accept="image/*,video/*">
 
                 <!-- Barra de envio de mensagens -->
-                <div id="chat-input-bar" class="hidden p-3 bg-slate-50/40 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800/80">
+                <div id="chat-input-bar" class="hidden p-3 bg-slate-50/40 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800/80 animate-fade-in">
                     <form id="chat-form" class="flex items-center gap-2">
-                        <input id="message-input" type="text" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        <input id="message-input" type="text" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all duration-300">
                         
                         <!-- Botão Anexar (+) -->
-                        <button id="attach-file-btn" type="button" class="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50 transition-all flex items-center justify-center shrink-0" aria-label="Anexar arquivo" title="Anexar arquivo">
+                        <button id="attach-file-btn" type="button" class="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50 transition-all flex items-center justify-center shrink-0 active:scale-90" aria-label="Anexar arquivo" title="Anexar arquivo">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                         </button>
 
-                        <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center shrink-0" aria-label="Enviar" title="Enviar">
+                        <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center shrink-0 active:scale-95" aria-label="Enviar" title="Enviar">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                             </svg>
@@ -397,11 +421,11 @@
     </div>
 
     <!-- MODAL DE CRIAR GRUPO -->
-    <div id="create-group-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+    <div id="create-group-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 animate-slide-up">
             <div class="flex items-center justify-between">
                 <h3 id="create-group-modal-title" class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Criar Novo Grupo</h3>
-                <button id="close-create-group-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white" title="Fechar">
+                <button id="close-create-group-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all active:scale-90" title="Fechar">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -410,9 +434,9 @@
             <form id="create-group-form" class="space-y-4">
                 <div>
                     <label for="group-name-input" id="label-group-name" class="block text-xs font-medium text-slate-700 dark:text-slate-300">Nome do Grupo</label>
-                    <input id="group-name-input" type="text" placeholder="Ex: Projeto Integrador, Família" required class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <input id="group-name-input" type="text" placeholder="Ex: Projeto Integrador, Família" required class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all">
                 </div>
-                <button type="submit" id="btn-create-group-submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
+                <button type="submit" id="btn-create-group-submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
                     Criar Grupo
                 </button>
             </form>
@@ -420,11 +444,11 @@
     </div>
 
     <!-- MODAL DE EDITAR PERFIL -->
-    <div id="profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+    <div id="profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 animate-slide-up">
             <div class="flex items-center justify-between">
                 <h3 id="label-perfil-modal" class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Editar Seu Perfil</h3>
-                <button id="close-profile-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white" aria-label="Fechar" title="Fechar">
+                <button id="close-profile-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all active:scale-90" aria-label="Fechar" title="Fechar">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -433,7 +457,7 @@
             <form id="profile-form" class="space-y-4">
                 <div>
                     <label for="profile-name-input" id="label-nome-exibicao" class="block text-xs font-medium text-slate-700 dark:text-slate-300">Seu Nome de Exibição</label>
-                    <input id="profile-name-input" type="text" required class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <input id="profile-name-input" type="text" required class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all">
                 </div>
                 <div>
                     <label for="profile-avatar-type" class="block text-xs font-medium text-slate-700 dark:text-slate-300">Tipo de Foto de Perfil</label>
@@ -445,9 +469,9 @@
                 </div>
                 <div id="profile-avatar-value-group">
                     <label id="profile-avatar-value-label" for="profile-avatar-value" class="block text-xs font-medium text-slate-700 dark:text-slate-300">Valor do Emoji ou URL</label>
-                    <input id="profile-avatar-value" type="text" placeholder="Ex: 🚀 ou https://..." class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <input id="profile-avatar-value" type="text" placeholder="Ex: 🚀 ou https://..." class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all">
                 </div>
-                <button type="submit" id="btn-save-profile" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all">
+                <button type="submit" id="btn-save-profile" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
                     Salvar Alterações
                 </button>
             </form>
@@ -455,14 +479,14 @@
     </div>
 
     <!-- MODAL DE CONFIGURAÇÕES DE MEMBROS DO GRUPO -->
-    <div id="group-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4">
+    <div id="group-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 animate-slide-up">
             <div class="flex items-center justify-between">
                 <div>
                     <h3 id="settings-group-title" class="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[250px]">Membros do Grupo</h3>
                     <p id="settings-group-creator" class="text-[10px] text-slate-500 dark:text-slate-400">Criado por @username</p>
                 </div>
-                <button id="close-group-settings-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white" title="Fechar">
+                <button id="close-group-settings-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all active:scale-90" title="Fechar">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -475,7 +499,7 @@
                 <form id="edit-group-details-form" class="space-y-2">
                     <div>
                         <label for="edit-group-name" class="block text-[10px] text-slate-500 dark:text-slate-400">Nome do Grupo</label>
-                        <input id="edit-group-name" type="text" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none">
+                        <input id="edit-group-name" type="text" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none transition-all">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
@@ -488,10 +512,10 @@
                         </div>
                         <div>
                             <label id="edit-group-avatar-value-label" for="edit-group-avatar-value" class="block text-[10px] text-slate-500 dark:text-slate-400">Emoji ou Link</label>
-                            <input id="edit-group-avatar-value" type="text" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none">
+                            <input id="edit-group-avatar-value" type="text" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none transition-all">
                         </div>
                     </div>
-                    <button type="submit" id="btn-save-group-config" class="w-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-bold py-2 rounded-xl text-xs transition-all border border-emerald-500/30">
+                    <button type="submit" id="btn-save-group-config" class="w-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-bold py-2 rounded-xl text-xs border border-emerald-500/30 transition-all duration-300 active:scale-95">
                         Salvar Configurações do Grupo
                     </button>
                 </form>
@@ -503,9 +527,9 @@
                 <form id="add-member-form" class="flex gap-2">
                     <div class="relative flex-1">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-xs">@</span>
-                        <input id="new-member-username" type="text" placeholder="luis_prog" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 pl-7 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none">
+                        <input id="new-member-username" type="text" placeholder="luis_prog" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 pl-7 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none transition-all">
                     </div>
-                    <button type="submit" id="btn-convidar-action" class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition-all border border-emerald-500/30">
+                    <button type="submit" id="btn-convidar-action" class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 font-bold px-4 py-2 rounded-xl text-xs border border-emerald-500/30 transition-all duration-300 active:scale-95 shrink-0">
                         Convidar
                     </button>
                 </form>
@@ -522,13 +546,13 @@
     </div>
 
     <!-- MODAL DE VISUALIZAÇÃO DE IMAGEM AMPLIADA (LIGHTBOX) -->
-    <div id="media-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <button id="close-media-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full bg-slate-900/55 hover:bg-slate-800 transition-all border border-slate-800" aria-label="Fechar mídia" title="Fechar">
+    <div id="media-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm transition-all duration-300">
+        <button id="close-media-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full bg-slate-900/55 hover:bg-slate-800 border border-slate-800 transition-all active:scale-90" aria-label="Fechar mídia" title="Fechar">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
-        <div class="max-w-4xl max-h-[85vh] flex items-center justify-center">
+        <div class="max-w-4xl max-h-[85vh] flex items-center justify-center animate-pop-in">
             <img id="media-modal-img" src="" class="hidden max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800" alt="Mídia expandida">
         </div>
     </div>
@@ -556,7 +580,7 @@
             const container = document.getElementById('toast-container');
             if (!container) return;
             const toast = document.createElement('div');
-            toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 ${
+            toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold pointer-events-auto animate-pop-in transition-all duration-300 ${
                 type === 'success' 
                     ? 'bg-emerald-100 border-emerald-300 text-emerald-800 dark:bg-emerald-950/90 dark:border-emerald-500/30 dark:text-emerald-300' 
                     : type === 'error' 
@@ -570,10 +594,6 @@
             `;
             
             container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
 
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
@@ -581,8 +601,38 @@
             }, 3500);
         }
 
+        // --- STREAMING_CHUNK:Injetando tratamento de permissões nativas de notificações... ---
+        function ativarNotificacoes() {
+            if ("Notification" in window) {
+                if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                    Notification.requestPermission();
+                }
+            }
+        }
+
+        function mostrarNotificacaoNativa(usuario, mensagem, chatTargetFn) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="url(#grad)"/><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><path d="M30 45h.01M50 45h.01M70 45h.01M80 45c0 16.5-13.5 30-30 30a32.8 32.8 0 01-14.2-3.2L16 75l4.6-12.4C17.7 56.8 16 51.1 16 45c0-16.5 13.5-30 30-30s30 13.5 30 30z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>`;
+                const logoUrl = `data:image/svg+xml;utf8,${encodeURIComponent(logoSvg)}`;
+                
+                try {
+                    const notification = new Notification(usuario, {
+                        body: message,
+                        icon: logoUrl
+                    });
+                    
+                    notification.onclick = function() {
+                        window.focus();
+                        if (chatTargetFn) chatTargetFn();
+                        notification.close();
+                    };
+                } catch (e) {
+                    console.debug("Navegador bloqueou disparo de notificação de segundo plano:", e);
+                }
+            }
+        }
+
         // --- STREAMING_CHUNK:Configurando os dicionários de idiomas... ---
-        // Sistema de Tradução para os 15 idiomas
         const languages = [
             { code: "PT", name: "Português", native: "Português" },
             { code: "EN", name: "English", native: "English" },
@@ -703,16 +753,14 @@
             }
         };
 
-        // Fallback dinâmico para os outros idiomas se não especificado
         languages.forEach(lang => {
             if (!translations[lang.code]) {
-                translations[lang.code] = translations.EN; // Default para Inglês
+                translations[lang.code] = translations.EN;
             }
         });
 
         let currentLang = "PT";
 
-        // --- MODO DE DIAGNÓSTICO E AUTO-FALLBACK OFFLINE ---
         let isOfflineMode = false;
         const banner = document.getElementById('connection-banner');
         const bannerText = document.getElementById('connection-text');
@@ -721,18 +769,17 @@
         function setStatusBanner(mode, message) {
             bannerText.innerText = message;
             if (mode === 'real') {
-                banner.className = "bg-emerald-600/20 border-b border-emerald-500/30 text-emerald-700 dark:text-emerald-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
+                banner.className = "bg-emerald-600/20 border-b border-emerald-500/30 text-emerald-700 dark:text-emerald-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2 transition-all duration-300";
                 bannerDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
             } else if (mode === 'checking') {
-                banner.className = "bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
+                banner.className = "bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2 transition-all duration-300 animate-pulse";
                 bannerDot.className = "w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse";
             } else {
-                banner.className = "bg-amber-600/20 border-b border-amber-500/30 text-amber-700 dark:text-amber-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2";
+                banner.className = "bg-amber-600/20 border-b border-amber-500/30 text-amber-700 dark:text-amber-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2 transition-all duration-300";
                 bannerDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
             }
         }
 
-        // --- STREAMING_CHUNK:Configurando os áudios e sons sintetizados... ---
         function playNotificationSound() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -799,7 +846,6 @@
             }
         }
 
-        // Sincronização automática entre abas em modo Offline
         if (syncChannel) {
             syncChannel.onmessage = (event) => {
                 if (event.data && event.data.type === 'SYNC_STATE') {
@@ -812,15 +858,12 @@
             };
         }
 
-        // --- STREAMING_CHUNK:Tratando o bypass e fallback automático do Offline... ---
-        // Ativação do Fallback Offline com Conta Predefinida Gerada Aleatoriamente (Bypass de login automático!)
         function activateOfflineFallback() {
             if (isOfflineMode) return;
             isOfflineMode = true;
             loadLocalSimulationData();
             accountsMap = simData.accounts;
 
-            // Criar Conta Predefinida com ID e Nome Aleatório!
             const randomID = Math.floor(1000 + Math.random() * 9000);
             const offlineNames = ["Luis_Dev", "Cyber_Alex", "Alice_Net", "Gamer_X", "Carlos_Prog", "Vanessa_QA", "Tiago_UX", "Beatriz_Cloud"];
             const chosenName = offlineNames[Math.floor(Math.random() * offlineNames.length)] + "_" + randomID;
@@ -834,14 +877,12 @@
                 avatarValue: '🤖'
             };
 
-            // Salvar no simulador offline
             simData.accounts[currentUser.username] = currentUser;
             saveLocalSimulationData();
 
             setStatusBanner('offline', `MODO OFFLINE ATIVO: Conta predefinida @${currentUser.username} criada automaticamente!`);
             showToast("Bypass ativo: Conta de convidado gerada com sucesso!", "info");
 
-            // Avançar instantaneamente para o aplicativo
             enterApplication();
         }
 
@@ -865,6 +906,7 @@
         let activeFriend = null; 
         let activeGroup = null;  
         let accountsMap = {}; 
+        let activeRelationships = []; 
         let lastAccountData = null; 
         let unsubscribeFriends = null;
         let unsubscribeGroups = null;
@@ -878,14 +920,15 @@
         window.addEventListener('focus', () => { isWindowFocused = true; });
         window.addEventListener('blur', () => { isWindowFocused = false; });
 
-        // --- STREAMING_CHUNK:Lógicas de notificações premium... ---
         function sendSystemNotification(title, body, triggerChatFn) {
             playNotificationSound();
+            mostrarNotificacaoNativa(title, body, triggerChatFn);
+            
             const container = document.getElementById('premium-notif-container');
             if (!container) return;
 
             const notif = document.createElement('div');
-            notif.className = "flex flex-col gap-2 p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl shadow-2xl pointer-events-auto transform translate-x-12 opacity-0 transition-all duration-300 max-w-sm shrink-0 border-l-4 border-l-indigo-500";
+            notif.className = "flex flex-col gap-2 p-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl shadow-2xl pointer-events-auto transform translate-x-12 opacity-0 transition-all duration-300 max-w-sm shrink-0 border-l-4 border-l-indigo-500 animate-slide-up";
             
             notif.innerHTML = `
                 <div class="flex items-start gap-2.5">
@@ -898,8 +941,8 @@
                     </div>
                 </div>
                 <div class="flex justify-end gap-1.5 mt-1.5 border-t border-slate-100 dark:border-slate-800/60 pt-2">
-                    <button class="notif-close-btn px-2.5 py-1 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all">Fechar</button>
-                    <button class="notif-action-btn px-3 py-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-[9px] font-bold shadow-md shadow-indigo-500/15 transition-all">Abrir</button>
+                    <button class="notif-close-btn px-2.5 py-1 rounded-lg text-[9px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all active:scale-90">Fechar</button>
+                    <button class="notif-action-btn px-3 py-1 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white text-[9px] font-bold shadow-md shadow-indigo-500/15 transition-all active:scale-95">Abrir</button>
                 </div>
             `;
 
@@ -925,7 +968,6 @@
             }, 7000);
         }
 
-        // --- STREAMING_CHUNK:Aplicando traduções dinâmicas de interface... ---
         function applyTranslations() {
             const t = translations[currentLang];
             document.getElementById('auth-title').innerText = registerMode ? t.authTitleReg : t.authTitle;
@@ -960,19 +1002,16 @@
             document.getElementById('btn-convidar-action').innerText = t.convidarBtn;
         }
 
-        // --- STREAMING_CHUNK:Montando o seletor de 15 idiomas... ---
-        // Renderizar a Grid de Idiomas
         const languagesGrid = document.getElementById('languages-grid');
         languages.forEach(lang => {
             const btn = document.createElement('button');
             btn.type = "button";
-            btn.className = "flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-950/40 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all group";
+            btn.className = "flex flex-col items-center justify-center p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-950/40 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all duration-300 group active:scale-95";
             btn.innerHTML = `
-                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">${lang.native}</span>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">${lang.native}</span>
                 <span class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">${lang.name}</span>
             `;
             btn.addEventListener('click', () => {
-                // Remover destaque dos outros
                 Array.from(languagesGrid.children).forEach(child => child.classList.remove('border-indigo-500', 'bg-indigo-50/50', 'dark:bg-indigo-950/20'));
                 btn.classList.add('border-indigo-500', 'bg-indigo-50/50', 'dark:bg-indigo-950/20');
                 currentLang = lang.code;
@@ -980,17 +1019,15 @@
             languagesGrid.appendChild(btn);
         });
 
-        // Selecionar Português por padrão na Grid
         languagesGrid.children[0].click();
 
         document.getElementById('confirm-lang-btn').addEventListener('click', () => {
             applyTranslations();
             document.getElementById('language-screen').classList.add('hidden');
+            ativarNotificacoes();
             authenticateFirebase();
         });
 
-        // --- STREAMING_CHUNK:Configurando os Temas de Interface (Modos Claro e Escuro)... ---
-        // Gerenciamento de Tema Claro / Escuro
         function toggleTheme() {
             const html = document.documentElement;
             if (html.classList.contains('dark')) {
@@ -1005,7 +1042,6 @@
         document.getElementById('theme-toggle-auth').addEventListener('click', toggleTheme);
         document.getElementById('theme-toggle-main').addEventListener('click', toggleTheme);
 
-        // Inicializar tema com base na escolha salva
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'light') {
             document.documentElement.classList.remove('dark');
@@ -1013,7 +1049,6 @@
             document.documentElement.classList.add('dark');
         }
 
-        // --- STREAMING_CHUNK:Lógicas de Autenticação e Entrada de Usuários... ---
         async function authenticateFirebase() {
             if (isOfflineMode) return;
             try {
@@ -1025,18 +1060,17 @@
                 }
                 firebaseAuthenticated = true;
                 setStatusBanner('real', 'Conectado ao Firebase Cloud Server');
+                
                 startListeningAccounts();
                 await checkLastAccount();
                 
-                // Mostrar a tela de Auth se não tivermos bypass offline engatilhado
                 document.getElementById('auth-screen').classList.remove('hidden');
             } catch (err) {
-                console.warn("Autenticação de rede indisponível. Ativando modo offline predefinido...", err);
+                console.warn("Autenticação falhou. Ativando modo offline...", err);
                 activateOfflineFallback();
             }
         }
 
-        // Buscar última conta para login rápido
         async function checkLastAccount() {
             if (isOfflineMode) return;
             const userId = auth.currentUser?.uid;
@@ -1085,8 +1119,6 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Gerenciando Perfis e Customização de Avatares... ---
-        // Perfil e Customização de Avatar
         const profileModal = document.getElementById('profile-modal');
         const profileForm = document.getElementById('profile-form');
         const profileNameInput = document.getElementById('profile-name-input');
@@ -1129,12 +1161,12 @@
         function getAvatarHTML(type, value, fallbackInitial, bgGradientClass = 'from-indigo-500 to-indigo-600') {
             if (type === 'url' && value && value.trim() !== '') {
                 const cleanUrl = value.replace(/"/g, '&quot;');
-                return `<img src="${cleanUrl}" class="w-full h-full object-cover rounded-full" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="hidden w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} items-center justify-center font-bold text-white uppercase">${fallbackInitial}</div>`;
+                return `<img src="${cleanUrl}" class="w-full h-full object-cover rounded-full transition-all duration-350" alt="Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="hidden w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} items-center justify-center font-bold text-white uppercase transition-all duration-350">${fallbackInitial}</div>`;
             } else if (type === 'emoji' && value && value.trim() !== '') {
-                return `<div class="w-full h-full rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg leading-none" style="display:flex;">${value}</div>`;
+                return `<div class="w-full h-full rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-lg leading-none transition-all duration-350" style="display:flex;">${value}</div>`;
             } else {
-                return `<div class="w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} flex items-center justify-center font-bold text-white uppercase" style="display:flex;">${fallbackInitial}</div>`;
+                return `<div class="w-full h-full rounded-full bg-gradient-to-tr ${bgGradientClass} flex items-center justify-center font-bold text-white uppercase transition-all duration-350" style="display:flex;">${fallbackInitial}</div>`;
             }
         }
 
@@ -1190,8 +1222,6 @@
             }
         });
 
-        // --- STREAMING_CHUNK:Lógicas de compactação e processamento de imagens... ---
-        // Compactação Canvas para Envio de Imagem Segura
         function compressAndConvertToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1227,7 +1257,7 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.7); 
-                        resolve({ base64: dataUrl, type: 'image' });
+                        resolve({ dataUrl, type: 'image' });
                     };
                     img.onerror = err => reject(err);
                 };
@@ -1235,7 +1265,6 @@
             });
         }
 
-        // Gerenciamento de Anexos
         const mediaFileInput = document.getElementById('media-file-input');
         const attachFileBtn = document.getElementById('attach-file-btn');
         const filePreviewBar = document.getElementById('file-preview-bar');
@@ -1262,7 +1291,7 @@
             try {
                 const res = await compressAndConvertToBase64(file);
                 selectedFilePayload = {
-                    base64: res.base64,
+                    base64: res.base64 || res.dataUrl,
                     type: res.type,
                     name: file.name,
                     size: (file.size / 1024).toFixed(1) + " KB"
@@ -1273,9 +1302,9 @@
                 filePreviewContainer.innerHTML = '';
 
                 if (res.type === 'image') {
-                    filePreviewContainer.innerHTML = `<img src="${res.base64}" class="w-full h-full object-cover">`;
+                    filePreviewContainer.innerHTML = `<img src="${selectedFilePayload.base64}" class="w-full h-full object-cover">`;
                 } else if (res.type === 'video') {
-                    filePreviewContainer.innerHTML = `<video src="${res.base64}" class="w-full h-full object-cover" muted autoplay loop></video>`;
+                    filePreviewContainer.innerHTML = `<video src="${selectedFilePayload.base64}" class="w-full h-full object-cover" muted autoplay loop></video>`;
                 }
 
                 filePreviewBar.classList.remove('hidden');
@@ -1305,7 +1334,7 @@
                 mediaModalImg.classList.remove('hidden');
                 mediaModal.classList.remove('hidden');
             }
-        };
+        }
 
         document.getElementById('close-media-modal').addEventListener('click', () => {
             mediaModal.classList.add('hidden');
@@ -1313,7 +1342,6 @@
             mediaModalImg.src = '';
         });
 
-        // --- STREAMING_CHUNK:Iniciando fluxos de escuta e conexões de rede... ---
         function enterApplication() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
@@ -1379,7 +1407,6 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Manipulando formulários de registro e login com Firebase... ---
         const authForm = document.getElementById('auth-form');
         let registerMode = false;
 
@@ -1468,7 +1495,42 @@
             }
         });
 
-        // --- STREAMING_CHUNK:Executando as sessões de sincronização de rede do Firebase... ---
+        function executeOfflineRegistration(usernameInput, displayNameInput, passwordInput) {
+            if (simData.accounts[usernameInput]) {
+                showToast("Este nome de usuário já está sendo usado localmente.", "error");
+                return;
+            }
+            const newUserData = {
+                username: usernameInput,
+                name: displayNameInput || usernameInput,
+                password: passwordInput,
+                uid: crypto.randomUUID()
+            };
+            simData.accounts[usernameInput] = newUserData;
+            saveLocalSimulationData();
+            accountsMap = simData.accounts;
+            showToast("Sua conta offline foi criada com sucesso! Faça login.");
+            toggleAuthModeBtn.click();
+            document.getElementById('auth-password').value = '';
+        }
+
+        function executeOfflineLogin(usernameInput, passwordInput) {
+            const matchedUser = simData.accounts[usernameInput];
+            if (!matchedUser || matchedUser.password !== passwordInput) {
+                showToast("Nome de usuário ou senha incorretos offline.", "error");
+                return;
+            }
+            currentUser = matchedUser;
+            showToast(`Conectado no Modo Offline como ${currentUser.name}!`);
+            
+            const backup = { username: currentUser.username, name: currentUser.name, password: passwordInput };
+            localStorage.setItem('conectachat_last_account', JSON.stringify(backup));
+            lastAccountData = backup;
+            showLastAccountUI(lastAccountData);
+
+            enterApplication();
+        }
+
         function startUserSession() {
             if (unsubscribeFriends) unsubscribeFriends();
             if (unsubscribeGroups) unsubscribeGroups();
@@ -1485,9 +1547,11 @@
                 const friendsList = [];
                 const reqReceived = [];
                 const reqSent = [];
+                activeRelationships = [];
 
                 snapshot.forEach(doc => {
                     const data = { id: doc.id, ...doc.data() };
+                    activeRelationships.push(data);
                     if (data.status === 'accepted') {
                         if (data.sender === currentUser.username) {
                             friendsList.push({ requestDocId: data.id, friendUsername: data.receiver });
@@ -1538,7 +1602,6 @@
                 activateOfflineFallback();
             });
 
-            // Monitor de Notificações em Segundo Plano (DMs)
             const globalDMsCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
             onSnapshot(globalDMsCol, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
@@ -1563,7 +1626,6 @@
                 });
             });
 
-            // Monitor de Notificações em Segundo Plano (Grupos)
             const globalGroupsCol = collection(db, 'artifacts', appId, 'public', 'data', 'group_messages');
             onSnapshot(globalGroupsCol, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
@@ -1592,7 +1654,135 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Renderizando contatos e amigos com Modo Claro / Escuro... ---
+        // --- SISTEMA DE SOLICITAÇÃO DE AMIZADES (renderRequests, handleAcceptRequest, handleDeleteRequest) ---
+        function renderRequests(received, sent) {
+            const receivedContainer = document.getElementById('req-received-container');
+            const sentContainer = document.getElementById('req-sent-container');
+            const badgeRequests = document.getElementById('badge-requests');
+
+            if (!receivedContainer || !sentContainer || !badgeRequests) return;
+
+            if (received.length > 0) {
+                badgeRequests.innerText = received.length;
+                badgeRequests.classList.remove('hidden');
+            } else {
+                badgeRequests.classList.add('hidden');
+            }
+
+            // Renderiza pedidos recebidos
+            receivedContainer.innerHTML = '';
+            if (received.length === 0) {
+                receivedContainer.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido pendente</p>`;
+            } else {
+                received.forEach(req => {
+                    const senderData = accountsMap[req.sender];
+                    const senderName = senderData ? senderData.name : req.sender;
+                    const item = document.createElement('div');
+                    item.className = 'p-2.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-2 animate-pop-in';
+                    item.innerHTML = `
+                        <div class="truncate">
+                            <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">${senderName}</p>
+                            <p class="text-[9px] text-slate-400 dark:text-slate-500">@${req.sender}</p>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 transition-all active:scale-90" aria-label="Aceitar" title="Aceitar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-700 dark:text-rose-400 hover:text-white transition-all active:scale-90" aria-label="Recusar" title="Recusar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+
+                    item.querySelector('.accept-btn').addEventListener('click', () => handleAcceptRequest(req.id, req.sender));
+                    item.querySelector('.decline-btn').addEventListener('click', () => handleDeleteRequest(req.id));
+                    receivedContainer.appendChild(item);
+                });
+            }
+
+            // Renderiza pedidos enviados
+            sentContainer.innerHTML = '';
+            if (sent.length === 0) {
+                sentContainer.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido enviado</p>`;
+            } else {
+                sent.forEach(req => {
+                    const receiverData = accountsMap[req.receiver];
+                    const receiverName = receiverData ? receiverData.name : req.receiver;
+                    const item = document.createElement('div');
+                    item.className = 'p-2.5 rounded-xl bg-slate-100 dark:bg-slate-950/30 border border-slate-200 dark:border-slate-800/50 flex items-center justify-between gap-2 animate-pop-in';
+                    item.innerHTML = `
+                        <div class="truncate">
+                            <p class="text-xs font-semibold text-slate-800 dark:text-slate-400 truncate">${receiverName}</p>
+                            <p class="text-[9px] text-slate-400 dark:text-slate-500">@${req.receiver}</p>
+                        </div>
+                        <button class="cancel-btn p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 transition-all active:scale-90" aria-label="Cancelar" title="Cancelar">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    `;
+                    item.querySelector('.cancel-btn').addEventListener('click', () => handleDeleteRequest(req.id));
+                    sentContainer.appendChild(item);
+                });
+            }
+        }
+
+        async function handleAcceptRequest(docId, senderUsername) {
+            if (isOfflineMode) {
+                if (simData.friends[docId]) {
+                    simData.friends[docId].status = 'accepted';
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    showToast(`Você agora é amigo de @${senderUsername}!`);
+                }
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), {
+                    status: 'accepted'
+                });
+                showToast(`Você agora é amigo de @${senderUsername}!`);
+            } catch (err) {
+                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
+                    activateOfflineFallback();
+                    handleAcceptRequest(docId, senderUsername);
+                } else {
+                    console.error("Erro ao aceitar amizade:", err);
+                    showToast("Erro ao aceitar convite.", "error");
+                }
+            }
+        }
+
+        async function handleDeleteRequest(docId) {
+            if (isOfflineMode) {
+                if (simData.friends[docId]) {
+                    delete simData.friends[docId];
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    showToast("Solicitação de amizade resolvida.");
+                }
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
+                showToast("Solicitação de amizade resolvida.");
+            } catch (err) {
+                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
+                    activateOfflineFallback();
+                    handleDeleteRequest(docId);
+                } else {
+                    console.error("Erro ao remover solicitação:", err);
+                    showToast("Erro ao deletar solicitação.", "error");
+                }
+            }
+        }
+
         function renderFriends(friends) {
             const container = document.getElementById('friends-container');
             const emptyEl = document.getElementById('friends-empty');
@@ -1616,7 +1806,7 @@
                     : 'bg-slate-100/50 dark:bg-slate-950/40 hover:bg-slate-200/50 dark:hover:bg-slate-800/60 border-transparent text-slate-700 dark:text-slate-300';
 
                 const friendItem = document.createElement('div');
-                friendItem.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${activeClass}`;
+                friendItem.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${activeClass}`;
                 
                 const avatarHTML = getAvatarHTML(
                     friendData ? friendData.avatarType : 'initial',
@@ -1626,7 +1816,7 @@
 
                 friendItem.innerHTML = `
                     <div class="flex items-center gap-3 w-full">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 relative overflow-hidden">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 relative overflow-hidden transition-all duration-300">
                             ${avatarHTML}
                         </div>
                         <div class="truncate flex-1">
@@ -1665,13 +1855,13 @@
                     : 'bg-slate-100/50 dark:bg-slate-950/40 hover:bg-slate-200/50 dark:hover:bg-slate-800/60 border-transparent text-slate-700 dark:text-slate-300';
 
                 const groupItem = document.createElement('div');
-                groupItem.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${activeClass}`;
+                groupItem.className = `p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${activeClass}`;
                 
                 const avatarHTML = getAvatarHTML(g.avatarType, g.avatarValue, g.name.charAt(0).toUpperCase(), 'from-emerald-500 to-teal-500');
 
                 groupItem.innerHTML = `
                     <div class="flex items-center gap-3 w-full">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 relative overflow-hidden">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 relative overflow-hidden transition-all duration-300">
                             ${avatarHTML}
                         </div>
                         <div class="truncate flex-1">
@@ -1689,124 +1879,6 @@
             });
         }
 
-        // Renderizar a lista de solicitações recebidas e enviadas
-        function renderRequests(received, sent) {
-            const receivedContainer = document.getElementById('req-received-container');
-            const sentContainer = document.getElementById('req-sent-container');
-            const badgeRequests = document.getElementById('badge-requests');
-
-            if (received.length > 0) {
-                badgeRequests.innerText = received.length;
-                badgeRequests.classList.remove('hidden');
-            } else {
-                badgeRequests.classList.add('hidden');
-            }
-
-            // Renderizar recebidos
-            receivedContainer.innerHTML = '';
-            if (received.length === 0) {
-                receivedContainer.innerHTML = '<p class="text-[11px] text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido recebido</p>';
-            } else {
-                received.forEach(req => {
-                    const senderName = accountsMap[req.sender] ? accountsMap[req.sender].name : req.sender;
-                    const item = document.createElement('div');
-                    item.className = 'p-2.5 rounded-xl bg-slate-100/50 dark:bg-slate-950/60 border border-slate-200/50 dark:border-slate-800/80 flex items-center justify-between gap-2';
-                    item.innerHTML = `
-                        <div class="truncate">
-                            <p class="text-xs font-semibold text-slate-850 dark:text-slate-200 truncate">${senderName}</p>
-                            <p class="text-[9px] text-slate-500">@${req.sender}</p>
-                        </div>
-                        <div class="flex items-center gap-1 shrink-0">
-                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 transition-all" aria-label="Aceitar" title="Aceitar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </button>
-                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-700 dark:text-rose-400 hover:text-white transition-all" aria-label="Recusar" title="Recusar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                    `;
-
-                    item.querySelector('.accept-btn').addEventListener('click', () => handleAcceptRequest(req.id, req.sender));
-                    item.querySelector('.decline-btn').addEventListener('click', () => handleDeleteRequest(req.id));
-                    receivedContainer.appendChild(item);
-                });
-            }
-
-            // Renderizar enviados
-            sentContainer.innerHTML = '';
-            if (sent.length === 0) {
-                sentContainer.innerHTML = '<p class="text-[11px] text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido pendente</p>';
-            } else {
-                sent.forEach(req => {
-                    const receiverName = accountsMap[req.receiver] ? accountsMap[req.receiver].name : req.receiver;
-                    const item = document.createElement('div');
-                    item.className = 'p-2.5 rounded-xl bg-slate-100/30 dark:bg-slate-950/30 border border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between gap-2';
-                    item.innerHTML = `
-                        <div class="truncate">
-                            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate">${receiverName}</p>
-                            <p class="text-[9px] text-slate-600">@${req.receiver}</p>
-                        </div>
-                        <button class="cancel-btn p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 transition-all" aria-label="Cancelar" title="Cancelar">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    `;
-                    item.querySelector('.cancel-btn').addEventListener('click', () => handleDeleteRequest(req.id));
-                    sentContainer.appendChild(item);
-                });
-            }
-        }
-
-        // Aceitar solicitação recebida
-        async function handleAcceptRequest(docId, senderUsername) {
-            if (isOfflineMode) {
-                if (simData.friends[docId]) {
-                    simData.friends[docId].status = 'accepted';
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    showToast(`Você agora é amigo de @${senderUsername}!`);
-                }
-                return;
-            }
-
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), {
-                    status: 'accepted'
-                });
-                showToast(`Você agora é amigo de @${senderUsername}!`);
-            } catch (err) {
-                console.error("Erro ao aceitar amizade:", err);
-                showToast("Erro ao aceitar convite.", "error");
-            }
-        }
-
-        // Recusar ou Cancelar solicitação
-        async function handleDeleteRequest(docId) {
-            if (isOfflineMode) {
-                if (simData.friends[docId]) {
-                    delete simData.friends[docId];
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    showToast("Solicitação de amizade resolvida.");
-                }
-                return;
-            }
-
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
-                showToast("Solicitação de amizade resolvida.");
-            } catch (err) {
-                console.error("Erro ao remover solicitação:", err);
-                showToast("Erro ao deletar solicitação.", "error");
-            }
-        }
-
-        // --- STREAMING_CHUNK:Renderizando as mensagens com bolhas do chat... ---
         function renderMessages(messages) {
             const container = document.getElementById('messages-container');
             container.innerHTML = '';
@@ -1833,7 +1905,7 @@
                 if (msg.fileData) {
                     if (msg.fileType === 'image') {
                         mediaHtml = `
-                            <div class="mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-90 transition-all" onclick="openMediaModal('${msg.fileData}', 'image')">
+                            <div class="mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-90 transition-all duration-300" onclick="openMediaModal('${msg.fileData}', 'image')">
                                 <img src="${msg.fileData}" class="max-h-60 object-contain w-full" alt="Imagem">
                             </div>
                         `;
@@ -1847,10 +1919,10 @@
                 }
 
                 const msgElement = document.createElement('div');
-                msgElement.className = `flex ${alignmentClass} w-full`;
+                msgElement.className = `flex ${alignmentClass} w-full animate-pop-in`;
                 msgElement.innerHTML = `
                     <div class="max-w-[75%] flex flex-col ${isMine ? 'items-end' : 'items-start'}">
-                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor}">
+                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor} transition-all duration-300">
                             ${msg.text ? `<div>${msg.text}</div>` : ''}
                             ${mediaHtml}
                         </div>
@@ -1870,7 +1942,7 @@
 
             if (messages.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-12 text-slate-400 dark:text-slate-500 text-xs">
+                    <div class="text-center py-12 text-slate-400 dark:text-slate-500 text-xs animate-pop-in">
                         Este é o início das mensagens no grupo!
                     </div>
                 `;
@@ -1890,7 +1962,7 @@
                 if (msg.fileData) {
                     if (msg.fileType === 'image') {
                         mediaHtml = `
-                            <div class="mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-90 transition-all" onclick="openMediaModal('${msg.fileData}', 'image')">
+                            <div class="mt-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-90 transition-all duration-300" onclick="openMediaModal('${msg.fileData}', 'image')">
                                 <img src="${msg.fileData}" class="max-h-60 object-contain w-full" alt="Imagem">
                             </div>
                         `;
@@ -1904,7 +1976,7 @@
                 }
 
                 const msgElement = document.createElement('div');
-                msgElement.className = `flex ${alignmentClass} w-full`;
+                msgElement.className = `flex ${alignmentClass} w-full animate-pop-in`;
                 
                 const senderHeader = !isMine 
                     ? `<p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">@${msg.senderName || msg.sender}</p>` 
@@ -1913,7 +1985,7 @@
                 msgElement.innerHTML = `
                     <div class="max-w-[75%] flex flex-col ${isMine ? 'items-end' : 'items-start'}">
                         ${senderHeader}
-                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor}">
+                        <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor} transition-all duration-300">
                             ${msg.text ? `<div>${msg.text}</div>` : ''}
                             ${mediaHtml}
                         </div>
@@ -1927,156 +1999,9 @@
             chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
         }
 
-        // --- STREAMING_CHUNK:Enviando as mensagens com mídias ou arquivos anexos... ---
-        document.getElementById('chat-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('message-input');
-            const text = input.value.trim();
-
-            if (!text && !selectedFilePayload) return;
-
-            const payloadMessage = {
-                sender: currentUser.username,
-                text: text,
-                timestamp: Date.now()
-            };
-
-            if (selectedFilePayload) {
-                payloadMessage.fileData = selectedFilePayload.base64;
-                payloadMessage.fileType = selectedFilePayload.type;
-                payloadMessage.fileName = selectedFilePayload.name;
-            }
-
-            if (activeGroup) {
-                payloadMessage.groupId = activeGroup.id;
-                payloadMessage.senderName = currentUser.name;
-
-                if (isOfflineMode) {
-                    simData.groupMessages.push(payloadMessage);
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    input.value = '';
-                    clearSelectedFile();
-                    input.focus();
-                    return;
-                }
-
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'group_messages'), payloadMessage);
-                    input.value = '';
-                    clearSelectedFile();
-                    input.focus();
-                } catch (err) {
-                    console.error("Erro ao enviar mensagem em grupo:", err);
-                    showToast("Erro ao entregar mensagem de grupo.", "error");
-                }
-                return;
-            }
-
-            if (activeFriend) {
-                payloadMessage.receiver = activeFriend.username;
-
-                if (isOfflineMode) {
-                    simData.messages.push(payloadMessage);
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    input.value = '';
-                    clearSelectedFile();
-                    input.focus();
-                    return;
-                }
-
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), payloadMessage);
-                    input.value = '';
-                    clearSelectedFile();
-                    input.focus();
-                } catch (err) {
-                    console.error("Falha ao enviar mensagem:", err);
-                    showToast("Erro ao entregar mensagem.", "error");
-                }
-            }
-        });
-
-        // --- STREAMING_CHUNK:Lógicas de amizades, conexões e convites... ---
-        document.getElementById('add-friend-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('friend-search-input');
-            const targetUsername = input.value.trim().toLowerCase();
-
-            if (!targetUsername) return;
-            if (targetUsername === currentUser.username) {
-                showToast("Você não pode adicionar a si mesmo!", "error");
-                return;
-            }
-
-            if (isOfflineMode) {
-                const friendExists = simData.accounts[targetUsername];
-                if (!friendExists) {
-                    showToast(`Usuário @${targetUsername} não encontrado offline.`, "error");
-                    return;
-                }
-                const requestDocId = `${currentUser.username}_${targetUsername}`;
-                const requestDocIdAlt = `${targetUsername}_${currentUser.username}`;
-
-                if (simData.friends[requestDocId] || simData.friends[requestDocIdAlt]) {
-                    showToast("Uma solicitação ou amizade com este usuário já existe offline.", "error");
-                    return;
-                }
-                simData.friends[requestDocId] = {
-                    id: requestDocId,
-                    sender: currentUser.username,
-                    receiver: targetUsername,
-                    status: 'pending',
-                    timestamp: Date.now()
-                };
-                saveLocalSimulationData();
-                triggerOfflineCallbacks();
-                showToast(`Solicitação enviada offline para @${targetUsername}!`);
-                input.value = '';
-                return;
-            }
-
-            try {
-                const targetAccountDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', targetUsername);
-                const targetDocSnap = await getDoc(targetAccountDocRef);
-
-                if (!targetDocSnap.exists()) {
-                    showToast(`Usuário @${targetUsername} não encontrado.`, "error");
-                    return;
-                }
-
-                accountsMap[targetUsername] = targetDocSnap.data();
-
-                const requestDocId = `${currentUser.username}_${targetUsername}`;
-                const requestDocIdAlt = `${targetUsername}_${currentUser.username}`;
-
-                const querySnapshot = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', requestDocId));
-                const querySnapshotAlt = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', requestDocIdAlt));
-
-                if (querySnapshot.exists() || querySnapshotAlt.exists()) {
-                    showToast("Uma solicitação ou amizade com este usuário já existe.", "error");
-                    return;
-                }
-
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', requestDocId), {
-                    sender: currentUser.username,
-                    receiver: targetUsername,
-                    status: 'pending',
-                    timestamp: Date.now()
-                });
-
-                showToast(`Solicitação enviada para @${targetUsername}!`);
-                input.value = '';
-            } catch (err) {
-                activateOfflineFallback();
-            }
-        });
-
-        // --- STREAMING_CHUNK:Lógicas de manipulação e controle de moderação de grupos... ---
-        // Criação de Grupos
+        const openCreateGroupModalBtn = document.getElementById('open-create-group-modal');
         const createGroupModal = document.getElementById('create-group-modal');
-        document.getElementById('open-create-group-modal').addEventListener('click', () => {
+        openCreateGroupModalBtn.addEventListener('click', () => {
             createGroupModal.classList.remove('hidden');
         });
         document.getElementById('close-create-group-modal').addEventListener('click', () => {
@@ -2124,7 +2049,6 @@
             }
         });
 
-        // --- ATIVAÇÃO E EXPORTAÇÃO DOS MÉTODOS DE ABERTURA DE CHAT ---
         function openChatWith(friend) {
             activeFriend = friend;
             activeGroup = null;
@@ -2225,7 +2149,6 @@
             });
         }
 
-        // --- STREAMING_CHUNK:Lógicas de manipulação de moderação de grupos... ---
         function setupGroupSettingsTrigger() {
             document.getElementById('settings-group-title').innerText = activeGroup.name;
             document.getElementById('settings-group-creator').innerText = `Criado por @${activeGroup.creator}`;
@@ -2279,7 +2202,7 @@
                 const isCreator = memberUsername === activeGroup.creator;
                 
                 const div = document.createElement('div');
-                div.className = "flex items-center justify-between p-2 rounded-xl bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800/40 text-xs gap-3";
+                div.className = "flex items-center justify-between p-2 rounded-xl bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800/40 text-xs gap-3 animate-pop-in";
                 
                 const avatarHTML = getAvatarHTML(
                     memberData ? memberData.avatarType : 'initial',
@@ -2292,7 +2215,7 @@
 
                 div.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-[10px] shrink-0">
+                        <div class="w-6 h-6 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-[10px] shrink-0 transition-all duration-300">
                             ${avatarHTML}
                         </div>
                         <div class="truncate">
@@ -2301,7 +2224,7 @@
                         </div>
                     </div>
                     ${showKickBtn ? `
-                        <button class="kick-btn text-[10px] font-bold text-rose-500 hover:text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 px-2 py-1 rounded-lg border border-rose-500/20 transition-all shrink-0">
+                        <button class="kick-btn text-[10px] font-bold text-rose-500 hover:text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 px-2 py-1 rounded-lg border border-rose-500/20 transition-all duration-300 active:scale-90 shrink-0">
                             Expulsar
                         </button>
                     ` : ''}
@@ -2338,7 +2261,6 @@
             }
         }
 
-        // Convidar Membro
         document.getElementById('add-member-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('new-member-username');
@@ -2380,7 +2302,6 @@
             }
         });
 
-        // Salvar detalhes do grupo
         document.getElementById('edit-group-details-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const newName = document.getElementById('edit-group-name').value.trim();
@@ -2424,6 +2345,136 @@
             document.getElementById('group-settings-modal').classList.add('hidden');
         });
 
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evita o recarregamento nativo do navegador!
+            const text = messageInput.value.trim();
+            
+            if (!text && !selectedFilePayload) {
+                return; // Nada para enviar
+            }
+
+            const msgPayload = {
+                sender: currentUser.username,
+                timestamp: Date.now(),
+                text: text
+            };
+
+            // Adiciona anexo se houver
+            if (selectedFilePayload) {
+                msgPayload.fileData = selectedFilePayload.base64;
+                msgPayload.fileType = selectedFilePayload.type;
+            }
+
+            if (activeFriend) {
+                msgPayload.receiver = activeFriend.username;
+
+                if (isOfflineMode) {
+                    msgPayload.id = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+                    simData.messages.push(msgPayload);
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                } else {
+                    try {
+                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgPayload);
+                    } catch (err) {
+                        console.error("Erro ao enviar DM:", err);
+                        showToast("Erro ao enviar mensagem.", "error");
+                        return;
+                    }
+                }
+            } else if (activeGroup) {
+                msgPayload.groupId = activeGroup.id;
+                msgPayload.senderName = currentUser.name;
+
+                if (isOfflineMode) {
+                    msgPayload.id = `gmsg_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+                    simData.groupMessages.push(msgPayload);
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                } else {
+                    try {
+                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'group_messages'), msgPayload);
+                    } catch (err) {
+                        console.error("Erro ao enviar mensagem no grupo:", err);
+                        showToast("Erro ao enviar mensagem no grupo.", "error");
+                        return;
+                    }
+                }
+            }
+
+            // Limpa o campo de entrada e anexo
+            messageInput.value = '';
+            clearSelectedFile();
+        });
+
+        const addFriendForm = document.getElementById('add-friend-form');
+        const friendSearchInput = document.getElementById('friend-search-input');
+
+        addFriendForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evita recarregar a página ao pesquisar/adicionar!
+            const targetUsername = friendSearchInput.value.trim().toLowerCase();
+
+            if (!targetUsername) return;
+
+            if (targetUsername === currentUser.username) {
+                showToast("Você não pode adicionar a si mesmo.", "error");
+                return;
+            }
+
+            const exists = isOfflineMode ? simData.accounts[targetUsername] : accountsMap[targetUsername];
+            if (!exists) {
+                showToast(`Usuário @${targetUsername} não encontrado.`, "error");
+                return;
+            }
+
+            const relationships = isOfflineMode ? Object.values(simData.friends) : activeRelationships;
+            const existing = relationships.find(r => 
+                (r.sender === currentUser.username && r.receiver === targetUsername) ||
+                (r.sender === targetUsername && r.receiver === currentUser.username)
+            );
+
+            if (existing) {
+                if (existing.status === 'accepted') {
+                    showToast(`Você já é amigo de @${targetUsername}.`, "info");
+                } else if (existing.status === 'pending') {
+                    if (existing.sender === currentUser.username) {
+                        showToast("Você já tem uma solicitação pendente para este usuário.", "info");
+                    } else {
+                        showToast("Este usuário já te enviou uma solicitação. Aceite na aba 'Solicitações'!", "info");
+                    }
+                }
+                return;
+            }
+
+            const payload = {
+                sender: currentUser.username,
+                receiver: targetUsername,
+                status: 'pending',
+                timestamp: Date.now()
+            };
+
+            if (isOfflineMode) {
+                const reqId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+                payload.id = reqId;
+                simData.friends[reqId] = payload;
+                saveLocalSimulationData();
+                triggerOfflineCallbacks();
+                showToast(`Solicitação enviada para @${targetUsername}!`);
+            } else {
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'friends'), payload);
+                    showToast(`Solicitação enviada para @${targetUsername}!`);
+                } catch (err) {
+                    console.error("Erro ao enviar solicitação de amizade:", err);
+                    showToast("Erro ao enviar solicitação.", "error");
+                }
+            }
+            friendSearchInput.value = '';
+        });
+
         function closeActiveChat() {
             activeFriend = null;
             activeGroup = null;
@@ -2434,8 +2485,6 @@
             document.getElementById('chat-input-bar').classList.add('hidden');
         }
 
-        // --- STREAMING_CHUNK:Iniciando as lógicas globais adicionais... ---
-        // Abas e cliques globais da Sidebar
         const tabFriends = document.getElementById('tab-friends');
         const tabGroups = document.getElementById('tab-groups');
         const tabRequests = document.getElementById('tab-requests');
@@ -2445,33 +2494,32 @@
         const panelRequests = document.getElementById('panel-requests-list');
 
         tabFriends.addEventListener('click', () => {
-            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all";
-            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
-            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all flex items-center justify-center gap-1";
+            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all duration-300";
+            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300";
+            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300 flex items-center justify-center gap-1";
             panelFriends.classList.remove('hidden');
             panelGroups.classList.add('hidden');
             panelRequests.classList.add('hidden');
         });
 
         tabGroups.addEventListener('click', () => {
-            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 transition-all";
-            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
-            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all flex items-center justify-center gap-1";
+            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 border-b-2 border-emerald-500 transition-all duration-300";
+            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300";
+            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300 flex items-center justify-center gap-1";
             panelFriends.classList.add('hidden');
             panelGroups.classList.remove('hidden');
             panelRequests.classList.add('hidden');
         });
 
         tabRequests.addEventListener('click', () => {
-            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all flex items-center justify-center gap-1";
-            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
-            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all";
+            tabRequests.className = "flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all duration-300 flex items-center justify-center gap-1";
+            tabFriends.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300";
+            tabGroups.className = "flex-1 py-3 text-center text-[11px] font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-all duration-300";
             panelFriends.classList.add('hidden');
             panelGroups.classList.add('hidden');
             panelRequests.classList.remove('hidden');
         });
 
-        // Configuração de Favicon dinâmico
         function setupFavicon() {
             const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="url(#grad)"/><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><path d="M30 45h.01M50 45h.01M70 45h.01M80 45c0 16.5-13.5 30-30 30a32.8 32.8 0 01-14.2-3.2L16 75l4.6-12.4C17.7 56.8 16 51.1 16 45c0-16.5 13.5-30 30-30s30 13.5 30 30z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>`;
             const faviconUrl = `data:image/svg+xml;utf8,${encodeURIComponent(faviconSvg)}`;
@@ -2488,7 +2536,6 @@
             setupFavicon();
         };
 
-        // --- EXPORTANDO AS CONEXÕES ADICIONAIS FINAIS NO ESCOPO GLOBAL DO ARQUIVO ---
         window.openChatWith = openChatWith;
         window.openGroupChatWith = openGroupChatWith;
         window.openMediaModal = openMediaModal;
