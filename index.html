@@ -66,9 +66,16 @@
     <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- Banner de Status de Conexão -->
-    <div id="connection-banner" class="bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2 transition-all duration-300">
-        <span id="connection-dot" class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
-        <span id="connection-text">Verificando conexão com o Firebase...</span>
+    <div id="connection-banner" class="bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-between gap-2 transition-all duration-300">
+        <div class="flex items-center justify-center gap-2 mx-auto">
+            <span id="connection-dot" class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+            <span id="connection-text">Verificando conexão com o Firebase...</span>
+        </div>
+        <button id="close-connection-banner" class="text-slate-500 hover:text-slate-800 dark:text-indigo-400 dark:hover:text-indigo-200 font-bold p-1 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded transition-all active:scale-90" aria-label="Fechar" title="Fechar">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     </div>
 
     <!-- Container de Notificação Premium Flutuante -->
@@ -202,8 +209,8 @@
 
     <!-- MAIN INTERFACE -->
     <div id="main-app" class="hidden flex-1 flex flex-col overflow-hidden h-full">
-        <!-- Topbar -->
-        <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-10 shadow-md">
+        <!-- Topbar - Atualizado para z-30 para sobrepor o menu lateral de contatos (z-20) -->
+        <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-30 shadow-md transition-colors duration-305">
             <!-- Logo e Perfil Rápido -->
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center animate-pop-in">
@@ -221,15 +228,19 @@
             </div>
 
             <!-- Barra de Adicionar Amigo -->
-            <form id="add-friend-form" class="flex-1 max-w-md min-w-[240px]">
+            <form id="add-friend-form" class="flex-1 max-w-md min-w-[240px] relative">
                 <div class="relative flex items-center">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <span class="text-slate-400 text-sm">@</span>
                     </div>
-                    <input id="friend-search-input" type="text" placeholder="Adicionar amigo pelo usuário..." required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-24 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300">
+                    <input id="friend-search-input" type="text" autocomplete="off" placeholder="Adicionar amigo pelo usuário..." required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-24 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300">
                     <button type="submit" id="btn-add-action" class="absolute right-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-semibold px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider border border-emerald-500/30 transition-all duration-300 active:scale-95">
                         Adicionar
                     </button>
+                </div>
+                <!-- Menu Suspenso de Sugestões de Pesquisa (Z-index 50 garante que flutue sobre tudo) -->
+                <div id="search-dropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl max-h-52 overflow-y-auto z-50 p-1 divide-y divide-slate-100 dark:divide-slate-800">
+                    <!-- Usuários encontrados injetados aqui -->
                 </div>
             </form>
 
@@ -344,7 +355,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white relative overflow-hidden transition-all duration-300" id="active-chat-avatar">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white relative overflow-hidden transition-all duration-300 cursor-pointer" id="active-chat-avatar">
                             A
                         </div>
                         <div class="truncate">
@@ -420,6 +431,32 @@
         </main>
     </div>
 
+    <!-- MODAL DE DETALHES DO USUÁRIO -->
+    <div id="user-info-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4 animate-slide-up relative">
+            <button id="close-user-info-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all active:scale-90" aria-label="Fechar" title="Fechar">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="flex flex-col items-center text-center space-y-3.5 pt-4">
+                <div id="info-modal-avatar" class="w-20 h-20 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-2xl shadow-xl transition-all duration-300">
+                    <!-- Avatar Dinâmico -->
+                </div>
+                <div>
+                    <h3 id="info-modal-name" class="text-base font-bold text-slate-900 dark:text-white"></h3>
+                    <p id="info-modal-username" class="text-xs text-indigo-500 dark:text-indigo-400 font-medium mt-0.5"></p>
+                </div>
+                <div id="info-modal-status-badge" class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                    <!-- Conexão de Amizade -->
+                </div>
+                <button id="info-modal-action-btn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 rounded-xl shadow-lg transition-all active:scale-95 text-xs">
+                    Adicionar Amigo
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE CRIAR GRUPO -->
     <div id="create-group-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all duration-300">
         <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 animate-slide-up">
@@ -478,12 +515,12 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÕES DE MEMBROS DO GRUPO -->
+    <!-- MODAL DE CONFIGURAÇÕES DE MEMBROS DO GRUPO (Com correções de rolagem no celular) -->
     <div id="group-settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all duration-300">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-4 animate-slide-up">
-            <div class="flex items-center justify-between">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl flex flex-col max-h-[85vh] animate-slide-up">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
                 <div>
-                    <h3 id="settings-group-title" class="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[250px]">Membros do Grupo</h3>
+                    <h3 id="settings-group-title" class="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[220px]">Membros do Grupo</h3>
                     <p id="settings-group-creator" class="text-[10px] text-slate-500 dark:text-slate-400">Criado por @username</p>
                 </div>
                 <button id="close-group-settings-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all active:scale-90" title="Fechar">
@@ -493,60 +530,63 @@
                 </button>
             </div>
 
-            <!-- EDITAR DETALHES DO GRUPO (Apenas Criador) -->
-            <div id="admin-group-details-section" class="hidden border-b border-slate-200 dark:border-slate-800 pb-4 space-y-3">
-                <h4 id="label-personalizar-grupo" class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Personalizar Grupo</h4>
-                <form id="edit-group-details-form" class="space-y-2">
-                    <div>
-                        <label for="edit-group-name" class="block text-[10px] text-slate-500 dark:text-slate-400">Nome do Grupo</label>
-                        <input id="edit-group-name" type="text" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none transition-all">
-                    </div>
-                    <div class="grid grid-cols-2 gap-2">
+            <!-- Área de conteúdo interna rolável para evitar cortes no celular -->
+            <div class="flex-1 overflow-y-auto space-y-4 py-3 pr-1 no-scrollbar">
+                <!-- EDITAR DETALHES DO GRUPO (Apenas Criador) -->
+                <div id="admin-group-details-section" class="hidden border-b border-slate-100 dark:border-slate-800 pb-4 space-y-3">
+                    <h4 id="label-personalizar-grupo" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Personalizar Grupo</h4>
+                    <form id="edit-group-details-form" class="space-y-2">
                         <div>
-                            <label for="edit-group-avatar-type" class="block text-[10px] text-slate-500 dark:text-slate-400">Tipo de Logo</label>
-                            <select id="edit-group-avatar-type" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none">
-                                <option value="initial">Iniciais</option>
-                                <option value="emoji">Emoji</option>
-                                <option value="url">Link de Imagem (URL)</option>
-                            </select>
+                            <label for="edit-group-name" class="block text-[10px] text-slate-500 dark:text-slate-400">Nome do Grupo</label>
+                            <input id="edit-group-name" type="text" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none transition-all">
                         </div>
-                        <div>
-                            <label id="edit-group-avatar-value-label" for="edit-group-avatar-value" class="block text-[10px] text-slate-500 dark:text-slate-400">Emoji ou Link</label>
-                            <input id="edit-group-avatar-value" type="text" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none transition-all">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label for="edit-group-avatar-type" class="block text-[10px] text-slate-500 dark:text-slate-400">Tipo de Logo</label>
+                                <select id="edit-group-avatar-type" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-2 py-2 text-xs text-slate-900 dark:text-slate-100 focus:outline-none">
+                                    <option value="initial">Iniciais</option>
+                                    <option value="emoji">Emoji</option>
+                                    <option value="url">Link de Imagem (URL)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label id="edit-group-avatar-value-label" for="edit-group-avatar-value" class="block text-[10px] text-slate-500 dark:text-slate-400">Emoji ou Link</label>
+                                <input id="edit-group-avatar-value" type="text" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-3 py-2 text-xs text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none transition-all">
+                            </div>
                         </div>
-                    </div>
-                    <button type="submit" id="btn-save-group-config" class="w-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-bold py-2 rounded-xl text-xs border border-emerald-500/30 transition-all duration-300 active:scale-95">
-                        Salvar Configurações do Grupo
-                    </button>
-                </form>
-            </div>
+                        <button type="submit" id="btn-save-group-config" class="w-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-bold py-2 rounded-xl text-xs border border-emerald-500/30 transition-all duration-300 active:scale-95">
+                            Salvar Configurações do Grupo
+                        </button>
+                    </form>
+                </div>
 
-            <!-- Formulário para o Criador Adicionar Novos Membros -->
-            <div id="admin-add-member-section" class="hidden border-b border-slate-200 dark:border-slate-800 pb-4 space-y-2">
-                <label for="new-member-username" id="label-convidar-membro" class="block text-xs font-medium text-emerald-600 dark:text-emerald-400">Convidar Novo Membro</label>
-                <form id="add-member-form" class="flex gap-2">
-                    <div class="relative flex-1">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-xs">@</span>
-                        <input id="new-member-username" type="text" placeholder="luis_prog" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 pl-7 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none transition-all">
-                    </div>
-                    <button type="submit" id="btn-convidar-action" class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 font-bold px-4 py-2 rounded-xl text-xs border border-emerald-500/30 transition-all duration-300 active:scale-95 shrink-0">
-                        Convidar
-                    </button>
-                </form>
-            </div>
+                <!-- Formulário para o Criador Adicionar Novos Membros -->
+                <div id="admin-add-member-section" class="hidden border-b border-slate-100 dark:border-slate-800 pb-4 space-y-2">
+                    <label for="new-member-username" id="label-convidar-membro" class="block text-xs font-medium text-emerald-600 dark:text-emerald-400">Convidar Novo Membro</label>
+                    <form id="add-member-form" class="flex gap-2">
+                        <div class="relative flex-1">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 text-xs">@</span>
+                            <input id="new-member-username" type="text" placeholder="luis_prog" required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 pl-7 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none transition-all">
+                        </div>
+                        <button type="submit" id="btn-convidar-action" class="bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-bold px-4 py-2 rounded-xl text-xs border border-emerald-500/30 transition-all duration-300 active:scale-95 shrink-0">
+                            Convidar
+                        </button>
+                    </form>
+                </div>
 
-            <!-- Lista de Membros Cadastrados -->
-            <div class="space-y-2">
-                <h4 id="label-membros-titulo" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Membros do Canal</h4>
-                <div id="group-members-container" class="max-h-60 overflow-y-auto space-y-1 pr-1">
-                    <!-- Membros injetados via JS -->
+                <!-- Lista de Membros Cadastrados -->
+                <div class="space-y-2">
+                    <h4 id="label-membros-titulo" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Membros do Canal</h4>
+                    <div id="group-members-container" class="space-y-1">
+                        <!-- Membros injetados via JS -->
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- MODAL DE VISUALIZAÇÃO DE IMAGEM AMPLIADA (LIGHTBOX) -->
-    <div id="media-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm transition-all duration-300">
+    <div id="media-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-all duration-300">
         <button id="close-media-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full bg-slate-900/55 hover:bg-slate-800 border border-slate-800 transition-all active:scale-90" aria-label="Fechar mídia" title="Fechar">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -601,7 +641,7 @@
             }, 3500);
         }
 
-        // --- STREAMING_CHUNK:Injetando tratamento de permissões nativas de notificações... ---
+        // --- SISTEMA DE NOTIFICAÇÕES NATIVAS ---
         function ativarNotificacoes() {
             if ("Notification" in window) {
                 if (Notification.permission !== "granted" && Notification.permission !== "denied") {
@@ -610,7 +650,7 @@
             }
         }
 
-        function mostrarNotificacaoNativa(usuario, mensagem, chatTargetFn) {
+        function mostrarNotificacaoNativa(usuario, message, chatTargetFn) {
             if ("Notification" in window && Notification.permission === "granted") {
                 const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="url(#grad)"/><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><path d="M30 45h.01M50 45h.01M70 45h.01M80 45c0 16.5-13.5 30-30 30a32.8 32.8 0 01-14.2-3.2L16 75l4.6-12.4C17.7 56.8 16 51.1 16 45c0-16.5 13.5-30 30-30s30 13.5 30 30z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>`;
                 const logoUrl = `data:image/svg+xml;utf8,${encodeURIComponent(logoSvg)}`;
@@ -632,7 +672,12 @@
             }
         }
 
-        // --- STREAMING_CHUNK:Configurando os dicionários de idiomas... ---
+        // Fechamento manual do banner de conexão
+        document.getElementById('close-connection-banner').addEventListener('click', () => {
+            document.getElementById('connection-banner').classList.add('hidden');
+        });
+
+      // --- DICIONÁRIOS DE IDIOMAS ---
         const languages = [
             { code: "PT", name: "Português", native: "Português" },
             { code: "EN", name: "English", native: "English" },
@@ -683,7 +728,43 @@
                 membrosTitulo: "Membros do Canal",
                 convidarBtn: "Convidar",
                 addFriendBtn: "Adicionar",
-                salvarBtn: "Salvar Alterações"
+                salvarBtn: "Salvar Alterações",
+                friendsEmpty: "Nenhum amigo conectado ainda.<br>Adicione pessoas pelo topo!",
+                groupsEmpty: "Você não está em nenhum grupo.<br>Crie um agora mesmo!",
+                verifyingConnection: "Verificando conexão com o Firebase...",
+                connectedFirebase: "Conectado ao Firebase Cloud Server",
+                offlineModeActive: "MODO OFFLINE ATIVO: Conta predefinida @{name} criada automaticamente!",
+                toastOfflineGuestCreated: "Bypass ativo: Conta de convidado gerada com sucesso!",
+                toastUsernameTaken: "Este nome de usuário já está sendo usado por outra pessoa.",
+                toastAccountCreated: "Sua conta foi criada! Faça login agora.",
+                toastErrorReg: "Não foi possível criar a conta remota.",
+                toastUserNotFound: "Nome de usuário incorreto ou não cadastrado.",
+                toastWrongPassword: "Senha incorreta.",
+                toastWelcomeBack: "Bem-vindo de volta, {name}!",
+                toastLoggedOut: "Você desconectou da conta.",
+                toastLimitExceeded: "O arquivo excede o limite de 1.5MB.",
+                toastProcessingAttachment: "Processando anexo...",
+                toastError: "Erro ao processar arquivo.",
+                toastProfileUpdatedOffline: "Seu perfil foi atualizado offline!",
+                toastProfileUpdated: "Seu perfil foi atualizado com sucesso!",
+                toastNoSelfAdd: "Você não pode adicionar a si mesmo.",
+                toastAlreadyFriends: "Você já é amigo de @{name}.",
+                toastPendingRequest: "Você já tem uma solicitação pendente para este usuário.",
+                toastReceivedRequest: "Este usuário já te enviou uma solicitação. Aceite na aba 'Solicitações'!",
+                toastSentRequest: "Solicitação enviada para @{name}!",
+                toastFriendshipAccepted: "Você agora é amigo de @{name}!",
+                toastRequestResolved: "Solicitação de amizade resolvida.",
+                toastGroupCreatedOffline: "Grupo \"{name}\" criado offline!",
+                toastGroupCreated: "Grupo \"{name}\" criado com sucesso!",
+                toastKickedMemberOffline: "Membro @{name} expulso offline.",
+                toastKickedMember: "Membro @{name} expulso com sucesso!",
+                toastAlreadyInGroup: "Usuário já é membro do grupo.",
+                toastMemberAddedOffline: "@{name} adicionado offline.",
+                toastMemberAdded: "@{name} convidado com sucesso!",
+                toastGroupUpdatedOffline: "Configurações do grupo salvas offline!",
+                toastGroupUpdated: "Grupo atualizado com sucesso!",
+                fileSentNotification: "{name} te enviou um arquivo",
+                fileGroupSentNotification: "{name} enviou um arquivo no grupo"
             },
             EN: {
                 authTitle: "Access your account to chat",
@@ -716,7 +797,43 @@
                 membrosTitulo: "Channel Members",
                 convidarBtn: "Invite",
                 addFriendBtn: "Add",
-                salvarBtn: "Save Changes"
+                salvarBtn: "Save Changes",
+                friendsEmpty: "No friends connected yet.<br>Add people at the top!",
+                groupsEmpty: "You are not in any group.<br>Create one right now!",
+                verifyingConnection: "Verifying connection with Firebase...",
+                connectedFirebase: "Connected to Firebase Cloud Server",
+                offlineModeActive: "OFFLINE MODE ACTIVE: Preset account @{name} created automatically!",
+                toastOfflineGuestCreated: "Bypass active: Guest account generated successfully!",
+                toastUsernameTaken: "This username is already taken by someone else.",
+                toastAccountCreated: "Your account has been created! Please log in.",
+                toastErrorReg: "Could not create remote account.",
+                toastUserNotFound: "Incorrect or unregistered username.",
+                toastWrongPassword: "Incorrect password.",
+                toastWelcomeBack: "Welcome back, {name}!",
+                toastLoggedOut: "You logged out of your account.",
+                toastLimitExceeded: "The file exceeds the 1.5MB limit.",
+                toastProcessingAttachment: "Processing attachment...",
+                toastError: "Error processing file.",
+                toastProfileUpdatedOffline: "Your profile was updated offline!",
+                toastProfileUpdated: "Your profile has been updated successfully!",
+                toastNoSelfAdd: "You cannot add yourself.",
+                toastAlreadyFriends: "You are already friends with @{name}.",
+                toastPendingRequest: "You already have a pending request for this user.",
+                toastReceivedRequest: "This user has already sent you a request. Accept in the 'Requests' tab!",
+                toastSentRequest: "Request sent to @{name}!",
+                toastFriendshipAccepted: "You are now friends with @{name}!",
+                toastRequestResolved: "Friend request resolved.",
+                toastGroupCreatedOffline: "Group \"{name}\" created offline!",
+                toastGroupCreated: "Group \"{name}\" created successfully!",
+                toastKickedMemberOffline: "Member @{name} kicked offline.",
+                toastKickedMember: "Member @{name} kicked successfully!",
+                toastAlreadyInGroup: "User is already a member of the group.",
+                toastMemberAddedOffline: "@{name} added offline.",
+                toastMemberAdded: "@{name} invited successfully!",
+                toastGroupUpdatedOffline: "Group settings saved offline!",
+                toastGroupUpdated: "Group updated successfully!",
+                fileSentNotification: "{name} sent you a file",
+                fileGroupSentNotification: "{name} sent a file in the group"
             },
             ES: {
                 authTitle: "Accede a tu cuenta para chatear",
@@ -749,15 +866,873 @@
                 membrosTitulo: "Miembros del Canal",
                 convidarBtn: "Invitar",
                 addFriendBtn: "Añadir",
-                salvarBtn: "Guardar Cambios"
+                salvarBtn: "Guardar Cambios",
+                friendsEmpty: "Ningún amigo conectado aún.<br>¡Añade personas arriba!",
+                groupsEmpty: "No estás en ningún grupo.<br>¡Crea uno ahora mismo!",
+                verifyingConnection: "Verificando conexión con Firebase...",
+                connectedFirebase: "Conectado al servidor en la nube de Firebase",
+                offlineModeActive: "MODO OFFLINE ACTIVO: ¡Cuenta predefinida @{name} creada automáticamente!",
+                toastOfflineGuestCreated: "Bypass activo: ¡Cuenta de invitado generada con éxito!",
+                toastUsernameTaken: "Este nombre de usuario ya está siendo usado por otra persona.",
+                toastAccountCreated: "¡Tu cuenta ha sido creada! Inicia sesión.",
+                toastErrorReg: "No se pudo crear la cuenta remota.",
+                toastUserNotFound: "Nombre de usuario incorrecto o no registrado.",
+                toastWrongPassword: "Contraseña incorrecta.",
+                toastWelcomeBack: "¡Bienvenido de nuevo, {name}!",
+                toastLoggedOut: "Cerraste la sesión de tu cuenta.",
+                toastLimitExceeded: "El archivo supera el límite de 1.5MB.",
+                toastProcessingAttachment: "Procesando archivo adjunto...",
+                toastError: "Error al procesar el archivo.",
+                toastProfileUpdatedOffline: "¡Tu perfil se actualizó sin conexión!",
+                toastProfileUpdated: "¡Tu perfil ha sido actualizado con éxito!",
+                toastNoSelfAdd: "No puedes agregarte a ti mismo.",
+                toastAlreadyFriends: "Ya eres amigo de @{name}.",
+                toastPendingRequest: "Ya tienes una solicitud pendiente para este usuario.",
+                toastReceivedRequest: "Este usuario ya te envió una solicitud. ¡Acepta en la pestaña 'Solicitudes'!",
+                toastSentRequest: "¡Solicitud enviada a @{name}!",
+                toastFriendshipAccepted: "¡Ahora eres amigo de @{name}!",
+                toastRequestResolved: "Solicitud de amistad resuelta.",
+                toastGroupCreatedOffline: "¡Grupo \"{name}\" creado sin conexión!",
+                toastGroupCreated: "¡Grupo \"{name}\" creado con éxito!",
+                toastKickedMemberOffline: "Miembro @{name} expulsado sin conexión.",
+                toastKickedMember: "¡Miembro @{name} expulsado con éxito!",
+                toastAlreadyInGroup: "El usuario ya es miembro del grupo.",
+                toastMemberAddedOffline: "@{name} agregado sin conexión.",
+                toastMemberAdded: "¡@{name} invitado con éxito!",
+                toastGroupUpdatedOffline: "¡Configuración del grupo guardada sin conexión!",
+                toastGroupUpdated: "¡Grupo actualizado con éxito!",
+                fileSentNotification: "{name} te envió un arquivo",
+                fileGroupSentNotification: "{name} envió un archivo en el grupo"
+            },
+            FR: {
+                authTitle: "Accédez à votre compte pour discuter",
+                authTitleReg: "Créez votre compte pour commencer",
+                displayName: "Comment voulez-vous être appelé ?",
+                username: "Nom d'utilisateur (@ID)",
+                password: "Mot de passe",
+                loginBtn: "Entrer dans le chat",
+                registerBtn: "Créer un compte",
+                noAccount: "Pas de compte ? Inscrivez-vous",
+                haveAccount: "Déjà un compte ? Connectez-vous",
+                addFriendPlaceholder: "Ajouter un ami par ID...",
+                friendsTab: "Amis",
+                groupsTab: "Groupes",
+                requestsTab: "Demandes",
+                logout: "Quitter",
+                chatPlaceholderHeader: "Choisissez un chat pour commencer",
+                chatPlaceholderSub: "Échangez des messages instantanément !",
+                membrosBtn: "Membres",
+                openCreateGroupBtn: "Créer un groupe",
+                groupNameLabel: "Nom du groupe",
+                createGroupModalTitle: "Créer un nouveau groupe",
+                editPerfilTitle: "Modifier le profil",
+                nomeExibicaoLabel: "Nom d'affichage",
+                recebidosHeader: "Reçus",
+                enviadosHeader: "Envoyés",
+                orText: "Ou connectez-vous avec un autre compte",
+                personalizarGrupo: "Personnaliser le groupe",
+                convidarMembro: "Inviter un membre",
+                membrosTitulo: "Membres du canal",
+                convidarBtn: "Inviter",
+                addFriendBtn: "Ajouter",
+                salvarBtn: "Enregistrer",
+                friendsEmpty: "Aucun ami connecté pour le moment.<br>Ajoutez-en en haut !",
+                groupsEmpty: "Vous n'êtes dans aucun groupe.<br>Créez-en un !",
+                verifyingConnection: "Vérification de la connexion Firebase...",
+                connectedFirebase: "Connecté au serveur cloud Firebase",
+                offlineModeActive: "MODE HORS LIGNE ACTIF : Compte @{name} créé automatiquement !",
+                toastOfflineGuestCreated: "Bypass actif : Compte invité généré avec succès !",
+                toastUsernameTaken: "Ce nom d'utilisateur est déjà pris.",
+                toastAccountCreated: "Votre compte a été créé ! Connectez-vous.",
+                toastErrorReg: "Impossible de créer le compte distant.",
+                toastUserNotFound: "Nom d'utilisateur incorrect ou inexistant.",
+                toastWrongPassword: "Mot de passe incorrect.",
+                toastWelcomeBack: "Bon retour, {name} !",
+                toastLoggedOut: "Vous vous êtes déconnecté.",
+                toastLimitExceeded: "Le fichier dépasse la limite de 1.5Mo.",
+                toastProcessingAttachment: "Traitement de la pièce jointe...",
+                toastError: "Erreur lors du traitement du fichier.",
+                toastProfileUpdatedOffline: "Profil mis à jour hors ligne !",
+                toastProfileUpdated: "Profil mis à jour avec succès !",
+                toastNoSelfAdd: "Vous ne pouvez pas vous ajouter vous-même.",
+                toastAlreadyFriends: "Vous êtes déjà ami avec @{name}.",
+                toastPendingRequest: "Vous avez déjà une demande en attente pour cet utilisateur.",
+                toastReceivedRequest: "Cet utilisateur vous a déjà envoyé une demande.",
+                toastSentRequest: "Demande envoyée à @{name} !",
+                toastFriendshipAccepted: "Vous êtes maintenant ami avec @{name} !",
+                toastRequestResolved: "Demande d'ami résolue.",
+                toastGroupCreatedOffline: "Groupe \"{name}\" créé hors ligne !",
+                toastGroupCreated: "Groupe \"{name}\" créé avec succès !",
+                toastKickedMemberOffline: "Membre @{name} exclu hors ligne.",
+                toastKickedMember: "Membre @{name} exclu avec succès !",
+                toastAlreadyInGroup: "L'utilisateur est déjà membre du groupe.",
+                toastMemberAddedOffline: "@{name} ajouté hors ligne.",
+                toastMemberAdded: "@{name} invité avec succès !",
+                toastGroupUpdatedOffline: "Paramètres du groupe enregistrés hors ligne !",
+                toastGroupUpdated: "Groupe mis à jour avec succès !",
+                fileSentNotification: "{name} vous a envoyé un fichier",
+                fileGroupSentNotification: "{name} a envoyé un fichier dans le groupe"
+            },
+            DE: {
+                authTitle: "Melden Sie sich an, um zu chatten",
+                authTitleReg: "Erstellen Sie ein Konto, um zu starten",
+                displayName: "Wie möchten Sie genannt werden?",
+                username: "Benutzername (@ID)",
+                password: "Kennwort",
+                loginBtn: "Chat betreten",
+                registerBtn: "Konto registrieren",
+                noAccount: "Kein Konto? Jetzt registrieren",
+                haveAccount: "Bereits ein Konto? Anmelden",
+                addFriendPlaceholder: "Freund per ID hinzufügen...",
+                friendsTab: "Freunde",
+                groupsTab: "Gruppen",
+                requestsTab: "Anfragen",
+                logout: "Abmelden",
+                chatPlaceholderHeader: "Wählen Sie einen Chat aus, um zu beginnen",
+                chatPlaceholderSub: "Tauschen Sie Nachrichten sofort aus!",
+                membrosBtn: "Mitglieder",
+                openCreateGroupBtn: "Gruppe erstellen",
+                groupNameLabel: "Gruppenname",
+                createGroupModalTitle: "Neue Gruppe erstellen",
+                editPerfilTitle: "Profil bearbeiten",
+                nomeExibicaoLabel: "Anzeigename",
+                recebidosHeader: "Empfangen",
+                enviadosHeader: "Gesendet",
+                orText: "Oder mit anderem Konto anmelden",
+                personalizarGrupo: "Gruppe anpassen",
+                convidarMembro: "Mitglied einladen",
+                membrosTitulo: "Kanalmitglieder",
+                convidarBtn: "Einladen",
+                addFriendBtn: "Hinzufügen",
+                salvarBtn: "Speichern",
+                friendsEmpty: "Noch keine Freunde verbunden.<br>Füge oben welche hinzu!",
+                groupsEmpty: "Du bist in keiner Gruppe.<br>Erstelle jetzt eine!",
+                verifyingConnection: "Verbindung zu Firebase wird geprüft...",
+                connectedFirebase: "Mit Firebase Cloud Server verbunden",
+                offlineModeActive: "OFFLINE-MODUS AKTIV: Standardkonto @{name} erstellt!",
+                toastOfflineGuestCreated: "Bypass aktiv: Gastkonto erfolgreich generiert!",
+                toastUsernameTaken: "Dieser Benutzername ist bereits vergeben.",
+                toastAccountCreated: "Konto erstellt! Bitte anmelden.",
+                toastErrorReg: "Remote-Konto konnte nicht erstellt werden.",
+                toastUserNotFound: "Ungültiger oder nicht registrierter Benutzername.",
+                toastWrongPassword: "Falsches Passwort.",
+                toastWelcomeBack: "Willkommen zurück, {name}!",
+                toastLoggedOut: "Erfolgreich abgemeldet.",
+                toastLimitExceeded: "Datei überschreitet das Limit von 1.5MB.",
+                toastProcessingAttachment: "Anhang wird verarbeitet...",
+                toastError: "Fehler beim Verarbeiten der Datei.",
+                toastProfileUpdatedOffline: "Profil offline aktualisiert!",
+                toastProfileUpdated: "Profil erfolgreich aktualisiert!",
+                toastNoSelfAdd: "Du kannst dich nicht selbst hinzufügen.",
+                toastAlreadyFriends: "Du bist bereits mit @{name} befreundet.",
+                toastPendingRequest: "Es läuft bereits eine Anfrage für diesen Nutzer.",
+                toastReceivedRequest: "Dieser Nutzer hat dir bereits eine Anfrage gesendet.",
+                toastSentRequest: "Anfrage an @{name} gesendet!",
+                toastFriendshipAccepted: "Du bist jetzt mit @{name} befreundet!",
+                toastRequestResolved: "Freundschaftsanfrage geklärt.",
+                toastGroupCreatedOffline: "Gruppe \"{name}\" offline erstellt!",
+                toastGroupCreated: "Gruppe \"{name}\" erfolgreich erstellt!",
+                toastKickedMemberOffline: "Mitglied @{name} offline entfernt.",
+                toastKickedMember: "Mitglied @{name} erfolgreich entfernt!",
+                toastAlreadyInGroup: "Nutzer ist bereits Mitglied der Gruppe.",
+                toastMemberAddedOffline: "@{name} offline hinzugefügt.",
+                toastMemberAdded: "@{name} erfolgreich eingeladen!",
+                toastGroupUpdatedOffline: "Gruppeneinstellungen offline gespeichert!",
+                toastGroupUpdated: "Gruppe erfolgreich aktualisiert!",
+                fileSentNotification: "{name} hat dir eine Datei gesendet",
+                fileGroupSentNotification: "{name} hat eine Datei in der Gruppe gesendet"
+            },
+            IT: {
+                authTitle: "Accedi al tuo account per chattare",
+                authTitleReg: "Crea un account per iniziare",
+                displayName: "Come vuoi essere chiamato?",
+                username: "Nome utente (@ID)",
+                password: "Password",
+                loginBtn: "Entra in Chat",
+                registerBtn: "Registra Account",
+                noAccount: "Non hai un account? Registrati",
+                haveAccount: "Hai già un account? Accedi",
+                addFriendPlaceholder: "Aggiungi amico per ID...",
+                friendsTab: "Amici",
+                groupsTab: "Gruppi",
+                requestsTab: "Richieste",
+                logout: "Esci",
+                chatPlaceholderHeader: "Scegli una chat per iniziare",
+                chatPlaceholderSub: "Scambia messaggi istantaneamente!",
+                membrosBtn: "Membri",
+                openCreateGroupBtn: "Crea Gruppo",
+                groupNameLabel: "Nome del Gruppo",
+                createGroupModalTitle: "Crea Nuovo Gruppo",
+                editPerfilTitle: "Modifica Profilo",
+                nomeExibicaoLabel: "Nome visualizzato",
+                recebidosHeader: "Ricevuti",
+                enviadosHeader: "Inviati",
+                orText: "O accedi con un altro account",
+                personalizarGrupo: "Personalizza Gruppo",
+                convidarMembro: "Invita Membro",
+                membrosTitulo: "Membri del Canale",
+                convidarBtn: "Invita",
+                addFriendBtn: "Aggiungi",
+                salvarBtn: "Salva",
+                friendsEmpty: "Nessun amico collegato.<br>Aggiungine in alto!",
+                groupsEmpty: "Non sei in nessun gruppo.<br>Creane uno ora!",
+                verifyingConnection: "Verifica della connessione Firebase...",
+                connectedFirebase: "Connesso al cloud server Firebase",
+                offlineModeActive: "MODALITÀ OFFLINE ATTIVA: Account @{name} creato automaticamente!",
+                toastOfflineGuestCreated: "Bypass attivo: Account ospite generato con successo!",
+                toastUsernameTaken: "Questo nome utente è già in uso.",
+                toastAccountCreated: "Account creato! Accedi ora.",
+                toastErrorReg: "Impossibile creare l'account remoto.",
+                toastUserNotFound: "Nome utente errato o non registrato.",
+                toastWrongPassword: "Password errata.",
+                toastWelcomeBack: "Bentornato, {name}!",
+                toastLoggedOut: "Sei uscito dal tuo account.",
+                toastLimitExceeded: "Il file supera il limite di 1.5MB.",
+                toastProcessingAttachment: "Elaborazione allegato...",
+                toastError: "Errore durante l'elaborazione del file.",
+                toastProfileUpdatedOffline: "Profilo aggiornato offline!",
+                toastProfileUpdated: "Profilo aggiornato con successo!",
+                toastNoSelfAdd: "Non puoi aggiungere te stesso.",
+                toastAlreadyFriends: "Sei già amico di @{name}.",
+                toastPendingRequest: "Hai già una richiesta pendente per questo utente.",
+                toastReceivedRequest: "Questo utente ti ha già inviato una richiesta.",
+                toastSentRequest: "Richiesta inviata a @{name}!",
+                toastFriendshipAccepted: "Ora sei amico di @{name}!",
+                toastRequestResolved: "Richiesta di amicizia risolta.",
+                toastGroupCreatedOffline: "Gruppo \"{name}\" creato offline!",
+                toastGroupCreated: "Gruppo \"{name}\" creato con successo!",
+                toastKickedMemberOffline: "Membro @{name} rimosso offline.",
+                toastKickedMember: "Membro @{name} rimosso con successo!",
+                toastAlreadyInGroup: "L'utente fa già parte del gruppo.",
+                toastMemberAddedOffline: "@{name} aggiunto offline.",
+                toastMemberAdded: "@{name} invitato con successo!",
+                toastGroupUpdatedOffline: "Impostazioni del gruppo salvate offline!",
+                toastGroupUpdated: "Gruppo aggiornato con successo!",
+                fileSentNotification: "{name} ti ha inviato un file",
+                fileGroupSentNotification: "{name} ha inviato un file nel gruppo"
+            },
+            JA: {
+                authTitle: "ログインしてチャットを開始する",
+                authTitleReg: "アカウントを作成して開始する",
+                displayName: "表示名（ニックネーム）",
+                username: "ユーザー名 (@ID)",
+                password: "パスワード",
+                loginBtn: "チャットに入る",
+                registerBtn: "アカウント登録",
+                noAccount: "アカウントをお持ちでないですか？新規登録",
+                haveAccount: "既にアカウントをお持ちですか？ログイン",
+                addFriendPlaceholder: "ユーザーIDで友達追加...",
+                friendsTab: "友達",
+                groupsTab: "グループ",
+                requestsTab: "リクエスト",
+                logout: "ログアウト",
+                chatPlaceholderHeader: "チャットを選択して開始してください",
+                chatPlaceholderSub: "メッセージを今すぐ交換しましょう！",
+                membrosBtn: "メンバー",
+                openCreateGroupBtn: "グループ作成",
+                groupNameLabel: "グループ名",
+                createGroupModalTitle: "新規グループ作成",
+                editPerfilTitle: "プロフィール編集",
+                nomeExibicaoLabel: "表示名",
+                recebidosHeader: "受信済み",
+                enviadosHeader: "送信済み",
+                orText: "または別のアカウントでログイン",
+                personalizarGrupo: "グループカスタマイズ",
+                convidarMembro: "メンバーを招待",
+                membrosTitulo: "チャンネルメンバー",
+                convidarBtn: "招待",
+                addFriendBtn: "追加",
+                salvarBtn: "保存",
+                friendsEmpty: "まだ友達がいません。<br>上部から追加してください！",
+                groupsEmpty: "グループに所属していません。<br>今すぐ作成しましょう！",
+                verifyingConnection: "Firebase接続を確認中...",
+                connectedFirebase: "Firebaseクラウドサーバーに接続完了",
+                offlineModeActive: "オフラインモード有効：自動作成されたアカウント @{name}",
+                toastOfflineGuestCreated: "バイパス有効：ゲストアカウントが生成されました！",
+                toastUsernameTaken: "このユーザー名は既に使われています。",
+                toastAccountCreated: "アカウントが作成されました！ログインしてください。",
+                toastErrorReg: "リモートアカウントを作成できませんでした。",
+                toastUserNotFound: "ユーザー名が正しくないか、登録されていません。",
+                toastWrongPassword: "パスワードが間違っています。",
+                toastWelcomeBack: "おかえりなさい、{name}さん！",
+                toastLoggedOut: "ログアウトしました。",
+                toastLimitExceeded: "ファイルは1.5MBの上限を超えています。",
+                toastProcessingAttachment: "添付ファイルを処理中...",
+                toastError: "ファイルの処理中にエラーが発生しました。",
+                toastProfileUpdatedOffline: "プロフィールをオフラインで更新しました！",
+                toastProfileUpdated: "プロフィールが正常に更新されました！",
+                toastNoSelfAdd: "自分自身を追加することはできません。",
+                toastAlreadyFriends: "@{name}さんと既に友達です。",
+                toastPendingRequest: "このユーザーに対する保留中のリクエストが既にあります。",
+                toastReceivedRequest: "このユーザーから既にリクエストが届いています。",
+                toastSentRequest: "@{name}さんにリクエストを送信しました！",
+                toastFriendshipAccepted: "@{name}さんと友達になりました！",
+                toastRequestResolved: "友達リクエストが解決されました。",
+                toastGroupCreatedOffline: "グループ「{name}」をオフラインで作成しました！",
+                toastGroupCreated: "グループ「{name}」が作成されました！",
+                toastKickedMemberOffline: "メンバー @{name} をオフラインで追放しました。",
+                toastKickedMember: "メンバー @{name} を追放しました！",
+                toastAlreadyInGroup: "ユーザーは既にグループのメンバーです。",
+                toastMemberAddedOffline: "@{name} をオフラインで追加しました。",
+                toastMemberAdded: "@{name} を招待しました！",
+                toastGroupUpdatedOffline: "グループ設定をオフラインで保存しました！",
+                toastGroupUpdated: "グループ情報が更新されました！",
+                fileSentNotification: "{name}がファイルを送信しました",
+                fileGroupSentNotification: "{name}がグループにファイルを送信しました"
+            },
+            ZH: {
+                authTitle: "登录账户以开始聊天",
+                authTitleReg: "创建账户以开始",
+                displayName: "显示名称",
+                username: "用户名 (@ID)",
+                password: "密码",
+                loginBtn: "进入聊天",
+                registerBtn: "注册账户",
+                noAccount: "没有账户？立即注册",
+                haveAccount: "已有账户？登录",
+                addFriendPlaceholder: "通过用户名添加好友...",
+                friendsTab: "好友",
+                groupsTab: "群组",
+                requestsTab: "请求",
+                logout: "退出登录",
+                chatPlaceholderHeader: "选择一个聊天开始互动",
+                chatPlaceholderSub: "即时发送消息，保持联系！",
+                membrosBtn: "成员",
+                openCreateGroupBtn: "创建群组",
+                groupNameLabel: "群组名称",
+                createGroupModalTitle: "创建新群组",
+                editPerfilTitle: "编辑个人资料",
+                nomeExibicaoLabel: "您的显示名称",
+                recebidosHeader: "已收到",
+                enviadosHeader: "已发送",
+                orText: "或使用其他账户登录",
+                personalizarGrupo: "个性化群组",
+                convidarMembro: "邀请新成员",
+                membrosTitulo: "频道成员",
+                convidarBtn: "邀请",
+                addFriendBtn: "添加",
+                salvarBtn: "保存修改",
+                friendsEmpty: "暂无好友。<br>在上方搜索添加好友！",
+                groupsEmpty: "您还没有加入任何群组。<br>现在创建一个！",
+                verifyingConnection: "正在验证 Firebase 连接...",
+                connectedFirebase: "已成功连接到 Firebase 云服务器",
+                offlineModeActive: "离线模式激活：自动生成的预设帐户 @{name}",
+                toastOfflineGuestCreated: "离线绕过：临时游客账户已生成！",
+                toastUsernameTaken: "该用户名已被占用。",
+                toastAccountCreated: "账户创建成功！请登录。",
+                toastErrorReg: "无法创建云端账户。",
+                toastUserNotFound: "用户名不正确或未注册。",
+                toastWrongPassword: "密码错误。",
+                toastWelcomeBack: "欢迎回来，{name}！",
+                toastLoggedOut: "已成功退出登录。",
+                toastLimitExceeded: "文件大小超过 1.5MB 限制。",
+                toastProcessingAttachment: "正在处理附件...",
+                toastError: "处理文件时出错。",
+                toastProfileUpdatedOffline: "个人资料已在本地更新！",
+                toastProfileUpdated: "个人资料更新成功！",
+                toastNoSelfAdd: "您不能添加自己为好友。",
+                toastAlreadyFriends: "您已经是 @{name} 的好友了。",
+                toastPendingRequest: "您已经向该用户发送过请求，正在等待通过。",
+                toastReceivedRequest: "该用户已向您发送过请求，请去请求列表处理。",
+                toastSentRequest: "已向 @{name} 发送好友请求！",
+                toastFriendshipAccepted: "您已与 @{name} 成为好友！",
+                toastRequestResolved: "好友请求已处理。",
+                toastGroupCreatedOffline: "群组 \"{name}\" 已在离线状态创建！",
+                toastGroupCreated: "群组 \"{name}\" 创建成功！",
+                toastKickedMemberOffline: "已在离线状态将成员 @{name} 移出群组。",
+                toastKickedMember: "成员 @{name} 已成功移出群组！",
+                toastAlreadyInGroup: "该用户已经是群组成员。",
+                toastMemberAddedOffline: "已在本地将 @{name} 添加进群组。",
+                toastMemberAdded: "成功邀请 @{name} 加入群组！",
+                toastGroupUpdatedOffline: "群组设置已在本地保存！",
+                toastGroupUpdated: "群组资料更新成功！",
+                fileSentNotification: "{name} 给你发送了一个文件",
+                fileGroupSentNotification: "{name} 在群组里发送了一个文件"
+            },
+            RU: {
+                authTitle: "Войдите, чтобы общаться",
+                authTitleReg: "Создайте аккаунт, чтобы начать",
+                displayName: "Как вас называть? (Имя)",
+                username: "Имя пользователя (@ID)",
+                password: "Пароль",
+                loginBtn: "Войти в чат",
+                registerBtn: "Регистрация",
+                noAccount: "Нет аккаунта? Зарегистрироваться",
+                haveAccount: "Уже есть аккаунт? Войти",
+                addFriendPlaceholder: "Найти друга по ID...",
+                friendsTab: "Друзья",
+                groupsTab: "Группы",
+                requestsTab: "Заявки",
+                logout: "Выйти",
+                chatPlaceholderHeader: "Выберите чат, чтобы начать общение",
+                chatPlaceholderSub: "Мгновенный обмен сообщениями!",
+                membrosBtn: "Участники",
+                openCreateGroupBtn: "Создать группу",
+                groupNameLabel: "Название группы",
+                createGroupModalTitle: "Создать новую группу",
+                editPerfilTitle: "Редактировать профиль",
+                nomeExibicaoLabel: "Отображаемое имя",
+                recebidosHeader: "Полученные",
+                enviadosHeader: "Отправленные",
+                orText: "Или войдите через другой аккаунт",
+                personalizarGrupo: "Настройка группы",
+                convidarMembro: "Пригласить участника",
+                membrosTitulo: "Участники канала",
+                convidarBtn: "Пригласить",
+                addFriendBtn: "Добавить",
+                salvarBtn: "Сохранить",
+                friendsEmpty: "Нет подключенных друзей.<br>Добавьте кого-нибудь сверху!",
+                groupsEmpty: "Вы не состоите в группах.<br>Создайте прямо сейчас!",
+                verifyingConnection: "Проверка подключения к Firebase...",
+                connectedFirebase: "Подключено к облачному серверу Firebase",
+                offlineModeActive: "АВТОНОМНЫЙ РЕЖИМ: Создан аккаунт гостя @{name}",
+                toastOfflineGuestCreated: "Обход сети: Успешно создан временный гостевой аккаунт!",
+                toastUsernameTaken: "Это имя пользователя уже занято.",
+                toastAccountCreated: "Аккаунт создан! Пожалуйста, войдите.",
+                toastErrorReg: "Не удалось создать удаленный аккаунт.",
+                toastUserNotFound: "Имя пользователя неверно или не зарегистрировано.",
+                toastWrongPassword: "Неверный пароль.",
+                toastWelcomeBack: "С возвращением, {name}!",
+                toastLoggedOut: "Вы вышли из системы.",
+                toastLimitExceeded: "Файл превышает лимит 1.5 МБ.",
+                toastProcessingAttachment: "Обработка вложения...",
+                toastError: "Ошибка при обработке файла.",
+                toastProfileUpdatedOffline: "Профиль обновлен локально!",
+                toastProfileUpdated: "Профиль успешно обновлен!",
+                toastNoSelfAdd: "Вы не можете добавить себя.",
+                toastAlreadyFriends: "Вы уже дружите с @{name}.",
+                toastPendingRequest: "У вас уже есть активный запрос к этому пользователю.",
+                toastReceivedRequest: "Этот пользователь уже отправил вам запрос.",
+                toastSentRequest: "Запрос отправлен пользователю @{name}!",
+                toastFriendshipAccepted: "Теперь вы друзья с @{name}!",
+                toastRequestResolved: "Запрос дружбы разрешен.",
+                toastGroupCreatedOffline: "Группа \"{name}\" создана локально!",
+                toastGroupCreated: "Группа \"{name}\" успешно создана!",
+                toastKickedMemberOffline: "Участник @{name} исключен локально.",
+                toastKickedMember: "Участник @{name} успешно исключен!",
+                toastAlreadyInGroup: "Пользователь уже состоит в группе.",
+                toastMemberAddedOffline: "@{name} добавлен локально.",
+                toastMemberAdded: "@{name} успешно приглашен!",
+                toastGroupUpdatedOffline: "Настройки группы сохранены локально!",
+                toastGroupUpdated: "Группа успешно обновлена!",
+                fileSentNotification: "{name} отправил(а) вам файл",
+                fileGroupSentNotification: "{name} отправил(а) файл в группу"
+            },
+            AR: {
+                authTitle: "تسجيل الدخول لبدء الدردشة",
+                authTitleReg: "أنشئ حسابًا للبدء",
+                displayName: "اسم العرض (الاسم المستعار)",
+                username: "اسم المستخدم (@ID)",
+                password: "كلمة المرور",
+                loginBtn: "دخول الدردشة",
+                registerBtn: "تسجيل الحساب",
+                noAccount: "ليس لديك حساب؟ سجل الآن",
+                haveAccount: "لديك حساب بالفعل؟ تسجيل الدخول",
+                addFriendPlaceholder: "إضافة صديق باسم المستخدم...",
+                friendsTab: "الأصدقاء",
+                groupsTab: "المجموعات",
+                requestsTab: "الطلبات",
+                logout: "تسجيل الخروج",
+                chatPlaceholderHeader: "اختر دردشة للبدء",
+                chatPlaceholderSub: "تبادل الرسائل وتواصل فوراً!",
+                membrosBtn: "الأعضاء",
+                openCreateGroupBtn: "إنشاء مجموعة",
+                groupNameLabel: "اسم المجموعة",
+                createGroupModalTitle: "إنشاء مجموعة جديدة",
+                editPerfilTitle: "تعديل الملف الشخصي",
+                nomeExibicaoLabel: "اسم العرض الخاص بك",
+                recebidosHeader: "الواردة",
+                enviadosHeader: "الصادرة",
+                orText: "أو سجل الدخول بحساب آخر",
+                personalizarGrupo: "تخصيص المجموعة",
+                convidarMembro: "دعوة عضو جديد",
+                membrosTitulo: "أعضاء القناة",
+                convidarBtn: "دعوة",
+                addFriendBtn: "إضافة",
+                salvarBtn: "حفظ التغييرات",
+                friendsEmpty: "لا يوجد أصدقاء متصلون بعد.<br>أضف أشخاصاً من الأعلى!",
+                groupsEmpty: "أنت لست في أي مجموعة.<br>أنشئ واحدة الآن!",
+                verifyingConnection: "جاري التحقق من الاتصال بقاعدة البيانات...",
+                connectedFirebase: "متصل بخادم Firebase السحابي",
+                offlineModeActive: "الوضع غير المتصل نشط: تم إنشاء حساب الضيف @{name}",
+                toastOfflineGuestCreated: "تخطي الشبكة: تم إنشاء حساب الضيف بنجاح!",
+                toastUsernameTaken: "اسم المستخدم هذا مستخدم بالفعل من قبل شخص آخر.",
+                toastAccountCreated: "تم إنشاء حسابك! يرجى تسجيل الدخول.",
+                toastErrorReg: "تعذر إنشاء الحساب البعيد.",
+                toastUserNotFound: "اسم المستخدم غير صحيح أو غير مسجل.",
+                toastWrongPassword: "كلمة المرور غير صحيحة.",
+                toastWelcomeBack: "مرحبًا بعودتك، {name}!",
+                toastLoggedOut: "لقد سجلت الخروج من حسابك.",
+                toastLimitExceeded: "الملف يتجاوز الحد المسموح به 1.5 ميغابايت.",
+                toastProcessingAttachment: "جاري معالجة المرفق...",
+                toastError: "خطأ أثناء معالجة الملف.",
+                toastProfileUpdatedOffline: "تم تحديث ملفك الشخصي محلياً دون اتصال!",
+                toastProfileUpdated: "تم تحديث الملف الشخصي بنجاح!",
+                toastNoSelfAdd: "لا يمكنك إضافة نفسك.",
+                toastAlreadyFriends: "أنت بالفعل صديق لـ @{name}.",
+                toastPendingRequest: "لديك بالفعل طلب معلق لهذا المستخدم.",
+                toastReceivedRequest: "لقد أرسل لك هذا المستخدم بالفعل طلباً. اقبله في علامة تبويب 'الطلبات'!",
+                toastSentRequest: "تم إرسال الطلب إلى @{name}!",
+                toastFriendshipAccepted: "أصبحتما صديقين الآن مع @{name}!",
+                toastRequestResolved: "تمت تسوية طلب الصداقة.",
+                toastGroupCreatedOffline: "تم إنشاء المجموعة \"{name}\" دون اتصال بالشبكة!",
+                toastGroupCreated: "تم إنشاء المجموعة \"{name}\" بنجاح!",
+                toastKickedMemberOffline: "تم طرد العضو @{name} دون اتصال بالشبكة.",
+                toastKickedMember: "تم طرد العضو @{name} بنجاح!",
+                toastAlreadyInGroup: "المستخدم عضو بالفعل في المجموعة.",
+                toastMemberAddedOffline: "تمت إضافة @{name} دون اتصال بالشبكة.",
+                toastMemberAdded: "تمت دعوة @{name} بنجاح!",
+                toastGroupUpdatedOffline: "تم حفظ إعدادات المجموعة دون اتصال بالشبكة!",
+                toastGroupUpdated: "تم تحديث المجموعة بنجاح!",
+                fileSentNotification: "أرسل لك {name} ملفًا",
+                fileGroupSentNotification: "أرسل {name} ملفًا في المجموعة"
+            },
+            HI: {
+                authTitle: "चैट करने के लिए लॉगिन करें",
+                authTitleReg: "शुरू करने के लिए खाता बनाएं",
+                displayName: "प्रदर्शन नाम (किस नाम से बुलाएं?)",
+                username: "उपयोगकर्ता नाम (@ID)",
+                password: "पासवर्ड",
+                loginBtn: "चैट में प्रवेश करें",
+                registerBtn: "खाता पंजीकृत करें",
+                noAccount: "खाता नहीं है? अभी पंजीकरण करें",
+                haveAccount: "पहले से खाता है? लॉगिन करें",
+                addFriendPlaceholder: "आईडी द्वारा मित्र जोड़ें...",
+                friendsTab: "मित्र",
+                groupsTab: "समूह",
+                requestsTab: "अनुरोध",
+                logout: "लॉगआउट",
+                chatPlaceholderHeader: "आरंभ करने के लिए एक चैट चुनें",
+                chatPlaceholderSub: "तुरंत संदेश भेजें और संपर्क में रहें!",
+                membrosBtn: "सदस्य",
+                openCreateGroupBtn: "समूह बनाएं",
+                groupNameLabel: "समूह का नाम",
+                createGroupModalTitle: "नया समूह बनाएं",
+                editPerfilTitle: "प्रोफ़ाइल संपादित करें",
+                nomeExibicaoLabel: "आपका प्रदर्शन नाम",
+                recebidosHeader: "प्राप्त",
+                enviadosHeader: "भेजे गए",
+                orText: "या किसी अन्य खाते से जुड़ें",
+                personalizarGrupo: "समूह को अनुकूलित करें",
+                convidarMembro: "नए सदस्य को आमंत्रित करें",
+                membrosTitulo: "चैनल के सदस्य",
+                convidarBtn: "आमंत्रित करें",
+                addFriendBtn: "जोड़ें",
+                salvarBtn: "बदलाव सहेजें",
+                friendsEmpty: "अभी तक कोई मित्र नहीं जुड़ा है।<br>ऊपर से जोड़ें!",
+                groupsEmpty: "आप किसी समूह में नहीं हैं।<br>अभी एक बनाएं!",
+                verifyingConnection: "कनेक्शन की जाँच की जा रही है...",
+                connectedFirebase: "फायरबेस क्लाउड सर्वर से जुड़ा है",
+                offlineModeActive: "ऑफ़लाइन मोड सक्रिय: अतिथि खाता @{name} बनाया गया!",
+                toastOfflineGuestCreated: "बायपास सक्रिय: अतिथि खाता सफलतापूर्वक बनाया गया!",
+                toastUsernameTaken: "यह उपयोगकर्ता नाम पहले से ही किसी और के द्वारा उपयोग में है।",
+                toastAccountCreated: "आपका खाता बन गया है! कृपया लॉगिन करें।",
+                toastErrorReg: "रिमोट खाता बनाने में विफल।",
+                toastUserNotFound: "गलत या अपंजीकृत उपयोगकर्ता नाम।",
+                toastWrongPassword: "गलत पासवर्ड।",
+                toastWelcomeBack: "वापसी पर स्वागत है, {name}!",
+                toastLoggedOut: "सफलतापूर्वक लॉगआउट हो गया।",
+                toastLimitExceeded: "फ़ाइल 1.5MB की सीमा से अधिक है।",
+                toastProcessingAttachment: "फ़ाइल संसाधित की जा रही है...",
+                toastError: "फ़ाइल संसाधित करने में त्रुटि।",
+                toastProfileUpdatedOffline: "प्रोफ़ाइल को ऑफ़लाइन अपडेट किया गया!",
+                toastProfileUpdated: "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!",
+                toastNoSelfAdd: "आप स्वयं को नहीं जोड़ सकते।",
+                toastAlreadyFriends: "आप पहले से ही @{name} के मित्र हैं।",
+                toastPendingRequest: "इस उपयोगकर्ता के लिए आपके पास पहले से ही एक लंबित अनुरोध है।",
+                toastReceivedRequest: "इस उपयोगकर्ता ने आपको पहले ही एक अनुरोध भेजा है।",
+                toastSentRequest: "@{name} को अनुरोध भेजा गया!",
+                toastFriendshipAccepted: "अब आप @{name} के मित्र बन गए हैं!",
+                toastRequestResolved: "मित्र अनुरोध का समाधान हो गया।",
+                toastGroupCreatedOffline: "समूह \"{name}\" ऑफ़लाइन बनाया गया!",
+                toastGroupCreated: "समूह \"{name}\" सफलतापूर्वक बनाया गया!",
+                toastKickedMemberOffline: "सदस्य @{name} को ऑफ़लाइन निष्कासित किया गया।",
+                toastKickedMember: "सदस्य @{name} को सफलतापूर्वक निष्कासित किया गया!",
+                toastAlreadyInGroup: "उपयोगकर्ता पहले से ही समूह का सदस्य है।",
+                toastMemberAddedOffline: "@{name} को ऑफ़लाइन जोड़ा गया।",
+                toastMemberAdded: "@{name} को सफलतापूर्वक आमंत्रित किया गया!",
+                toastGroupUpdatedOffline: "समूह सेटिंग्स ऑफ़लाइन सहेजी गईं!",
+                toastGroupUpdated: "समूह सफलतापूर्वक अपडेट किया गया!",
+                fileSentNotification: "{name} ने आपको एक फ़ाइल भेजी",
+                fileGroupSentNotification: "{name} ने समूह में एक फ़ाइल भेजी"
+            },
+            KO: {
+                authTitle: "채팅에 로그인하십시오",
+                authTitleReg: "시작하려면 계정을 만드십시오",
+                displayName: "닉네임 (표시 이름)",
+                username: "사용자 이름 (@ID)",
+                password: "비밀번호",
+                loginBtn: "채팅방 입장",
+                registerBtn: "회원가입",
+                noAccount: "계정이 없으신가요? 지금 가입",
+                haveAccount: "이미 계정이 있으신가요? 로그인",
+                addFriendPlaceholder: "아이디로 친구 추가...",
+                friendsTab: "친구",
+                groupsTab: "그룹",
+                requestsTab: "요청",
+                logout: "로그아웃",
+                chatPlaceholderHeader: "대화를 시작하려면 선택하십시오",
+                chatPlaceholderSub: "메시지를 보내 즉시 연결해보세요!",
+                membrosBtn: "멤버",
+                openCreateGroupBtn: "그룹 만들기",
+                groupNameLabel: "그룹 이름",
+                createGroupModalTitle: "새 그룹 만들기",
+                editPerfilTitle: "프로필 편집",
+                nomeExibicaoLabel: "내 표시 이름",
+                recebidosHeader: "받은 요청",
+                enviadosHeader: "보낸 요청",
+                orText: "또는 다른 계정으로 로그인",
+                personalizarGrupo: "그룹 사용자 지정",
+                convidarMembro: "새 멤버 초대",
+                membrosTitulo: "채널 멤버 목록",
+                convidarBtn: "초대",
+                addFriendBtn: "추가",
+                salvarBtn: "변경사항 저장",
+                friendsEmpty: "아직 친구가 없습니다.<br>상단에서 친구를 추가해보세요!",
+                groupsEmpty: "소속된 그룹이 없습니다.<br>지금 그룹을 만들어보세요!",
+                verifyingConnection: "Firebase 연결 상태 확인 중...",
+                connectedFirebase: "Firebase 클라우드 서버에 연결됨",
+                offlineModeActive: "오프라인 모드 활성화: 게스트 계정 @{name} 생성됨",
+                toastOfflineGuestCreated: "네트워크 바이패스: 임시 게스트 계정이 성공적으로 생성되었습니다!",
+                toastUsernameTaken: "이미 사용 중인 사용자 이름입니다.",
+                toastAccountCreated: "계정이 생성되었습니다! 로그인해주십시오.",
+                toastErrorReg: "서버 계정 생성에 실패했습니다.",
+                toastUserNotFound: "잘못되거나 등록되지 않은 사용자 이름입니다.",
+                toastWrongPassword: "비밀번호가 일치하지 않습니다.",
+                toastWelcomeBack: "돌아온 것을 환영합니다, {name}님!",
+                toastLoggedOut: "로그아웃 되었습니다.",
+                toastLimitExceeded: "파일이 1.5MB 용량 제한을 초과했습니다.",
+                toastProcessingAttachment: "파일 첨부 가공 중...",
+                toastError: "파일 처리 중 오류가 발생했습니다.",
+                toastProfileUpdatedOffline: "프로필이 오프라인에서 업데이트되었습니다!",
+                toastProfileUpdated: "프로필이 성공적으로 업데이트되었습니다!",
+                toastNoSelfAdd: "자기 자신은 추가할 수 없습니다.",
+                toastAlreadyFriends: "@{name}님과 이미 친구 상태입니다.",
+                toastPendingRequest: "이 사용자에게 보낸 대기 중인 요청이 이미 존재합니다.",
+                toastReceivedRequest: "이 사용자로부터 받은 요청이 이미 존재합니다. 보낸요청 탭을 확인하십시오.",
+                toastSentRequest: "@{name}님에게 친구 요청을 보냈습니다!",
+                toastFriendshipAccepted: "@{name}님과 친구가 되었습니다!",
+                toastRequestResolved: "친구 요청 처리가 완료되었습니다.",
+                toastGroupCreatedOffline: "\"{name}\" 그룹이 오프라인에서 생성되었습니다!",
+                toastGroupCreated: "\"{name}\" 그룹이 생성되었습니다!",
+                toastKickedMemberOffline: "@{name} 멤버가 오프라인에서 추방되었습니다.",
+                toastKickedMember: "@{name} 멤버가 성공적으로 추방되었습니다!",
+                toastAlreadyInGroup: "해당 사용자는 이미 그룹 멤버입니다.",
+                toastMemberAddedOffline: "@{name}님이 오프라인에서 추가되었습니다.",
+                toastMemberAdded: "@{name}님을 그룹에 초대하였습니다!",
+                toastGroupUpdatedOffline: "그룹 설정이 오프라인에서 저장되었습니다!",
+                toastGroupUpdated: "그룹 정보가 성공적으로 업데이트되었습니다!",
+                fileSentNotification: "{name}님이 파일을 보냈습니다",
+                fileGroupSentNotification: "{name}님이 그룹에 파일을 보냈습니다"
+            },
+            TR: {
+                authTitle: "Sohbet etmek için giriş yapın",
+                authTitleReg: "Başlamak için hesap oluşturun",
+                displayName: "Görünen Ad (Size nasıl hitap edelim?)",
+                username: "Kullanıcı Adı (@ID)",
+                password: "Şifre",
+                loginBtn: "Sohbete Gir",
+                registerBtn: "Kayıt Ol",
+                noAccount: "Hesabınız yok mu? Şimdi kaydolun",
+                haveAccount: "Zaten hesabınız var mı? Giriş yapın",
+                addFriendPlaceholder: "Kullanıcı adına göre arkadaş ekle...",
+                friendsTab: "Arkadaşlar",
+                groupsTab: "Gruplar",
+                requestsTab: "Talepler",
+                logout: "Çıkış Yap",
+                chatPlaceholderHeader: "Başlamak için bir sohbet seçin",
+                chatPlaceholderSub: "Anında mesaj gönderin ve bağlantıda kalın!",
+                membrosBtn: "Üyeler",
+                openCreateGroupBtn: "Grup Oluştur",
+                groupNameLabel: "Grup Adı",
+                createGroupModalTitle: "Yeni Grup Oluştur",
+                editPerfilTitle: "Profili Düzenle",
+                nomeExibicaoLabel: "Görünen Adınız",
+                recebidosHeader: "Gelenler",
+                enviadosHeader: "Gidenler",
+                orText: "Veya başka bir hesapla bağlanın",
+                personalizarGrupo: "Grubu Özelleştir",
+                convidarMembro: "Yeni Üye Davet Et",
+                membrosTitulo: "Kanal Üyeleri",
+                convidarBtn: "Davet Et",
+                addFriendBtn: "Ekle",
+                salvarBtn: "Değişiklikleri Kaydet",
+                friendsEmpty: "Henüz bağlı arkadaş yok.<br>Üst kısımdan ekleyin!",
+                groupsEmpty: "Herhangi bir grupta değilsiniz.<br>Şimdi bir tane oluşturun!",
+                verifyingConnection: "Firebase bağlantısı kontrol ediliyor...",
+                connectedFirebase: "Firebase Bulut Sunucusuna Bağlandı",
+                offlineModeActive: "ÇEVRİMDIŞI MOD AKTİF: Misafir hesabı @{name} otomatik oluşturuldu!",
+                toastOfflineGuestCreated: "Bypass aktif: Geçici misafir hesabı başarıyla oluşturuldu!",
+                toastUsernameTaken: "Bu kullanıcı adı zaten başkası tarafından alınmış.",
+                toastAccountCreated: "Hesabınız oluşturuldu! Lütfen giriş yapın.",
+                toastErrorReg: "Bulut hesabı oluşturulamadı.",
+                toastUserNotFound: "Kullanıcı adı yanlış veya kayıtlı değil.",
+                toastWrongPassword: "Şifre yanlış.",
+                toastWelcomeBack: "Tekrar hoş geldiniz, {name}!",
+                toastLoggedOut: "Hesaptan çıkış yapıldı.",
+                toastLimitExceeded: "Dosya 1.5MB sınırını aşıyor.",
+                toastProcessingAttachment: "Ek işleniyor...",
+                toastError: "Dosya işlenirken hata oluştu.",
+                toastProfileUpdatedOffline: "Profil çevrimdışı güncellendi!",
+                toastProfileUpdated: "Profil başarıyla güncellendi!",
+                toastNoSelfAdd: "Kendinizi arkadaş olarak ekleyemezsiniz.",
+                toastAlreadyFriends: "Zaten @{name} ile arkadaşsınız.",
+                toastPendingRequest: "Bu kullanıcıya gönderilmiş bekleyen talebiniz zaten var.",
+                toastReceivedRequest: "Bu kullanıcı size zaten talep göndermiş. Talepler sekmesinden onaylayın!",
+                toastSentRequest: "Talep @{name} kullanıcısına gönderildi!",
+                toastFriendshipAccepted: "@{name} ile artık arkadaşsınız!",
+                toastRequestResolved: "Arkadaşlık isteği çözüldü.",
+                toastGroupCreatedOffline: "\"{name}\" grubu çevrimdışı oluşturuldu!",
+                toastGroupCreated: "\"{name}\" grubu başarıyla oluşturuldu!",
+                toastKickedMemberOffline: "@{name} üyesi çevrimdışı gruptan atıldı.",
+                toastKickedMember: "@{name} üyesi başarıyla gruptan atıldı!",
+                toastAlreadyInGroup: "Kullanıcı zaten grubun üyesi.",
+                toastMemberAddedOffline: "@{name} çevrimdışı eklendi.",
+                toastMemberAdded: "@{name} başarıyla davet edildi!",
+                toastGroupUpdatedOffline: "Grup ayarları çevrimdışı kaydedildi!",
+                toastGroupUpdated: "Grup başarıyla güncellendi!",
+                fileSentNotification: "{name} size bir dosya gönderdi",
+                fileGroupSentNotification: "{name} grupta bir dosya gönderdi"
+            },
+            NL: {
+                authTitle: "Log in op uw account om te chatten",
+                authTitleReg: "Maak een account aan om te starten",
+                displayName: "Hoe wilt u genoemd worden?",
+                username: "Gebruikersnaam (@ID)",
+                password: "Wachtwoord",
+                loginBtn: "Chat openen",
+                registerBtn: "Account registreren",
+                noAccount: "Geen account? Nu registreren",
+                haveAccount: "Al een account? Inloggen",
+                addFriendPlaceholder: "Voeg vriend toe via ID...",
+                friendsTab: "Vrienden",
+                groupsTab: "Groepen",
+                requestsTab: "Verzoeken",
+                logout: "Uitloggen",
+                chatPlaceholderHeader: "Kies een gesprek om te beginnen",
+                chatPlaceholderSub: "Stuur direct berichten en blijf in contact!",
+                membrosBtn: "Leden",
+                openCreateGroupBtn: "Groep maken",
+                groupNameLabel: "Groepsnaam",
+                createGroupModalTitle: "Nieuwe groep maken",
+                editPerfilTitle: "Profiel bewerken",
+                nomeExibicaoLabel: "Uw weergavenaam",
+                recebidosHeader: "Ontvangen",
+                enviadosHeader: "Verzonden",
+                orText: "Of log in met een ander account",
+                personalizarGrupo: "Groep aanpassen",
+                convidarMembro: "Nieuw lid uitnodigen",
+                membrosTitulo: "Kanaalleden",
+                convidarBtn: "Uitnodigen",
+                addFriendBtn: "Toevoegen",
+                salvarBtn: "Opslaan",
+                friendsEmpty: "Nog geen vrienden verbonden.<br>Voeg bovenaan mensen toe!",
+                groupsEmpty: "U zit in geen enkele groep.<br>Maak er nu een aan!",
+                verifyingConnection: "Verbinding met Firebase controleren...",
+                connectedFirebase: "Verbonden met Firebase Cloud Server",
+                offlineModeActive: "OFFLINE MODUS ACTIEF: Gastaccount @{name} automatisch aangemaakt!",
+                toastOfflineGuestCreated: "Bypass actief: Gastaccount succesvol gegenereerd!",
+                toastUsernameTaken: "Deze gebruikersnaam is al in gebruik.",
+                toastAccountCreated: "Account aangemaakt! Log nu in.",
+                toastErrorReg: "Kan extern account niet maken.",
+                toastUserNotFound: "Gebruikersnaam onjuist of niet geregistreerd.",
+                toastWrongPassword: "Onjuist wachtwoord.",
+                toastWelcomeBack: "Welkom terug, {name}!",
+                toastLoggedOut: "Uitgelogd van account.",
+                toastLimitExceeded: "Bestand overschrijdt de limiet van 1.5MB.",
+                toastProcessingAttachment: "Bijlage verwerken...",
+                toastError: "Fout bij verwerken van bestand.",
+                toastProfileUpdatedOffline: "Profiel offline bijgewerkt!",
+                toastProfileUpdated: "Profiel succesvol bijgewerkt!",
+                toastNoSelfAdd: "U kunt uzelf niet toevoegen.",
+                toastAlreadyFriends: "U bent al vrienden met @{name}.",
+                toastPendingRequest: "U heeft al een openstaand verzoek voor deze gebruiker.",
+                toastReceivedRequest: "Deze gebruiker heeft u al een verzoek gestuurd.",
+                toastSentRequest: "Verzoek verzonden naar @{name}!",
+                toastFriendshipAccepted: "U bent nu vrienden met @{name}!",
+                toastRequestResolved: "Vriendschapsverzoek opgelost.",
+                toastGroupCreatedOffline: "Groep \"{name}\" offline aangemaakt!",
+                toastGroupCreated: "Groep \"{name}\" succesvol aangemaakt!",
+                toastKickedMemberOffline: "Lid @{name} offline verwijderd.",
+                toastKickedMember: "Lid @{name} succesvol verwijderd!",
+                toastAlreadyInGroup: "Gebruiker is al lid van de groep.",
+                toastMemberAddedOffline: "@{name} offline toegevoegd.",
+                toastMemberAdded: "@{name} succesvol uitgenodigd!",
+                toastGroupUpdatedOffline: "Groepsinstellingen offline opgeslagen!",
+                toastGroupUpdated: "Groep succesvol bijgewerkt!",
+                fileSentNotification: "{name} heeft je een bestand gestuurd",
+                fileGroupSentNotification: "{name} heeft een bestand in de groep gestuurd"
+            },
+            PL: {
+                authTitle: "Zaloguj się na konto, aby rozmawiać",
+                authTitleReg: "Utwórz konto, aby rozpocząć",
+                displayName: "Jak chcesz się nazywać? (Nazwa)",
+                username: "Nazwa użytkownika (@ID)",
+                password: "Hasło",
+                loginBtn: "Wejdź do czatu",
+                registerBtn: "Zarejestruj konto",
+                noAccount: "Nie masz konta? Zarejestruj się",
+                haveAccount: "Masz już konto? Zaloguj się",
+                addFriendPlaceholder: "Dodaj znajomego przez ID...",
+                friendsTab: "Znajomi",
+                groupsTab: "Grupy",
+                requestsTab: "Zaproszenia",
+                logout: "Wyloguj się",
+                chatPlaceholderHeader: "Wybierz czat, aby rozpocząć",
+                chatPlaceholderSub: "Wysyłaj wiadomości i bądź w stałym kontakcie!",
+                membrosBtn: "Członkowie",
+                openCreateGroupBtn: "Utwórz grupę",
+                groupNameLabel: "Nazwa grupy",
+                createGroupModalTitle: "Utwórz nową grupę",
+                editPerfilTitle: "Edytuj profil",
+                nomeExibicaoLabel: "Twoja nazwa wyświetlana",
+                recebidosHeader: "Otrzymane",
+                enviadosHeader: "Wysłane",
+                orText: "Lub zaloguj się na inne konto",
+                personalizarGrupo: "Dostosuj grupę",
+                convidarMembro: "Zaproś członka",
+                membrosTitulo: "Członkowie kanału",
+                convidarBtn: "Zaproś",
+                addFriendBtn: "Dodaj",
+                salvarBtn: "Zapisz",
+                friendsEmpty: "Brak połączonych znajomych.<br>Dodaj kogoś na górze!",
+                groupsEmpty: "Nie należysz do żadnej grupy.<br>Utwórz ją teraz!",
+                verifyingConnection: "Sprawdzanie połączenia z Firebase...",
+                connectedFirebase: "Połączono z serwerem chmurowym Firebase",
+                offlineModeActive: "TRYB OFFLINE AKTYWNY: Konto gościa @{name} utworzone automatycznie!",
+                toastOfflineGuestCreated: "Ominięcie sieci: Pomyślnie wygenerowano tymczasowe konto gościa!",
+                toastUsernameTaken: "Ta nazwa użytkownika jest już zajęta.",
+                toastAccountCreated: "Konto zostało utworzone! Zaloguj się.",
+                toastErrorReg: "Nie można utworzyć konta zdalnego.",
+                toastUserNotFound: "Niepoprawna lub niezarejestrowana nazwa użytkownika.",
+                toastWrongPassword: "Niepoprawne hasło.",
+                toastWelcomeBack: "Witaj z powrotem, {name}!",
+                toastLoggedOut: "Wylogowano pomyślnie.",
+                toastLimitExceeded: "Plik przekracza limit 1.5MB.",
+                toastProcessingAttachment: "Przetwarzanie załącznika...",
+                toastError: "Błąd podczas przetwarzania pliku.",
+                toastProfileUpdatedOffline: "Profil zaktualizowany lokalnie!",
+                toastProfileUpdated: "Profil pomyślnie zaktualizowany!",
+                toastNoSelfAdd: "Nie możesz dodać siebie.",
+                toastAlreadyFriends: "Jesteś już znajomym @{name}.",
+                toastPendingRequest: "Masz już oczekujące zaproszenie do tego użytkownika.",
+                toastReceivedRequest: "Ten użytkownik wysłał już do Ciebie zaproszenie.",
+                toastSentRequest: "Wysłano zaproszenie do @{name}!",
+                toastFriendshipAccepted: "Jesteś teraz znajomym @{name}!",
+                toastRequestResolved: "Zaproszenie do znajomych rozpatrzone.",
+                toastGroupCreatedOffline: "Grupa \"{name}\" została utworzona lokalnie!",
+                toastGroupCreated: "Grupa \"{name}\" utworzona pomyślnie!",
+                toastKickedMemberOffline: "Członek @{name} został wykluczony lokalnie.",
+                toastKickedMember: "Członek @{name} pomyślnie wykluczony!",
+                toastAlreadyInGroup: "Użytkownik jest już członkiem grupy.",
+                toastMemberAddedOffline: "Dodano @{name} lokalnie.",
+                toastMemberAdded: "Pomyślnie zaproszono @{name}!",
+                toastGroupUpdatedOffline: "Ustawienia grupy zapisane lokalnie!",
+                toastGroupUpdated: "Grupa zaktualizowana pomyślnie!",
+                fileSentNotification: "{name} wysłał(a) Ci plik",
+                fileGroupSentNotification: "{name} wysłał(a) plik w grupie"
             }
         };
-
-        languages.forEach(lang => {
-            if (!translations[lang.code]) {
-                translations[lang.code] = translations.EN;
-            }
-        });
 
         let currentLang = "PT";
 
@@ -769,13 +1744,13 @@
         function setStatusBanner(mode, message) {
             bannerText.innerText = message;
             if (mode === 'real') {
-                banner.className = "bg-emerald-600/20 border-b border-emerald-500/30 text-emerald-700 dark:text-emerald-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2 transition-all duration-300";
+                banner.className = "bg-emerald-600/20 border-b border-emerald-500/30 text-emerald-700 dark:text-emerald-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-between gap-2 transition-all duration-300";
                 bannerDot.className = "w-1.5 h-1.5 rounded-full bg-emerald-400";
             } else if (mode === 'checking') {
-                banner.className = "bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2 transition-all duration-300 animate-pulse";
+                banner.className = "bg-indigo-600/20 border-b border-indigo-500/30 text-indigo-700 dark:text-indigo-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-between gap-2 transition-all duration-300 animate-pulse";
                 bannerDot.className = "w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse";
             } else {
-                banner.className = "bg-amber-600/20 border-b border-amber-500/30 text-amber-700 dark:text-amber-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-center gap-2 transition-all duration-300";
+                banner.className = "bg-amber-600/20 border-b border-amber-500/30 text-amber-700 dark:text-amber-300 px-4 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider z-50 flex items-center justify-between gap-2 transition-all duration-300";
                 bannerDot.className = "w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse";
             }
         }
@@ -884,6 +1859,144 @@
             showToast("Bypass ativo: Conta de convidado gerada com sucesso!", "info");
 
             enterApplication();
+        }
+
+        // --- SISTEMA DE SOLICITAÇÃO DE AMIZADES (renderRequests, handleAcceptRequest, handleDeleteRequest) ---
+        function renderRequests(received, sent) {
+            const receivedContainer = document.getElementById('req-received-container');
+            const sentContainer = document.getElementById('req-sent-container');
+            const badgeRequests = document.getElementById('badge-requests');
+
+            if (!receivedContainer || !sentContainer || !badgeRequests) return;
+
+            if (received.length > 0) {
+                badgeRequests.innerText = received.length;
+                badgeRequests.classList.remove('hidden');
+            } else {
+                badgeRequests.classList.add('hidden');
+            }
+
+            // Renderiza pedidos recebidos
+            receivedContainer.innerHTML = '';
+            if (received.length === 0) {
+                receivedContainer.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido recebido</p>`;
+            } else {
+                received.forEach(req => {
+                    const senderData = accountsMap[req.sender];
+                    const senderName = senderData ? senderData.name : req.sender;
+                    const item = document.createElement('div');
+                    item.className = 'p-2.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-2 animate-pop-in';
+                    item.innerHTML = `
+                        <div class="truncate cursor-pointer hover:underline text-left" id="req-sender-${req.sender}">
+                            <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">${senderName}</p>
+                            <p class="text-[9px] text-slate-400 dark:text-slate-500">@${req.sender}</p>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 transition-all active:scale-90" aria-label="Aceitar" title="Aceitar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-700 dark:text-rose-400 hover:text-white transition-all active:scale-90" aria-label="Recusar" title="Recusar">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+
+                    item.querySelector(`#req-sender-${req.sender}`).addEventListener('click', () => {
+                        if (senderData) showUserInfoModal(senderData);
+                    });
+
+                    item.querySelector('.accept-btn').addEventListener('click', () => handleAcceptRequest(req.id, req.sender));
+                    item.querySelector('.decline-btn').addEventListener('click', () => handleDeleteRequest(req.id));
+                    receivedContainer.appendChild(item);
+                });
+            }
+
+            // Renderiza pedidos enviados
+            sentContainer.innerHTML = '';
+            if (sent.length === 0) {
+                sentContainer.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido enviado</p>`;
+            } else {
+                sent.forEach(req => {
+                    const receiverData = accountsMap[req.receiver];
+                    const receiverName = receiverData ? receiverData.name : req.receiver;
+                    const item = document.createElement('div');
+                    item.className = 'p-2.5 rounded-xl bg-slate-100 dark:bg-slate-950/30 border border-slate-200 dark:border-slate-800/50 flex items-center justify-between gap-2 animate-pop-in';
+                    item.innerHTML = `
+                        <div class="truncate cursor-pointer hover:underline text-left" id="req-receiver-${req.receiver}">
+                            <p class="text-xs font-semibold text-slate-800 dark:text-slate-400 truncate">${receiverName}</p>
+                            <p class="text-[9px] text-slate-400 dark:text-slate-500">@${req.receiver}</p>
+                        </div>
+                        <button class="cancel-btn p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 transition-all active:scale-90" aria-label="Cancelar" title="Cancelar">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    `;
+
+                    item.querySelector(`#req-receiver-${req.receiver}`).addEventListener('click', () => {
+                        if (receiverData) showUserInfoModal(receiverData);
+                    });
+
+                    item.querySelector('.cancel-btn').addEventListener('click', () => handleDeleteRequest(req.id));
+                    sentContainer.appendChild(item);
+                });
+            }
+        }
+
+        async function handleAcceptRequest(docId, senderUsername) {
+            if (isOfflineMode) {
+                if (simData.friends[docId]) {
+                    simData.friends[docId].status = 'accepted';
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    showToast(`Você agora é amigo de @${senderUsername}!`);
+                }
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), {
+                    status: 'accepted'
+                });
+                showToast(`Você agora é amigo de @${senderUsername}!`);
+            } catch (err) {
+                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
+                    activateOfflineFallback();
+                    handleAcceptRequest(docId, senderUsername);
+                } else {
+                    console.error("Erro ao aceitar amizade:", err);
+                    showToast("Erro ao aceitar convite.", "error");
+                }
+            }
+        }
+
+        async function handleDeleteRequest(docId) {
+            if (isOfflineMode) {
+                if (simData.friends[docId]) {
+                    delete simData.friends[docId];
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    showToast("Solicitação de amizade resolvida.");
+                }
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
+                showToast("Solicitação de amizade resolvida.");
+            } catch (err) {
+                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
+                    activateOfflineFallback();
+                    handleDeleteRequest(docId);
+                } else {
+                    console.error("Erro ao remover solicitação:", err);
+                    showToast("Erro ao deletar solicitação.", "error");
+                }
+            }
         }
 
         // Inicializar Firebase
@@ -1214,7 +2327,7 @@
                 accountsMap = simData.accounts;
                 updateUIPersonalProfile();
                 triggerOfflineCallbacks();
-                showToast("Seu perfil foi atualizado offline!");
+                showToast("Seu perfil foi updated offline!");
                 profileModal.classList.add('hidden');
                 return;
             }
@@ -1240,7 +2353,7 @@
                 reader.onload = function (event) {
                     const imgUrl = event.target.result;
                     
-                    if (file.type.startsWith('video/') || file.size < 100 * 1024) {
+                    if (file.type.startsWith('video/ ') || file.size < 100 * 1024) {
                         resolve({ base64: imgUrl, type: file.type.startsWith('video/') ? 'video' : 'image' });
                         return;
                     }
@@ -1705,134 +2818,148 @@
             });
         }
 
-        // --- SISTEMA DE SOLICITAÇÃO DE AMIZADES (renderRequests, handleAcceptRequest, handleDeleteRequest) ---
-        function renderRequests(received, sent) {
-            const receivedContainer = document.getElementById('req-received-container');
-            const sentContainer = document.getElementById('req-sent-container');
-            const badgeRequests = document.getElementById('badge-requests');
+        // --- MÓDULO DE DETALHES DO USUÁRIO ---
+        const userInfoModal = document.getElementById('user-info-modal');
+        const infoModalAvatar = document.getElementById('info-modal-avatar');
+        const infoModalName = document.getElementById('info-modal-name');
+        const infoModalUsername = document.getElementById('info-modal-username');
+        const infoModalStatusBadge = document.getElementById('info-modal-status-badge');
+        const infoModalActionBtn = document.getElementById('info-modal-action-btn');
 
-            if (!receivedContainer || !sentContainer || !badgeRequests) return;
+        document.getElementById('close-user-info-modal').addEventListener('click', () => {
+            userInfoModal.classList.add('hidden');
+        });
 
-            if (received.length > 0) {
-                badgeRequests.innerText = received.length;
-                badgeRequests.classList.remove('hidden');
+        function showUserInfoModal(userAcc) {
+            infoModalName.innerText = userAcc.name;
+            infoModalUsername.innerText = `@${userAcc.username}`;
+            infoModalAvatar.innerHTML = getAvatarHTML(userAcc.avatarType, userAcc.avatarValue, userAcc.name.charAt(0).toUpperCase(), 'from-indigo-500 to-indigo-600');
+            
+            const relationships = isOfflineMode ? Object.values(simData.friends) : activeRelationships;
+            const friendship = relationships.find(r => 
+                (r.sender === currentUser.username && r.receiver === userAcc.username) ||
+                (r.sender === userAcc.username && r.receiver === currentUser.username)
+            );
+
+            if (userAcc.username === currentUser.username) {
+                infoModalStatusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Você`;
+                infoModalActionBtn.classList.add('hidden');
+            } else if (friendship) {
+                if (friendship.status === 'accepted') {
+                    infoModalStatusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> Amigos`;
+                    infoModalActionBtn.innerText = "Enviar Mensagem";
+                    infoModalActionBtn.className = "w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-95";
+                    infoModalActionBtn.classList.remove('hidden');
+                    infoModalActionBtn.disabled = false;
+                    infoModalActionBtn.onclick = () => {
+                        openChatWith({ username: userAcc.username, name: userAcc.name });
+                        userInfoModal.classList.add('hidden');
+                    };
+                } else {
+                    infoModalStatusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pendente`;
+                    if (friendship.sender === currentUser.username) {
+                        infoModalActionBtn.innerText = "Solicitação Enviada";
+                        infoModalActionBtn.disabled = true;
+                        infoModalActionBtn.className = "w-full bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 font-bold py-2.5 rounded-xl text-xs cursor-not-allowed";
+                        infoModalActionBtn.classList.remove('hidden');
+                    } else {
+                        infoModalActionBtn.innerText = "Aceitar Amizade";
+                        infoModalActionBtn.disabled = false;
+                        infoModalActionBtn.className = "w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-95";
+                        infoModalActionBtn.classList.remove('hidden');
+                        infoModalActionBtn.onclick = () => {
+                            handleAcceptRequest(friendship.id, userAcc.username);
+                            userInfoModal.classList.add('hidden');
+                        };
+                    }
+                }
             } else {
-                badgeRequests.classList.add('hidden');
+                infoModalStatusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Desconectado`;
+                infoModalActionBtn.innerText = "Adicionar Amigo";
+                infoModalActionBtn.disabled = false;
+                infoModalActionBtn.className = "w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-95";
+                infoModalActionBtn.classList.remove('hidden');
+                infoModalActionBtn.onclick = () => {
+                    friendSearchInput.value = userAcc.username;
+                    addFriendForm.dispatchEvent(new Event('submit'));
+                    userInfoModal.classList.add('hidden');
+                };
             }
 
-            // Renderiza pedidos recebidos
-            receivedContainer.innerHTML = '';
-            if (received.length === 0) {
-                receivedContainer.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido pendente</p>`;
-            } else {
-                received.forEach(req => {
-                    const senderData = accountsMap[req.sender];
-                    const senderName = senderData ? senderData.name : req.sender;
-                    const item = document.createElement('div');
-                    item.className = 'p-2.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-2 animate-pop-in';
-                    item.innerHTML = `
-                        <div class="truncate">
-                            <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">${senderName}</p>
-                            <p class="text-[9px] text-slate-400 dark:text-slate-500">@${req.sender}</p>
-                        </div>
-                        <div class="flex items-center gap-1 shrink-0">
-                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 transition-all active:scale-90" aria-label="Aceitar" title="Aceitar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </button>
-                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-700 dark:text-rose-400 hover:text-white transition-all active:scale-90" aria-label="Recusar" title="Recusar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                    `;
+            userInfoModal.classList.remove('hidden');
+        }
 
-                    item.querySelector('.accept-btn').addEventListener('click', () => handleAcceptRequest(req.id, req.sender));
-                    item.querySelector('.decline-btn').addEventListener('click', () => handleDeleteRequest(req.id));
-                    receivedContainer.appendChild(item);
-                });
+        // --- SISTEMA DE PESQUISA EM TEMPO REAL COM AUTOCOMPLETE ---
+        const friendSearchInput = document.getElementById('friend-search-input');
+        const searchDropdown = document.getElementById('search-dropdown');
+
+        friendSearchInput.addEventListener('input', () => {
+            const queryVal = friendSearchInput.value.trim().toLowerCase();
+            if (!queryVal) {
+                searchDropdown.classList.add('hidden');
+                return;
             }
 
-            // Renderiza pedidos enviados
-            sentContainer.innerHTML = '';
-            if (sent.length === 0) {
-                sentContainer.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido enviado</p>`;
+            // Filtra contas cujo username ou nome combinam com o digitado
+            const matchedUsers = Object.values(accountsMap).filter(acc => 
+                acc.username.startsWith(queryVal) || 
+                (acc.name && acc.name.toLowerCase().startsWith(queryVal))
+            );
+
+            searchDropdown.innerHTML = '';
+            if (matchedUsers.length === 0) {
+                searchDropdown.innerHTML = `<div class="p-3 text-xs text-slate-400 dark:text-slate-500 italic text-center">Nenhum usuário encontrado</div>`;
             } else {
-                sent.forEach(req => {
-                    const receiverData = accountsMap[req.receiver];
-                    const receiverName = receiverData ? receiverData.name : req.receiver;
+                matchedUsers.forEach(acc => {
                     const item = document.createElement('div');
-                    item.className = 'p-2.5 rounded-xl bg-slate-100 dark:bg-slate-950/30 border border-slate-200 dark:border-slate-800/50 flex items-center justify-between gap-2 animate-pop-in';
+                    item.className = 'flex items-center justify-between p-2 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-xl cursor-pointer transition-all duration-200';
+                    
+                    const avatarHTML = getAvatarHTML(acc.avatarType, acc.avatarValue, acc.name.charAt(0).toUpperCase());
+                    
                     item.innerHTML = `
-                        <div class="truncate">
-                            <p class="text-xs font-semibold text-slate-800 dark:text-slate-400 truncate">${receiverName}</p>
-                            <p class="text-[9px] text-slate-400 dark:text-slate-500">@${req.receiver}</p>
+                        <div class="flex items-center gap-2 truncate flex-1 info-trigger">
+                            <div class="w-7 h-7 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-[10px] shrink-0 transition-all duration-300">
+                                ${avatarHTML}
+                            </div>
+                            <div class="truncate">
+                                <p class="text-xs font-bold text-slate-800 dark:text-white truncate">${acc.name}</p>
+                                <p class="text-[9px] text-slate-400 dark:text-slate-500">@${acc.username}</p>
+                            </div>
                         </div>
-                        <button class="cancel-btn p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 transition-all active:scale-90" aria-label="Cancelar" title="Cancelar">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <button type="button" class="add-quick-btn p-1 text-slate-400 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all" title="Adicionar Rápido">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                             </svg>
                         </button>
                     `;
-                    item.querySelector('.cancel-btn').addEventListener('click', () => handleDeleteRequest(req.id));
-                    sentContainer.appendChild(item);
+
+                    // Clicar na área do perfil abre o modal de informações
+                    item.querySelector('.info-trigger').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showUserInfoModal(acc);
+                        searchDropdown.classList.add('hidden');
+                    });
+
+                    // Clicar no botão "+" adiciona rapidamente
+                    item.querySelector('.add-quick-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        friendSearchInput.value = acc.username;
+                        addFriendForm.dispatchEvent(new Event('submit'));
+                        searchDropdown.classList.add('hidden');
+                    });
+
+                    searchDropdown.appendChild(item);
                 });
             }
-        }
+            searchDropdown.classList.remove('hidden');
+        });
 
-        async function handleAcceptRequest(docId, senderUsername) {
-            if (isOfflineMode) {
-                if (simData.friends[docId]) {
-                    simData.friends[docId].status = 'accepted';
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    showToast(`Você agora é amigo de @${senderUsername}!`);
-                }
-                return;
+        // Fechar dropdown de busca ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!addFriendForm.contains(e.target)) {
+                searchDropdown.classList.add('hidden');
             }
-
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId), {
-                    status: 'accepted'
-                });
-                showToast(`Você agora é amigo de @${senderUsername}!`);
-            } catch (err) {
-                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
-                    activateOfflineFallback();
-                    handleAcceptRequest(docId, senderUsername);
-                } else {
-                    console.error("Erro ao aceitar amizade:", err);
-                    showToast("Erro ao aceitar convite.", "error");
-                }
-            }
-        }
-
-        async function handleDeleteRequest(docId) {
-            if (isOfflineMode) {
-                if (simData.friends[docId]) {
-                    delete simData.friends[docId];
-                    saveLocalSimulationData();
-                    triggerOfflineCallbacks();
-                    showToast("Solicitação de amizade resolvida.");
-                }
-                return;
-            }
-
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
-                showToast("Solicitação de amizade resolvida.");
-            } catch (err) {
-                if (err.message?.includes('offline') || err.code === 'unavailable' || err.message?.includes('client is offline')) {
-                    activateOfflineFallback();
-                    handleDeleteRequest(docId);
-                } else {
-                    console.error("Erro ao remover solicitação:", err);
-                    showToast("Erro ao deletar solicitação.", "error");
-                }
-            }
-        }
+        });
 
         function renderFriends(friends) {
             const container = document.getElementById('friends-container');
@@ -1866,19 +2993,35 @@
                 );
 
                 friendItem.innerHTML = `
-                    <div class="flex items-center gap-3 w-full">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 relative overflow-hidden transition-all duration-300">
-                            ${avatarHTML}
+                    <div class="flex items-center gap-3 w-full justify-between">
+                        <div class="flex items-center gap-3 truncate flex-1 open-chat-trigger">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0 relative overflow-hidden transition-all duration-300">
+                                ${avatarHTML}
+                            </div>
+                            <div class="truncate flex-1">
+                                <p class="text-xs font-bold truncate max-w-[140px] text-slate-800 dark:text-white">${displayName}</p>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">@${f.friendUsername}</p>
+                            </div>
                         </div>
-                        <div class="truncate flex-1">
-                            <p class="text-xs font-bold truncate max-w-[140px] text-slate-800 dark:text-white">${displayName}</p>
-                            <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">@${f.friendUsername}</p>
-                        </div>
+                        <button type="button" class="view-profile-btn p-1.5 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-200/40 dark:hover:bg-slate-800/40 transition-all shrink-0 ml-1" title="Visualizar Perfil">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
                     </div>
                 `;
                 
-                friendItem.addEventListener('click', () => {
+                friendItem.querySelector('.open-chat-trigger').addEventListener('click', () => {
                     openChatWith({ username: f.friendUsername, name: displayName });
+                });
+
+                friendItem.querySelector('.view-profile-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (friendData) {
+                        showUserInfoModal(friendData);
+                    } else {
+                        showUserInfoModal({ username: f.friendUsername, name: displayName, avatarType: 'initial', avatarValue: '' });
+                    }
                 });
 
                 container.appendChild(friendItem);
@@ -2030,7 +3173,7 @@
                 msgElement.className = `flex ${alignmentClass} w-full animate-pop-in`;
                 
                 const senderHeader = !isMine 
-                    ? `<p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">@${msg.senderName || msg.sender}</p>` 
+                    ? `<p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 cursor-pointer hover:underline inline-block" id="msg-sender-${msg.id}">@${msg.senderName || msg.sender}</p>` 
                     : '';
 
                 msgElement.innerHTML = `
@@ -2043,7 +3186,23 @@
                         <p class="text-[9px] text-slate-400 mt-1">${time}</p>
                     </div>
                 `;
+                
                 container.appendChild(msgElement);
+
+                // Permite clicar no nome acima do balão para ver detalhes de perfil
+                if (!isMine) {
+                    const el = container.querySelector(`#msg-sender-${msg.id}`);
+                    if (el) {
+                        el.addEventListener('click', () => {
+                            const senderAcc = accountsMap[msg.sender];
+                            if (senderAcc) {
+                                showUserInfoModal(senderAcc);
+                            } else {
+                                showUserInfoModal({ username: msg.sender, name: msg.senderName || msg.sender, avatarType: 'initial', avatarValue: '' });
+                            }
+                        });
+                    }
+                }
             });
 
             const chatMessagesDiv = document.getElementById('chat-messages');
@@ -2097,6 +3256,14 @@
             } catch (err) {
                 console.error("Erro ao criar grupo no Firebase:", err);
                 showToast("Erro ao criar grupo.", "error");
+            }
+        });
+
+        // Configura o evento de clique no avatar do cabeçalho do chat ativo
+        document.getElementById('active-chat-avatar').addEventListener('click', () => {
+            if (activeFriend) {
+                const friendData = accountsMap[activeFriend.username];
+                if (friendData) showUserInfoModal(friendData);
             }
         });
 
@@ -2265,7 +3432,7 @@
                 const showKickBtn = (activeGroup.creator === currentUser.username) && !isCreator && !isMe;
 
                 div.innerHTML = `
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 truncate flex-1 cursor-pointer hover:opacity-85 select-none" id="member-profile-${memberUsername}">
                         <div class="w-6 h-6 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-[10px] shrink-0 transition-all duration-300">
                             ${avatarHTML}
                         </div>
@@ -2281,6 +3448,14 @@
                     ` : ''}
                 `;
                 
+                div.querySelector(`#member-profile-${memberUsername}`).addEventListener('click', () => {
+                    if (memberData) {
+                        showUserInfoModal(memberData);
+                    } else {
+                        showUserInfoModal({ username: memberUsername, name: displayName, avatarType: 'initial', avatarValue: '' });
+                    }
+                });
+
                 if (showKickBtn) {
                     div.querySelector('.kick-btn').addEventListener('click', () => handleKickMember(memberUsername));
                 }
@@ -2379,7 +3554,7 @@
 
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), updatedGroup);
-                showToast("Grupo atualizado com sucesso!");
+                showToast("Grupo updated com sucesso!");
                 document.getElementById('group-settings-modal').classList.add('hidden');
             } catch (err) {
                 console.error(err);
@@ -2462,7 +3637,6 @@
         });
 
         const addFriendForm = document.getElementById('add-friend-form');
-        const friendSearchInput = document.getElementById('friend-search-input');
 
         addFriendForm.addEventListener('submit', async (e) => {
             e.preventDefault(); // Evita recarregar a página ao pesquisar/adicionar!
@@ -2524,6 +3698,7 @@
                 }
             }
             friendSearchInput.value = '';
+            searchDropdown.classList.add('hidden');
         });
 
         function closeActiveChat() {
@@ -2586,6 +3761,36 @@
         window.onload = function() {
             setupFavicon();
         };
+
+        // Botão de retornar do chat no Mobile
+        document.getElementById('chat-back-btn').addEventListener('click', () => {
+            document.getElementById('chat-panel').classList.add('hidden');
+            document.getElementById('chat-panel').classList.remove('flex');
+            activeFriend = null;
+            activeGroup = null;
+            startUserSession();
+        });
+
+        // Logout de Usuário
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            currentUser = null;
+            activeFriend = null;
+            activeGroup = null;
+            if (unsubscribeFriends) unsubscribeFriends();
+            if (unsubscribeGroups) unsubscribeGroups();
+            if (unsubscribeMessages) unsubscribeMessages();
+            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
+
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('auth-password').value = '';
+            
+            if (lastAccountData && !registerMode) {
+                document.getElementById('last-account-container').classList.remove('hidden');
+            }
+            
+            showToast("Você desconectou da conta.");
+        });
 
         window.openChatWith = openChatWith;
         window.openGroupChatWith = openGroupChatWith;
