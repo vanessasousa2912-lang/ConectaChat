@@ -83,7 +83,6 @@
 
     <!-- IDIOMA SCREEN -->
     <div id="language-screen" class="flex-1 flex flex-col justify-start md:justify-center items-center px-4 py-8 sm:px-6 sm:py-12 bg-slate-50 dark:bg-slate-950 relative overflow-y-auto z-50 no-scrollbar">
-        <!-- Detalhes de luz de fundo modernas -->
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -100,9 +99,8 @@
         </div>
 
         <div class="w-full max-w-2xl bg-white dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-6 shadow-2xl rounded-2xl z-10 shrink-0 animate-slide-up">
-            <!-- Grid de 10 Idiomas -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6" id="languages-grid">
-                <!-- Injetado por JS de forma inteligente -->
+                <!-- Injetado por JS -->
             </div>
 
             <button id="confirm-lang-btn" class="w-full bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 text-sm active:scale-95">
@@ -111,12 +109,11 @@
         </div>
     </div>
 
-    <!-- AUTH SCREEN (Login / Registro) -->
+    <!-- AUTH SCREEN -->
     <div id="auth-screen" class="hidden flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 bg-slate-50 dark:bg-slate-950 relative overflow-hidden">
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <!-- Botão de Tema Rápido no topo da Auth Screen -->
         <button id="theme-toggle-auth" class="absolute top-4 right-4 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm active:scale-90" aria-label="Alterar Tema" title="Alterar Tema">
             <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             <svg class="w-5 h-5 hidden dark:block text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
@@ -125,7 +122,7 @@
         <div class="sm:mx-auto sm:w-full sm:max-w-md z-10 text-center animate-pop-in">
             <div class="flex justify-center items-center gap-2">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                 </div>
@@ -137,10 +134,10 @@
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md z-10 animate-slide-up">
             <div class="bg-white dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-800 py-8 px-6 shadow-2xl rounded-2xl sm:px-10">
                 <form id="auth-form" class="space-y-5">
-                    <!-- Botão de Entrada Rápida -->
+                    <!-- Entrada Rápida -->
                     <div id="last-account-container" class="hidden">
                         <button type="button" id="last-account-btn" class="flex w-full justify-center items-center gap-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-4 py-3.5 text-sm font-semibold text-indigo-700 dark:text-indigo-300 shadow-lg shadow-indigo-500/5 transition-all duration-300 active:scale-95">
-                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <svg class="w-5 h-5 text-indigo-500 dark:text-indigo-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>
                             <span class="truncate">Entrar como <strong id="last-account-user" class="text-slate-900 dark:text-white font-bold">...</strong></span>
@@ -155,7 +152,7 @@
                         </div>
                     </div>
 
-                    <!-- Campo de Nome de Exibição -->
+                    <!-- Nome de Exibição -->
                     <div id="display-name-group" class="hidden transition-all duration-300">
                         <label for="reg-name" id="label-display-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Como quer ser chamado? (Nome de Exibição)</label>
                         <div class="mt-1">
@@ -209,12 +206,11 @@
 
     <!-- MAIN INTERFACE -->
     <div id="main-app" class="hidden flex-1 flex flex-col overflow-hidden h-full">
-        <!-- Topbar - z-30 para sobrepor o menu lateral de contatos -->
+        <!-- Topbar -->
         <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-30 shadow-md transition-colors duration-305">
-            <!-- Logo e Perfil Rápido -->
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center animate-pop-in">
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                 </div>
@@ -227,7 +223,7 @@
                 </div>
             </div>
 
-            <!-- Barra de Adicionar Amigo -->
+            <!-- Adicionar Amigo -->
             <div class="flex-1 max-w-md min-w-[240px] relative">
                 <form id="add-friend-form" class="relative flex items-center">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -238,34 +234,27 @@
                         Adicionar
                     </button>
                 </form>
-                <!-- Menu Suspenso de Sugestões de Pesquisa -->
-                <div id="search-dropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl max-h-52 overflow-y-auto z-50 p-1 divide-y divide-slate-100 dark:divide-slate-800">
-                    <!-- Utilizadores encontrados injetados aqui -->
-                </div>
             </div>
 
             <div class="flex items-center gap-2">
-                <!-- Botão de Alternar Modo Claro/Escuro -->
                 <button id="theme-toggle-main" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 shadow-sm transition-all duration-300 active:scale-90" aria-label="Alterar Tema" title="Alterar Tema">
                     <svg class="w-4.5 h-4.5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M14 12a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     <svg class="w-4.5 h-4.5 hidden dark:block text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                 </button>
 
-                <!-- Logout -->
                 <button id="logout-btn" class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 hover:text-rose-500 bg-slate-100 dark:bg-slate-950/50 hover:bg-rose-500/10 border border-slate-200 dark:border-slate-800 hover:border-rose-500/20 px-3 py-2 rounded-xl transition-all duration-300 active:scale-95" aria-label="Sair" title="Sair">
                     <span id="logout-text-label">Sair</span>
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>
                 </button>
             </div>
         </header>
 
-        <!-- Corpo Principal do App -->
+        <!-- Corpo Principal -->
         <main class="flex-1 flex overflow-hidden relative">
             <!-- LATERAL: Contatos, Amigos, Grupos e Pedidos -->
             <aside id="sidebar-panel" class="w-full md:w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shrink-0 z-20 transition-all duration-300">
-                <!-- Abas da barra lateral -->
                 <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
                     <button id="tab-friends" class="flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all duration-300">
                         Amigos (<span id="count-friends">0</span>)
@@ -282,7 +271,6 @@
                 <!-- Lista de Amigos -->
                 <div id="panel-friends-list" class="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
                     <div id="friends-empty" class="text-center py-8 text-slate-400 dark:text-slate-500 text-xs">
-                        <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2 animate-bounce" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                         Nenhum amigo conectado ainda.<br>Adicione pessoas pelo topo!
                     </div>
                     <div id="friends-container" class="space-y-1"></div>
@@ -291,14 +279,9 @@
                 <!-- Painel de Grupos -->
                 <div id="panel-groups-list" class="hidden flex-1 overflow-y-auto p-3 space-y-3 no-scrollbar bg-slate-50/50 dark:bg-transparent">
                     <button id="open-create-group-modal" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500 hover:to-teal-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 border border-emerald-500/30 rounded-xl py-2.5 text-xs font-bold transition-all duration-300 shadow-sm active:scale-95">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                        </svg>
                         Criar Novo Grupo
                     </button>
-
                     <div id="groups-empty" class="text-center py-8 text-slate-400 dark:text-slate-500 text-xs">
-                        <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                         Você não está em nenhum grupo.<br>Crie um agora mesmo!
                     </div>
                     <div id="groups-container" class="space-y-1"></div>
@@ -308,15 +291,11 @@
                 <div id="panel-requests-list" class="hidden flex-1 overflow-y-auto p-3 space-y-4 no-scrollbar">
                     <div>
                         <h4 id="req-received-header" class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Recebidos</h4>
-                        <div id="req-received-container" class="space-y-1">
-                            <p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido pendente</p>
-                        </div>
+                        <div id="req-received-container" class="space-y-1"></div>
                     </div>
                     <div>
                         <h4 id="req-sent-header" class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Enviados</h4>
-                        <div id="req-sent-container" class="space-y-1">
-                            <p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido enviado</p>
-                        </div>
+                        <div id="req-sent-container" class="space-y-1"></div>
                     </div>
                 </div>
 
@@ -328,13 +307,12 @@
                                 U
                             </div>
                             <div class="truncate">
-                                <p id="user-display-name" class="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[120px] transition-all duration-350"></p>
+                                <p id="user-display-name" class="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[120px]"></p>
                                 <p id="user-tag" class="text-[10px] text-slate-500 dark:text-slate-400 truncate max-w-[120px]"></p>
                             </div>
                         </div>
-                        <svg class="w-4 h-4 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37( 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <svg class="w-4 h-4 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         </svg>
                     </button>
                 </div>
@@ -345,35 +323,42 @@
                 <!-- Chat Selecionado / Header -->
                 <div id="chat-header" class="hidden bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800/80 px-4 py-3 flex items-center justify-between animate-fade-in">
                     <div class="flex items-center gap-3">
-                        <!-- Botão de Voltar -->
                         <button id="chat-back-btn" class="md:hidden text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 p-1 bg-slate-200/50 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-all active:scale-90" aria-label="Voltar" title="Voltar">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
-                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white relative overflow-hidden transition-all duration-300 cursor-pointer" id="active-chat-avatar">
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-sm text-white relative overflow-hidden cursor-pointer" id="active-chat-avatar">
                             A
                         </div>
                         <div class="truncate">
                             <h3 id="active-chat-name" class="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[180px]">Carregando...</h3>
-                            <p id="active-chat-status" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-[180px]">@username</p>
+                            <p id="active-chat-status" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate max-w-[180px]"></p>
                         </div>
                     </div>
 
-                    <button id="group-settings-btn" class="hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-700 transition-all active:scale-95">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                        <span id="label-membros-btn">Membros</span>
-                    </button>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <!-- Botões de Ações do Chat Privado -->
+                        <button id="block-chat-btn" class="hidden text-xs font-semibold px-2.5 py-1.5 rounded-lg border transition-all active:scale-95">
+                            Bloquear
+                        </button>
+                        <button id="clear-chat-btn" class="hidden text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-rose-500/10 hover:text-rose-500 border border-slate-200 dark:border-slate-700 transition-all active:scale-95">
+                            Limpar Chat
+                        </button>
+                        <button id="group-settings-btn" class="hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs text-slate-700 dark:text-slate-300 font-semibold border border-slate-200 dark:border-slate-700 transition-all active:scale-95">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <span id="label-membros-btn">Membros</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Feed de Mensagens -->
                 <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar flex flex-col">
-                    <!-- Descarregamento inicial / Placeholder -->
                     <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 p-8 animate-pop-in">
                         <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-indigo-500 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <svg class="w-8 h-8 text-indigo-500 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                             </svg>
                         </div>
@@ -386,9 +371,7 @@
                 <!-- Barra de prévia de arquivo anexo -->
                 <div id="file-preview-bar" class="hidden bg-slate-100/90 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 p-3 flex items-center justify-between gap-3 animate-slide-up">
                     <div class="flex items-center gap-3">
-                        <div id="file-preview-container" class="w-14 h-14 rounded-lg bg-white dark:bg-slate-950 flex items-center justify-center relative border border-slate-200 dark:border-slate-800 overflow-hidden shrink-0">
-                            <!-- Previa injetada por JS -->
-                        </div>
+                        <div id="file-preview-container" class="w-14 h-14 rounded-lg bg-white dark:bg-slate-950 flex items-center justify-center relative border border-slate-200 dark:border-slate-800 overflow-hidden shrink-0"></div>
                         <div class="truncate">
                             <p id="file-preview-name" class="text-xs font-semibold text-slate-800 dark:text-white truncate max-w-[180px]"></p>
                             <p id="file-preview-size" class="text-[10px] text-slate-400 dark:text-slate-500"></p>
@@ -401,13 +384,11 @@
                     </button>
                 </div>
 
-                <!-- Input File Oculto -->
                 <input type="file" id="media-file-input" class="hidden" accept="image/*,video/*">
 
                 <!-- Barra de envio de mensagens -->
                 <div id="chat-input-bar" class="hidden p-3 bg-slate-50/40 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800/80 animate-fade-in">
                     <form id="chat-form" class="flex items-center gap-2">
-                        <!-- Botão de Gravar Áudio (Microfone) -->
                         <button id="record-audio-btn" type="button" class="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50 transition-all flex items-center justify-center shrink-0 active:scale-90" aria-label="Gravar áudio" title="Gravar áudio">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
@@ -416,7 +397,6 @@
 
                         <input id="message-input" type="text" placeholder="Escreva sua mensagem aqui..." class="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all duration-300">
                         
-                        <!-- Botão Anexar (+) -->
                         <button id="attach-file-btn" type="button" class="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50 transition-all flex items-center justify-center shrink-0 active:scale-90" aria-label="Anexar arquivo" title="Anexar arquivo">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -424,7 +404,7 @@
                         </button>
 
                         <button type="submit" class="p-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center shrink-0 active:scale-95" aria-label="Enviar" title="Enviar">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                             </svg>
                         </button>
@@ -443,19 +423,22 @@
                 </svg>
             </button>
             <div class="flex flex-col items-center text-center space-y-3.5 pt-4">
-                <div id="info-modal-avatar" class="w-20 h-20 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-2xl shadow-xl transition-all duration-300">
-                    <!-- Avatar Dinâmico -->
-                </div>
+                <div id="info-modal-avatar" class="w-20 h-20 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-2xl shadow-xl transition-all duration-300"></div>
                 <div>
                     <h3 id="info-modal-name" class="text-base font-bold text-slate-900 dark:text-white"></h3>
                     <p id="info-modal-username" class="text-xs text-indigo-500 dark:text-indigo-400 font-medium mt-0.5"></p>
                 </div>
-                <div id="info-modal-status-badge" class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
-                    <!-- Conexão de Amizade -->
+                <div id="info-modal-status-badge" class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center gap-1.5"></div>
+                
+                <div class="w-full flex flex-col gap-2">
+                    <button id="info-modal-action-btn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 rounded-xl shadow-lg transition-all active:scale-95 text-xs">
+                        Adicionar Amigo
+                    </button>
+                    <!-- NOVO: Botão Desfazer Amizade -->
+                    <button id="info-modal-unfriend-btn" class="hidden w-full bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/20 font-bold py-2.5 rounded-xl text-xs transition-all active:scale-95">
+                        Desfazer Amizade
+                    </button>
                 </div>
-                <button id="info-modal-action-btn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 rounded-xl shadow-lg transition-all active:scale-95 text-xs">
-                    Adicionar Amigo
-                </button>
             </div>
         </div>
     </div>
@@ -511,9 +494,20 @@
                     <label id="profile-avatar-value-label" for="profile-avatar-value" class="block text-xs font-medium text-slate-700 dark:text-slate-300">Valor do Emoji ou URL</label>
                     <input id="profile-avatar-value" type="text" placeholder="Ex: 🚀 ou https://..." class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all">
                 </div>
-                <button type="submit" id="btn-save-profile" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
-                    Salvar Alterações
-                </button>
+                <div class="flex gap-2">
+                    <button type="submit" id="btn-save-profile" class="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white text-xs font-bold py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
+                        Salvar Alterações
+                    </button>
+                    <button type="button" id="btn-reset-avatar" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 transition-all active:scale-95" title="Limpar foto de perfil">
+                        Limpar Foto
+                    </button>
+                </div>
+                <!-- NOVO: Botão Excluir Conta Permanentemente -->
+                <div class="border-t border-slate-100 dark:border-slate-800 pt-4 mt-2">
+                    <button type="button" id="btn-delete-account" class="w-full bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/20 hover:border-rose-600 font-bold py-3 rounded-xl text-xs transition-all duration-300 active:scale-95">
+                        Excluir Minha Conta Permanentemente
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -524,7 +518,7 @@
             <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
                 <div>
                     <h3 id="settings-group-title" class="text-sm font-bold text-slate-900 dark:text-white truncate max-w-[220px]">Membros do Grupo</h3>
-                    <p id="settings-group-creator" class="text-[10px] text-slate-500 dark:text-slate-400">Criado por @username</p>
+                    <p id="settings-group-creator" class="text-[10px] text-slate-500 dark:text-slate-400"></p>
                 </div>
                 <button id="close-group-settings-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all active:scale-90" title="Fechar">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -533,7 +527,6 @@
                 </button>
             </div>
 
-            <!-- Área de conteúdo interna rolável para evitar cortes no celular -->
             <div class="flex-1 overflow-y-auto space-y-4 py-3 pr-1 no-scrollbar">
                 <!-- EDITAR DETALHES DO GRUPO (Apenas Criador) -->
                 <div id="admin-group-details-section" class="hidden border-b border-slate-100 dark:border-slate-800 pb-4 space-y-3">
@@ -563,7 +556,6 @@
                     </form>
                 </div>
 
-                <!-- Formulário para o Criador Adicionar Novos Membros -->
                 <div id="admin-add-member-section" class="hidden border-b border-slate-100 dark:border-slate-800 pb-4 space-y-2">
                     <label for="new-member-username" id="label-convidar-membro" class="block text-xs font-medium text-emerald-600 dark:text-emerald-400">Convidar Novo Membro</label>
                     <form id="add-member-form" class="flex gap-2">
@@ -577,12 +569,9 @@
                     </form>
                 </div>
 
-                <!-- Lista de Membros Cadastrados -->
                 <div class="space-y-2">
                     <h4 id="label-membros-titulo" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Membros do Canal</h4>
-                    <div id="group-members-container" class="space-y-1">
-                        <!-- Membros injetados via JS -->
-                    </div>
+                    <div id="group-members-container" class="space-y-1"></div>
                 </div>
             </div>
         </div>
@@ -606,16 +595,16 @@
         </div>
     </div>
 
-    <!-- MODAL DE VISUALIZAÇÃO DE IMAGEM/VÍDEO AMPLIADA (LIGHTBOX) -->
+    <!-- LIGHTBOX DE MÍDIA -->
     <div id="media-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm transition-all duration-300">
-        <button id="close-media-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full bg-slate-900/55 hover:bg-slate-800 border border-slate-800 transition-all active:scale-90" aria-label="Fechar mídia" title="Fechar">
+        <button id="close-media-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full bg-slate-900/55 hover:bg-slate-800 border border-slate-800 transition-all active:scale-90" aria-label="Fechar" title="Fechar">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
         <div class="max-w-4xl max-h-[85vh] flex items-center justify-center animate-pop-in">
-            <img id="media-modal-img" src="" class="hidden max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800" alt="Mídia expandida">
-            <video id="media-modal-video" src="" controls class="hidden max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800" alt="Mídia expandida"></video>
+            <img id="media-modal-img" src="" class="hidden max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800" alt="Mídia">
+            <video id="media-modal-video" src="" controls class="hidden max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800"></video>
         </div>
     </div>
 
@@ -625,7 +614,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { initializeFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configurações do Firebase reais de Luis
         const firebaseConfig = {
             apiKey: "AIzaSyDeoGIS270NUa0mrjbIdzNJWKawtTW5vCc",
             authDomain: "conectachat-a08d3.firebaseapp.com",
@@ -637,14 +625,10 @@
         };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'co-chat-app';
 
-        // --- INSTANCIAÇÃO DO FIREBASE ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = initializeFirestore(app, {
-            experimentalAutoDetectLongPolling: true
-        });
+        const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 
-        // --- ESTADOS E VARIÁVEIS GLOBAIS ---
         let currentUser = null;
         let activeFriend = null;
         let activeGroup = null;
@@ -660,7 +644,9 @@
         const sessionStartTime = Date.now();
         let lastAccountData = null;
 
-        // Custom Toast Notification Maker
+        let activeMessagesListCached = [];
+        let activeGroupMessagesListCached = [];
+
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             if (!container) return;
@@ -686,7 +672,6 @@
             }, 3500);
         }
 
-        // --- SISTEMA DE NOTIFICAÇÕES NATIVAS ---
         function ativarNotificacoes() {
             if ("Notification" in window) {
                 if (Notification.permission !== "granted" && Notification.permission !== "denied") {
@@ -712,7 +697,7 @@
                         notification.close();
                     };
                 } catch (e) {
-                    console.debug("Navegador bloqueou disparo de notificação de segundo plano:", e);
+                    console.debug("Navegador bloqueou disparo de notificação:", e);
                 }
             }
         }
@@ -721,12 +706,10 @@
             mostrarNotificacaoNativa(title, message, onClickFn);
         }
 
-        // Fechamento manual do banner de conexão
         document.getElementById('close-connection-banner').addEventListener('click', () => {
             document.getElementById('connection-banner').classList.add('hidden');
         });
 
-        // --- DICIONÁRIOS DE IDIOMAS ---
         const languages = [
             { code: "PT", name: "Português", native: "Português" },
             { code: "EN", name: "English", native: "English" },
@@ -780,7 +763,7 @@
                 offlineModeActive: "MODO OFFLINE ATIVO: Conta predefinida @{name} criada automaticamente!",
                 toastOfflineGuestCreated: "Bypass ativo: Conta de convidado gerada com sucesso!",
                 toastLimitExceeded: "O arquivo de imagem excede o limite de 1.5MB.",
-                toastVideoLimitExceeded: "O vídeo ultrapassa o limite de 7 minutos e não pode ser enviado.",
+                toastVideoLimitExceeded: "O vídeo ultrapassa o limite de 7 minutos.",
                 toastCompressionError: "Erro ao processar e comprimir o vídeo para 480p.",
                 toastMicError: "Não foi possível aceder ao microfone ou gravação não suportada.",
                 audioRecordStart: "Gravação de áudio iniciada...",
@@ -825,9 +808,9 @@
                 offlineModeActive: "OFFLINE MODE ACTIVE: Preset account @{name} created automatically!",
                 toastOfflineGuestCreated: "Guest account generated successfully!",
                 toastLimitExceeded: "The image file exceeds the 1.5MB limit.",
-                toastVideoLimitExceeded: "The video exceeds the 7 minutes limit and cannot be sent.",
-                toastCompressionError: "Error processing and compressing the video to 480p.",
-                toastMicError: "Unable to access microphone or recording unsupported.",
+                toastVideoLimitExceeded: "The video exceeds the 7 minutes limit.",
+                toastCompressionError: "Error processing and compressing video.",
+                toastMicError: "Unable to access microphone.",
                 audioRecordStart: "Audio recording started...",
                 audioRecordStop: "Audio recording stopped!"
             }
@@ -836,7 +819,6 @@
         let currentLang = "PT";
         let selectedLang = "PT";
 
-        // Função inteligente de tradução dinâmica com substituição de placeholders e fallback seguro
         function getTranslation(key, replacements = {}) {
             const t = translations[currentLang] || translations["PT"];
             let text = t[key] || translations["PT"][key] || key;
@@ -846,7 +828,6 @@
             return text;
         }
 
-        // --- SISTEMA DE RENDERIZAÇÃO DE IDIOMAS ---
         function renderLanguages() {
             const grid = document.getElementById('languages-grid');
             if (!grid) return;
@@ -872,7 +853,6 @@
             });
         }
 
-        // Confirmar Idioma e avançar
         document.getElementById('confirm-lang-btn').addEventListener('click', () => {
             currentLang = selectedLang;
             applyTranslations();
@@ -881,7 +861,6 @@
             ativarNotificacoes();
         });
 
-        // --- MOTOR DE TRADUÇÃO DINÂMICA DA UI ---
         function applyTranslations() {
             const setTx = (id, key) => {
                 const el = document.getElementById(id);
@@ -892,7 +871,6 @@
                 if (el) el.placeholder = getTranslation(key);
             };
 
-            // Auth Screen
             if (registerMode) {
                 setTx('auth-title', 'authTitleReg');
                 setTx('auth-submit-btn', 'registerBtn');
@@ -908,12 +886,10 @@
             setTx('label-password', 'password');
             setTx('label-or-option', 'orText');
 
-            // Header & Sidebar Actions
             setPl('friend-search-input', 'addFriendPlaceholder');
             setTx('btn-add-action', 'addFriendBtn');
             setTx('logout-text-label', 'logout');
 
-            // Tabs (Preserving inner counters/badges safely)
             const countFriends = document.getElementById('count-friends')?.innerText || '0';
             const tabFriendsEl = document.getElementById('tab-friends');
             if (tabFriendsEl) {
@@ -934,48 +910,31 @@
                 tabRequestsEl.appendChild(badgeClone);
             }
 
-            // Empty state messages
             const friendsEmptyEl = document.getElementById('friends-empty');
-            if (friendsEmptyEl) friendsEmptyEl.innerHTML = `
-                <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2 animate-bounce" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                ${getTranslation('friendsEmpty')}
-            `;
+            if (friendsEmptyEl) friendsEmptyEl.innerHTML = `${getTranslation('friendsEmpty')}`;
 
             const groupsEmptyEl = document.getElementById('groups-empty');
-            if (groupsEmptyEl) groupsEmptyEl.innerHTML = `
-                <svg class="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-2" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                ${getTranslation('groupsEmpty')}
-            `;
+            if (groupsEmptyEl) groupsEmptyEl.innerHTML = `${getTranslation('groupsEmpty')}`;
 
-            // Create Group Button / Modal
             const openCreateGroupBtnEl = document.getElementById('open-create-group-modal');
             if (openCreateGroupBtnEl) {
-                openCreateGroupBtnEl.innerHTML = `
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                    </svg>
-                    ${getTranslation('openCreateGroupBtn')}
-                `;
+                openCreateGroupBtnEl.innerHTML = `${getTranslation('openCreateGroupBtn')}`;
             }
             setTx('create-group-modal-title', 'createGroupModalTitle');
             setTx('label-group-name', 'groupNameLabel');
             setTx('btn-create-group-submit', 'openCreateGroupBtn');
 
-            // Request Headers
             setTx('req-received-header', 'recebidosHeader');
             setTx('req-sent-header', 'enviadosHeader');
 
-            // Chat Placeholders
             setTx('chat-placeholder-header', 'chatPlaceholderHeader');
             setTx('chat-placeholder-sub', 'chatPlaceholderSub');
             setTx('label-membros-btn', 'membrosBtn');
 
-            // Edit Profile Modal
             setTx('label-perfil-modal', 'editPerfilTitle');
             setTx('label-nome-exibicao', 'nomeExibicaoLabel');
             setTx('btn-save-profile', 'salvarBtn');
 
-            // Group Members/Admin Customization
             setTx('label-personalizar-grupo', 'personalizarGrupo');
             setTx('label-convidar-membro', 'convidarMembro');
             setTx('label-membros-titulo', 'membrosTitulo');
@@ -1030,11 +989,10 @@
                     osc2.stop(ctx.currentTime + 0.36);
                 }, 80);
             } catch (e) {
-                console.debug("Navegador aguarda interação para reproduzir áudio.");
+                console.debug("Áudio pendente de interação do usuário.");
             }
         }
 
-        // --- MEMÓRIA DO SIMULADOR OFFLINE ---
         const syncChannel = window.BroadcastChannel ? new BroadcastChannel('conectachat-live-fallback') : null;
         let simData = {
             accounts: {},
@@ -1055,11 +1013,10 @@
                     if (!simData.videoChunks) simData.videoChunks = {};
                 }
             } catch (e) {
-                console.warn("Erro ao ler localStorage:", e);
+                console.warn("Erro no localStorage:", e);
             }
         }
 
-        // Função para persistir dados locais da simulação
         function saveLocalSimulationData() {
             try {
                 localStorage.setItem('conectachat_offline_db', JSON.stringify(simData));
@@ -1083,7 +1040,6 @@
             };
         }
 
-        // Ativa o fallback offline do chat
         function activateOfflineFallback() {
             if (isOfflineMode) return;
             isOfflineMode = true;
@@ -1112,7 +1068,6 @@
             enterApplication();
         }
 
-        // --- SISTEMA DE SOLICITAÇÃO DE AMIZADES ---
         function renderRequests(received, sent) {
             const receivedContainer = document.getElementById('req-received-container');
             const sentContainer = document.getElementById('req-sent-container');
@@ -1127,7 +1082,6 @@
                 badgeRequests.classList.add('hidden');
             }
 
-            // Renderiza pedidos recebidos
             receivedContainer.innerHTML = '';
             if (received.length === 0) {
                 receivedContainer.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido recebido</p>`;
@@ -1143,13 +1097,13 @@
                             <p class="text-[9px] text-slate-400 dark:text-slate-500">@${req.sender}</p>
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
-                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 transition-all active:scale-90" aria-label="Aceitar" title="Aceitar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <button class="accept-btn p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white dark:hover:text-slate-950 transition-all active:scale-90">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                                 </svg>
                             </button>
-                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-700 dark:text-rose-400 hover:text-white transition-all active:scale-90" aria-label="Recusar" title="Recusar">
-                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <button class="decline-btn p-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500 text-rose-700 dark:text-rose-400 hover:text-white transition-all active:scale-90">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
@@ -1166,7 +1120,6 @@
                 });
             }
 
-            // Renderiza pedidos enviados
             sentContainer.innerHTML = '';
             if (sent.length === 0) {
                 sentContainer.innerHTML = `<p class="text-xs text-slate-400 dark:text-slate-500 py-2 italic text-center">Nenhum pedido enviado</p>`;
@@ -1181,8 +1134,8 @@
                             <p class="text-xs font-semibold text-slate-800 dark:text-slate-400 truncate">${receiverName}</p>
                             <p class="text-[9px] text-slate-400 dark:text-slate-500">@${req.receiver}</p>
                         </div>
-                        <button class="cancel-btn p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 transition-all active:scale-90" aria-label="Cancelar" title="Cancelar">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <button class="cancel-btn p-1.5 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 transition-all active:scale-90">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
@@ -1215,7 +1168,6 @@
                 });
                 showToast(`Você agora é amigo de @${senderUsername}!`);
             } catch (err) {
-                console.error("Erro ao aceitar amizade:", err);
                 showToast("Erro ao aceitar convite.", "error");
             }
         }
@@ -1235,12 +1187,10 @@
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', docId));
                 showToast("Solicitação de amizade resolvida.");
             } catch (err) {
-                console.error("Erro ao remover solicitação:", err);
                 showToast("Erro ao deletar solicitação.", "error");
             }
         }
 
-        // --- SISTEMA UNIFICADO DE ADICIONAR AMIGO ---
         async function executeAddFriend(targetUsername) {
             if (!targetUsername) return;
             const cleanUsername = targetUsername.trim().toLowerCase();
@@ -1267,9 +1217,9 @@
                     showToast(`Você já é amigo de @${cleanUsername}.`, "info");
                 } else if (existing.status === 'pending') {
                     if (existing.sender === currentUser.username) {
-                        showToast("Você já tem uma solicitação pendente para este utilizador.", "info");
+                        showToast("Você já tem uma solicitação pendente.", "info");
                     } else {
-                        showToast("Este utilizador já te enviou uma solicitação. Aceite na aba 'Solicitações'!", "info");
+                        showToast("Este utilizador já lhe enviou um convite.", "info");
                     }
                 }
                 return;
@@ -1294,13 +1244,11 @@
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'friends'), payload);
                     showToast(`Solicitação enviada para @${cleanUsername}!`);
                 } catch (err) {
-                    console.error("Erro ao enviar solicitação de amizade:", err);
                     showToast("Erro ao enviar solicitação.", "error");
                 }
             }
         }
 
-        // --- SISTEMA DE GRAVAÇÃO DE ÁUDIO REAL-TIME ---
         let voiceMediaRecorder = null;
         let voiceAudioChunks = [];
         let isVoiceRecording = false;
@@ -1350,7 +1298,6 @@
                     recBtn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
                     showToast(getTranslation('audioRecordStart'), "info");
                 } catch (err) {
-                    console.error("Erro ao acessar microfone:", err);
                     showToast(getTranslation('toastMicError'), "error");
                 }
             } else {
@@ -1366,7 +1313,6 @@
 
         document.getElementById('record-audio-btn').addEventListener('click', toggleVoiceRecording);
 
-        // --- SISTEMA DE GERAÇÃO DE AVATARES ---
         function getAvatarHTML(type, value, initial, fallbackBg = 'from-indigo-500 to-indigo-600') {
             if (type === 'emoji' && value) {
                 return `
@@ -1374,9 +1320,12 @@
                         ${value}
                     </div>
                 `;
-            } else if (type === 'url' && value && value.startsWith('http')) {
+            } else if (type === 'url' && value && (value.startsWith('http://') || value.startsWith('https://'))) {
                 return `
-                    <img src="${value}" class="w-full h-full object-cover" onerror="this.outerHTML='<div class=\\'w-full h-full bg-gradient-to-tr ${fallbackBg} text-white flex items-center justify-center font-bold\\'>${initial}</div>'">
+                    <div class="w-full h-full relative">
+                        <img src="${value}" class="w-full h-full object-cover relative z-10" onerror="this.style.display='none';">
+                        <div class="absolute inset-0 flex w-full h-full bg-gradient-to-tr ${fallbackBg} text-white items-center justify-center font-bold z-0">${initial}</div>
+                    </div>
                 `;
             } else {
                 return `
@@ -1408,12 +1357,10 @@
                 reader.readAsDataURL(file);
                 reader.onload = function (event) {
                     const imgUrl = event.target.result;
-                    
                     if (file.size < 100 * 1024) {
                         resolve({ base64: imgUrl, type: 'image' });
                         return;
                     }
-
                     const img = new Image();
                     img.src = imgUrl;
                     img.onload = function () {
@@ -1437,7 +1384,7 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.7); 
-                        resolve({ dataUrl, type: 'image' });
+                        resolve({ base64: dataUrl, type: 'image' });
                     };
                     img.onerror = err => reject(err);
                 };
@@ -1445,7 +1392,6 @@
             });
         }
 
-        // --- SISTEMA DE EXTRAÇÃO DE ÁUDIO WAV ---
         async function extractAudioAsWavBase64(file) {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const arrayBuffer = await file.arrayBuffer();
@@ -1479,8 +1425,7 @@
                   btwView = new DataView(btwBuffer),
                   btwChnls = [],
                   btwSampleRate = buffer.sampleRate;
-            let btwIndex = 0,
-                btwVolume = 1;
+            let btwIndex = 0;
             
             writeString(btwView, 0, 'RIFF');
             btwView.setUint32(4, btwLength - 8, true);
@@ -1519,7 +1464,6 @@
             }
         }
 
-        // --- PIPELINE DE PROCESSAMENTO E GRAVAÇÃO DE VÍDEO 480P ---
         async function compressVideoTo480p(file) {
             return new Promise((resolve, reject) => {
                 const video = document.createElement('video');
@@ -1682,7 +1626,7 @@
                 try {
                     const res = await compressAndConvertToBase64(file);
                     selectedFilePayload = {
-                        base64: res.base64 || res.dataUrl,
+                        base64: res.base64,
                         type: 'image',
                         name: file.name,
                         size: (file.size / 1024).toFixed(1) + " KB"
@@ -1801,13 +1745,31 @@
             renderGroups(groupsList);
 
             if (activeFriend) {
+                const blockedList = currentUser.blockedUsers || [];
+                
                 const messagesList = simData.messages.filter(msg => {
                     const isFromMeToFriend = (msg.sender === currentUser.username && msg.receiver === activeFriend.username);
                     const isFromFriendToMe = (msg.sender === activeFriend.username && msg.receiver === currentUser.username);
                     const isHiddenByMe = msg.hiddenBy && msg.hiddenBy.includes(currentUser.username);
-                    return (isFromMeToFriend || isFromFriendToMe) && !isHiddenByMe;
+                    
+                    const isSenderBlocked = !isFromMeToFriend && blockedList.includes(msg.sender);
+
+                    return (isFromMeToFriend || isFromFriendToMe) && !isHiddenByMe && !isSenderBlocked;
                 });
+                
+                let offlineSeenUpdated = false;
+                messagesList.forEach(m => {
+                    if (m.sender === activeFriend.username && m.receiver === currentUser.username && !m.seen) {
+                        m.seen = true;
+                        offlineSeenUpdated = true;
+                    }
+                });
+                if (offlineSeenUpdated) {
+                    saveLocalSimulationData();
+                }
+
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                activeMessagesListCached = messagesList;
                 renderMessages(messagesList);
             }
 
@@ -1824,6 +1786,7 @@
                     return msg.groupId === activeGroup.id && !isHiddenByMe;
                 });
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                activeGroupMessagesListCached = messagesList;
                 renderGroupMessages(messagesList);
             }
         }
@@ -1850,7 +1813,6 @@
             applyTranslations();
         });
 
-        // Configurando o clique no botão de usar a última conta para entrar automaticamente
         const lastAccountBtn = document.getElementById('last-account-btn');
         if (lastAccountBtn) {
             lastAccountBtn.addEventListener('click', () => {
@@ -1874,7 +1836,7 @@
             const displayNameInput = document.getElementById('reg-name').value.trim();
 
             if (!/^[a-zA-Z0-9_]{3,15}$/.test(usernameInput)) {
-                showToast("O nome de utilizador deve conter apenas letras, números ou '_' e ter de 3 a 15 caracteres.", "error");
+                showToast("Nome inválido (Use de 3 a 15 caracteres alfanuméricos ou '_').", "error");
                 return;
             }
 
@@ -1887,7 +1849,7 @@
                     const userCheckRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', usernameInput);
                     const docSnap = await getDoc(userCheckRef);
                     if (docSnap.exists()) {
-                        showToast("Este nome de utilizador já está sendo usado por outra pessoa.", "error");
+                        showToast("Este utilizador já existe.", "error");
                         return;
                     }
                     const newUserData = {
@@ -1899,7 +1861,7 @@
                         avatarValue: ''
                     };
                     await setDoc(userCheckRef, newUserData);
-                    showToast("Sua conta foi criada! Faça login agora.");
+                    showToast("Sua conta foi criada! Faça login.");
                     accountsMap[usernameInput] = newUserData;
                     toggleAuthModeBtn.click();
                     document.getElementById('auth-password').value = '';
@@ -1916,18 +1878,18 @@
                     const userSnap = await getDoc(userDocRef);
 
                     if (!userSnap.exists()) {
-                        showToast("Nome de utilizador incorreto ou não cadastrado.", "error");
+                        showToast("Nome de utilizador ou senha incorretos.", "error");
                         return;
                     }
 
                     const matchedUser = userSnap.data();
                     if (matchedUser.password !== passwordInput) {
-                        showToast("Palavra-passe incorreta.", "error");
+                        showToast("Senha incorreta.", "error");
                         return;
                     }
 
                     currentUser = matchedUser;
-                    showToast(`Bem-vindo de volta, ${currentUser.name}!`);
+                    showToast(`Bem-vindo, ${currentUser.name}!`);
 
                     localStorage.setItem('conectachat_last_account', JSON.stringify({
                         username: currentUser.username,
@@ -1944,7 +1906,7 @@
 
         function executeOfflineRegistration(usernameInput, displayNameInput, passwordInput) {
             if (simData.accounts[usernameInput]) {
-                showToast("Este nome de utilizador já está sendo usado localmente.", "error");
+                showToast("Este utilizador já existe offline.", "error");
                 return;
             }
             const newUserData = {
@@ -1956,7 +1918,7 @@
             simData.accounts[usernameInput] = newUserData;
             saveLocalSimulationData();
             accountsMap = simData.accounts;
-            showToast("Sua conta offline foi criada com sucesso! Faça login.");
+            showToast("Conta offline criada com sucesso! Entre.");
             toggleAuthModeBtn.click();
             document.getElementById('auth-password').value = '';
         }
@@ -1964,11 +1926,11 @@
         function executeOfflineLogin(usernameInput, passwordInput) {
             const matchedUser = simData.accounts[usernameInput];
             if (!matchedUser || matchedUser.password !== passwordInput) {
-                showToast("Nome de utilizador ou palavra-passe incorretos offline.", "error");
+                showToast("Senha ou utilizador incorretos.", "error");
                 return;
             }
             currentUser = matchedUser;
-            showToast(`Ligar no Modo Offline como ${currentUser.name}!`);
+            showToast(`Sessão offline: ${currentUser.name}!`);
             
             const backup = { username: currentUser.username, name: currentUser.name, password: passwordInput };
             localStorage.setItem('conectachat_last_account', JSON.stringify(backup));
@@ -1996,8 +1958,8 @@
                 const reqSent = [];
                 activeRelationships = [];
 
-                snapshot.forEach(doc => {
-                    const data = { id: doc.id, ...doc.data() };
+                snapshot.forEach(docSnap => {
+                    const data = { id: docSnap.id, ...docSnap.data() };
                     activeRelationships.push(data);
                     if (data.status === 'accepted') {
                         if (data.sender === currentUser.username) {
@@ -2016,15 +1978,15 @@
 
                 renderFriends(friendsList);
                 renderRequests(reqReceived, reqSent);
-            }, (error) => {
+            }, () => {
                 activateOfflineFallback();
             });
 
             const groupsCol = collection(db, 'artifacts', appId, 'public', 'data', 'groups');
             unsubscribeGroups = onSnapshot(groupsCol, (snapshot) => {
                 const groupsList = [];
-                snapshot.forEach(doc => {
-                    const data = { id: doc.id, ...doc.data() };
+                snapshot.forEach(docSnap => {
+                    const data = { id: docSnap.id, ...docSnap.data() };
                     if (data.members && data.members.includes(currentUser.username)) {
                         groupsList.push(data);
                     }
@@ -2036,7 +1998,7 @@
                 if (activeGroup) {
                     const freshGroup = groupsList.find(g => g.id === activeGroup.id);
                     if (!freshGroup) {
-                        showToast("Você foi removido ou o grupo foi excluído.", "error");
+                        showToast("Você foi removido ou o grupo foi deletado.", "error");
                         closeActiveChat();
                     } else {
                         activeGroup = freshGroup; 
@@ -2045,7 +2007,7 @@
                         document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(activeGroup.avatarType, activeGroup.avatarValue, activeGroup.name.charAt(0).toUpperCase(), 'from-emerald-500 to-teal-500');
                     }
                 }
-            }, (error) => {
+            }, () => {
                 activateOfflineFallback();
             });
 
@@ -2053,47 +2015,60 @@
             unsubscribeMessages = onSnapshot(globalDMsCol, (snapshot) => {
                 if (!activeFriend) return;
                 const messagesList = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                const blockedList = currentUser.blockedUsers || [];
+                
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
                     const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
                     const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
                     const isHiddenByMe = data.hiddenBy && data.hiddenBy.includes(currentUser.username);
                     
-                    if ((isFromMeToFriend || isFromFriendToMe) && !isHiddenByMe) {
-                        messagesList.push({ id: doc.id, ...data });
+                    const isSenderBlocked = !isFromMeToFriend && blockedList.includes(data.sender);
+
+                    if ((isFromMeToFriend || isFromFriendToMe) && !isHiddenByMe && !isSenderBlocked) {
+                        messagesList.push({ id: docSnap.id, ...data });
+                        
+                        if (isFromFriendToMe && !data.seen) {
+                            const mRef = doc(db, 'artifacts', appId, 'public', 'data', 'messages', docSnap.id);
+                            updateDoc(mRef, { seen: true }).catch(e => console.debug("Falha ao registrar visto:", e));
+                        }
                     }
                 });
 
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                activeMessagesListCached = messagesList;
                 renderMessages(messagesList);
             }, (error) => {
-                console.error("Erro ao carregar chat:", error);
+                console.error("Erro no Listener de Chat:", error);
             });
 
             const globalGroupsCol = collection(db, 'artifacts', appId, 'public', 'data', 'group_messages');
             unsubscribeGroupMessages = onSnapshot(globalGroupsCol, (snapshot) => {
                 if (!activeGroup) return;
                 const messagesList = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
                     const isHiddenByMe = data.hiddenBy && data.hiddenBy.includes(currentUser.username);
                     if (data.groupId === activeGroup.id && !isHiddenByMe) {
-                        messagesList.push({ id: doc.id, ...data });
+                        messagesList.push({ id: docSnap.id, ...data });
                     }
                 });
 
                 messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                activeGroupMessagesListCached = messagesList;
                 renderGroupMessages(messagesList);
             }, (error) => {
-                console.error("Erro ao carregar chat do grupo:", error);
+                console.error("Erro no Listener de Grupos:", error);
             });
 
-            // Escutas globais para disparar notificações fora do foco
             onSnapshot(globalDMsCol, (snapshot) => {
                 snapshot.docChanges().forEach(change => {
                     if (change.type === "added") {
                         const data = change.doc.data();
                         const docId = change.doc.id;
+                        const blockedList = currentUser.blockedUsers || [];
+                        
+                        if (blockedList.includes(data.sender)) return;
                         
                         if (data.timestamp > sessionStartTime && data.sender !== currentUser.username && data.receiver === currentUser.username) {
                             if (!notifiedMessageIds.has(docId)) {
@@ -2101,7 +2076,7 @@
                                 const isViewingSender = activeFriend && activeFriend.username === data.sender;
                                 if (!isWindowFocused || !isViewingSender) {
                                     const senderName = accountsMap[data.sender]?.name || data.sender;
-                                    const bodyText = data.fileData ? `${senderName} te enviou um arquivo` : `${senderName}: ${data.text}`;
+                                    const bodyText = data.fileData ? `${senderName} lhe enviou um anexo` : `${senderName}: ${data.text}`;
                                     sendSystemNotification("ConectaChat", bodyText, () => {
                                         openChatWith(data.sender, senderName);
                                     });
@@ -2128,7 +2103,7 @@
                                     const senderName = data.senderName || accountsMap[data.sender]?.name || data.sender;
                                     const groupItem = activeGroupList.find(g => g.id === data.groupId);
                                     const groupName = groupItem ? groupItem.name : "Grupo";
-                                    const bodyText = data.fileData ? `${senderName} enviou um arquivo no grupo` : `${senderName}: ${data.text}`;
+                                    const bodyText = data.fileData ? `${senderName} enviou mídia no canal` : `${senderName}: ${data.text}`;
                                     sendSystemNotification(groupName, bodyText, () => {
                                         openGroupChatWith(groupItem);
                                     });
@@ -2141,7 +2116,6 @@
             });
         }
 
-        // --- MAPA DE CONTAS FIREBASE EM TEMPO REAL ---
         let unsubscribeAccounts = null;
         function startAccountsListener() {
             if (isOfflineMode) {
@@ -2150,8 +2124,8 @@
             }
             const accountsCol = collection(db, 'artifacts', appId, 'public', 'data', 'accounts');
             unsubscribeAccounts = onSnapshot(accountsCol, (snapshot) => {
-                snapshot.forEach(doc => {
-                    accountsMap[doc.id] = doc.data();
+                snapshot.forEach(docSnap => {
+                    accountsMap[docSnap.id] = docSnap.data();
                 });
                 if (currentUser) {
                     const friendsList = [];
@@ -2167,17 +2141,17 @@
                     renderFriends(friendsList);
                 }
             }, (error) => {
-                console.error("Erro ao sincronizar mapa de utilizadores:", error);
+                console.error("Erro de sincronização:", error);
             });
         }
 
-        // --- MÓDULO DE DETALHES DO UTILIZADOR ---
         const userInfoModal = document.getElementById('user-info-modal');
         const infoModalAvatar = document.getElementById('info-modal-avatar');
         const infoModalName = document.getElementById('info-modal-name');
         const infoModalUsername = document.getElementById('info-modal-username');
         const infoModalStatusBadge = document.getElementById('info-modal-status-badge');
         const infoModalActionBtn = document.getElementById('info-modal-action-btn');
+        const infoModalUnfriendBtn = document.getElementById('info-modal-unfriend-btn');
 
         document.getElementById('close-user-info-modal').addEventListener('click', () => {
             userInfoModal.classList.add('hidden');
@@ -2194,6 +2168,8 @@
                 (r.sender === userAcc.username && r.receiver === currentUser.username)
             );
 
+            infoModalUnfriendBtn.classList.add('hidden');
+
             if (userAcc.username === currentUser.username) {
                 infoModalStatusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Você`;
                 infoModalActionBtn.classList.add('hidden');
@@ -2206,6 +2182,12 @@
                     infoModalActionBtn.disabled = false;
                     infoModalActionBtn.onclick = () => {
                         openChatWith(userAcc.username, userAcc.name);
+                        userInfoModal.classList.add('hidden');
+                    };
+
+                    infoModalUnfriendBtn.classList.remove('hidden');
+                    infoModalUnfriendBtn.onclick = () => {
+                        handleDeleteFriendship(friendship.id, userAcc.username);
                         userInfoModal.classList.add('hidden');
                     };
                 } else {
@@ -2227,7 +2209,7 @@
                     }
                 }
             } else {
-                infoModalStatusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Desconectado`;
+                infoModalStatusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Sem conexão`;
                 infoModalActionBtn.innerText = "Adicionar Amigo";
                 infoModalActionBtn.disabled = false;
                 infoModalActionBtn.className = "w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-95";
@@ -2241,71 +2223,27 @@
             userInfoModal.classList.remove('hidden');
         }
 
-        // --- SISTEMA DE PESQUISA EM TEMPO REAL ---
-        const friendSearchInput = document.getElementById('friend-search-input');
-        const searchDropdown = document.getElementById('search-dropdown');
-
-        friendSearchInput.addEventListener('input', () => {
-            const queryVal = friendSearchInput.value.trim().toLowerCase();
-            if (!queryVal) {
-                searchDropdown.classList.add('hidden');
+        async function handleDeleteFriendship(requestDocId, friendUsername) {
+            if (isOfflineMode) {
+                delete simData.friends[requestDocId];
+                saveLocalSimulationData();
+                triggerOfflineCallbacks();
+                showToast(`Desfez amizade com @${friendUsername}.`);
+                if (activeFriend && activeFriend.username === friendUsername) {
+                    closeActiveChat();
+                }
                 return;
             }
-
-            const matchedUsers = Object.values(accountsMap).filter(acc => 
-                acc.username.startsWith(queryVal) || 
-                (acc.name && acc.name.toLowerCase().startsWith(queryVal))
-            );
-
-            searchDropdown.innerHTML = '';
-            if (matchedUsers.length === 0) {
-                searchDropdown.innerHTML = `<div class="p-3 text-xs text-slate-400 dark:text-slate-500 italic text-center">Nenhum utilizador encontrado</div>`;
-            } else {
-                matchedUsers.forEach(acc => {
-                    const item = document.createElement('div');
-                    item.className = 'flex items-center justify-between p-2 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-xl cursor-pointer transition-all duration-200';
-                    const avatarHTML = getAvatarHTML(acc.avatarType, acc.avatarValue, acc.name.charAt(0).toUpperCase());
-                    
-                    item.innerHTML = `
-                        <div class="flex items-center gap-2 truncate flex-1 info-trigger">
-                            <div class="w-7 h-7 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-[10px] shrink-0 transition-all duration-300">
-                                ${avatarHTML}
-                            </div>
-                            <div class="truncate">
-                                <p class="text-xs font-bold text-slate-800 dark:text-white truncate">${acc.name}</p>
-                                <p class="text-[9px] text-slate-400 dark:text-slate-500">@${acc.username}</p>
-                            </div>
-                        </div>
-                        <button type="button" class="add-quick-btn p-1 text-slate-400 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all" title="Adicionar Rápido">
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-                            </svg>
-                        </button>
-                    `;
-
-                    item.querySelector('.info-trigger').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        showUserInfoModal(acc);
-                        searchDropdown.classList.add('hidden');
-                    });
-
-                    item.querySelector('.add-quick-btn').addEventListener('click', async (e) => {
-                        e.stopPropagation();
-                        await executeAddFriend(acc.username);
-                        searchDropdown.classList.add('hidden');
-                    });
-
-                    searchDropdown.appendChild(item);
-                });
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'friends', requestDocId));
+                showToast(`Desfez amizade com @${friendUsername}.`);
+                if (activeFriend && activeFriend.username === friendUsername) {
+                    closeActiveChat();
+                }
+            } catch (err) {
+                showToast("Erro ao remover amizade.", "error");
             }
-            searchDropdown.classList.remove('hidden');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!addFriendForm.contains(e.target)) {
-                searchDropdown.classList.add('hidden');
-            }
-        });
+        }
 
         function renderFriends(friends) {
             const container = document.getElementById('friends-container');
@@ -2349,7 +2287,7 @@
                                 <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">@${f.friendUsername}</p>
                             </div>
                         </div>
-                        <button type="button" class="view-profile-btn p-1.5 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-200/40 dark:hover:bg-slate-800/40 transition-all shrink-0 ml-1" title="Visualizar Perfil">
+                        <button type="button" class="view-profile-btn p-1.5 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-200/40 dark:hover:bg-slate-800/40 transition-all shrink-0 ml-1">
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -2418,7 +2356,6 @@
             });
         }
 
-        // --- APAGAR MENSAGENS COM SEPARAÇÃO DE PERMISSÕES ---
         async function deleteMessage(msg, isGroup) {
             const isMine = msg.sender === currentUser.username;
             const collectionName = isGroup ? 'group_messages' : 'messages';
@@ -2466,7 +2403,6 @@
                     }
                 }
             } catch (err) {
-                console.error("Erro ao apagar mensagem remota:", err);
                 showToast("Erro ao excluir mensagem.", "error");
             }
         }
@@ -2487,12 +2423,19 @@
             messages.forEach(msg => {
                 const isMine = msg.sender === currentUser.username;
                 const alignmentClass = isMine ? 'justify-end' : 'justify-start';
-                const bubbleColor = isMine 
-                    ? 'bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-br-none shadow-md shadow-indigo-500/10' 
-                    : 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none';
+                
+                let bubbleColor;
+                if (isMine) {
+                    if (msg.seen) {
+                        bubbleColor = 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-br-none shadow-md shadow-emerald-500/10';
+                    } else {
+                        bubbleColor = 'bg-gradient-to-br from-slate-400 to-slate-500 dark:from-slate-600 dark:to-slate-700 text-white rounded-br-none shadow-md';
+                    }
+                } else {
+                    bubbleColor = 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none';
+                }
 
                 const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
                 const hasText = msg.text && msg.text.trim() !== '';
                 const hasFile = !!msg.fileType;
 
@@ -2513,11 +2456,6 @@
                                 <div class="image-preview-clickable rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-95 transition-all duration-300 shadow-sm">
                                     <img src="${msg.fileData}" class="max-h-60 object-contain w-full" alt="Imagem">
                                 </div>
-                                <button class="expand-media-btn absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md" title="Ecrã Inteiro">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4m12 4V4h-4M4 16v4h4m12-4v4h-4" />
-                                    </svg>
-                                </button>
                             </div>
                         `;
                     } else if (msg.fileType === 'video_chunked') {
@@ -2533,9 +2471,9 @@
                 }
 
                 const deleteButtonHTML = `
-                    <button class="delete-msg-btn text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center" title="Apagar mensagem">
+                    <button class="delete-msg-btn text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138( 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
                 `;
@@ -2563,15 +2501,6 @@
                 if (imgPreview) {
                     imgPreview.addEventListener('click', () => {
                         openMediaModal(msg.fileData, 'image');
-                    });
-                }
-
-                const expandBtn = msgElement.querySelector('.expand-media-btn');
-                if (expandBtn) {
-                    expandBtn.addEventListener('click', () => {
-                        if (msg.fileType === 'image') {
-                            openMediaModal(msg.fileData, 'image');
-                        }
                     });
                 }
 
@@ -2612,7 +2541,6 @@
                     : 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-bl-none';
 
                 const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
                 const hasText = msg.text && msg.text.trim() !== '';
                 const hasFile = !!msg.fileType;
 
@@ -2633,11 +2561,6 @@
                                 <div class="image-preview-clickable rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-95 transition-all duration-300 shadow-sm">
                                     <img src="${msg.fileData}" class="max-h-60 object-contain w-full" alt="Imagem">
                                 </div>
-                                <button class="expand-media-btn absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md" title="Ecrã Inteiro">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4m12 4V4h-4M4 16v4h4m12-4v4h-4" />
-                                    </svg>
-                                </button>
                             </div>
                         `;
                     } else if (msg.fileType === 'video_chunked') {
@@ -2653,7 +2576,7 @@
                 }
 
                 const deleteButtonHTML = `
-                    <button class="delete-msg-btn text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center" title="Apagar mensagem">
+                    <button class="delete-msg-btn text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -2691,15 +2614,6 @@
                         openMediaModal(msg.fileData, 'image');
                     });
                 }
-
-                const expandBtn = msgElement.querySelector('.expand-media-btn');
-                if (expandBtn) {
-                    expandBtn.addEventListener('click', () => {
-                        if (msg.fileType === 'image') {
-                            openMediaModal(msg.fileData, 'image');
-                        }
-                    });
-                }
                 
                 const delBtn = msgElement.querySelector('.delete-msg-btn');
                 if (delBtn) {
@@ -2708,7 +2622,6 @@
 
                 container.appendChild(msgElement);
 
-                // CORREÇÃO: Dispara a inicialização e carregamento dos pedaços de vídeo também nas mensagens de grupo
                 if (msg.fileType === 'video_chunked') {
                     setupVideoChunkLoader(msgElement, msg.id, msg.audioData, msg.totalChunks);
                 }
@@ -2764,7 +2677,7 @@
                 simData.groups[groupId] = groupPayload;
                 saveLocalSimulationData();
                 triggerOfflineCallbacks();
-                showToast(`Grupo "${name}" criado com sucesso offline!`);
+                showToast(`Grupo "${name}" criado offline!`);
                 groupNameInput.value = '';
                 createGroupModal.classList.add('hidden');
                 openGroupChatWith(groupPayload);
@@ -2778,258 +2691,9 @@
                 createGroupModal.classList.add('hidden');
                 openGroupChatWith(groupPayload);
             } catch (err) {
-                console.error("Erro ao criar grupo no Firebase:", err);
                 showToast("Erro ao criar grupo.", "error");
             }
         });
-
-        document.getElementById('active-chat-avatar').addEventListener('click', () => {
-            if (activeFriend) {
-                const friendData = accountsMap[activeFriend.username];
-                if (friendData) showUserInfoModal(friendData);
-            }
-        });
-
-        function openChatWith(friendUsername, friendName) {
-            activeFriend = { username: friendUsername, name: friendName };
-            activeGroup = null;
-
-            document.getElementById('chat-panel').classList.remove('hidden');
-            document.getElementById('chat-panel').classList.add('flex');
-            
-            document.getElementById('chat-header').classList.remove('hidden');
-            document.getElementById('chat-input-bar').classList.remove('hidden');
-            document.getElementById('chat-placeholder').classList.add('hidden');
-            document.getElementById('group-settings-btn').classList.add('hidden');
-
-            document.getElementById('active-chat-name').innerText = friendName;
-            document.getElementById('active-chat-status').innerText = `@${friendUsername}`;
-            
-            const friendData = accountsMap[friendUsername];
-            document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(
-                friendData ? friendData.avatarType : 'initial',
-                friendData ? friendData.avatarValue : '',
-                friendName.charAt(0).toUpperCase()
-            );
-
-            if (unsubscribeMessages) unsubscribeMessages();
-            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
-
-            if (isOfflineMode) {
-                triggerOfflineCallbacks();
-                return;
-            }
-
-            const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-            unsubscribeMessages = onSnapshot(messagesCol, (snapshot) => {
-                const messagesList = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
-                    const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
-                    const isHiddenByMe = data.hiddenBy && data.hiddenBy.includes(currentUser.username);
-                    
-                    if ((isFromMeToFriend || isFromFriendToMe) && !isHiddenByMe) {
-                        messagesList.push({ id: doc.id, ...data });
-                    }
-                });
-
-                messagesList.sort((a, b) => a.timestamp - b.timestamp);
-                renderMessages(messagesList);
-            }, (error) => {
-                console.error("Erro ao carregar chat:", error);
-            });
-        }
-
-        function openGroupChatWith(group) {
-            activeGroup = group;
-            activeFriend = null;
-
-            document.getElementById('chat-panel').classList.remove('hidden');
-            document.getElementById('chat-panel').classList.add('flex');
-            
-            document.getElementById('chat-header').classList.remove('hidden');
-            document.getElementById('chat-input-bar').classList.remove('hidden');
-            document.getElementById('chat-placeholder').classList.add('hidden');
-            document.getElementById('group-settings-btn').classList.remove('hidden');
-
-            document.getElementById('active-chat-name').innerText = group.name;
-            document.getElementById('active-chat-status').innerText = `${group.members.length} membros • Criado por @${group.creator}`;
-            document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(
-                group.avatarType,
-                group.avatarValue,
-                group.name.charAt(0).toUpperCase(),
-                'from-emerald-500 to-teal-500'
-            );
-
-            setupGroupSettingsTrigger();
-
-            if (unsubscribeMessages) unsubscribeMessages();
-            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
-
-            if (isOfflineMode) {
-                triggerOfflineCallbacks();
-                return;
-            }
-
-            const groupMessagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'group_messages');
-            unsubscribeGroupMessages = onSnapshot(groupMessagesCol, (snapshot) => {
-                const messagesList = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const isHiddenByMe = data.hiddenBy && data.hiddenBy.includes(currentUser.username);
-                    if (data.groupId === activeGroup.id && !isHiddenByMe) {
-                        messagesList.push({ id: doc.id, ...data });
-                    }
-                });
-
-                messagesList.sort((a, b) => a.timestamp - b.timestamp);
-                renderGroupMessages(messagesList);
-            }, (error) => {
-                console.error("Erro ao carregar chat do grupo:", error);
-            });
-        }
-
-        function setupGroupSettingsTrigger() {
-            document.getElementById('settings-group-title').innerText = activeGroup.name;
-            document.getElementById('settings-group-creator').innerText = `Criado por @${activeGroup.creator}`;
-            
-            const isAdmin = activeGroup.creator === currentUser.username || (activeGroup.admins && activeGroup.admins.includes(currentUser.username));
-            const adminSection = document.getElementById('admin-add-member-section');
-            const adminDetailsSection = document.getElementById('admin-group-details-section');
-            
-            if (isAdmin) {
-                adminSection.classList.remove('hidden');
-                adminDetailsSection.classList.remove('hidden');
-                
-                document.getElementById('edit-group-name').value = activeGroup.name;
-                document.getElementById('edit-group-avatar-type').value = activeGroup.avatarType || 'initial';
-                document.getElementById('edit-group-avatar-value').value = activeGroup.avatarValue || '';
-                toggleGroupAvatarInputs();
-            } else {
-                adminSection.classList.add('hidden');
-                adminDetailsSection.classList.add('hidden');
-            }
-            
-            renderGroupMembers();
-        }
-
-        function toggleGroupAvatarInputs() {
-            const val = document.getElementById('edit-group-avatar-type').value;
-            const label = document.getElementById('edit-group-avatar-value-label');
-            const input = document.getElementById('edit-group-avatar-value');
-            if (val === 'initial') {
-                input.parentElement.classList.add('hidden');
-            } else {
-                input.parentElement.classList.remove('hidden');
-                if (val === 'emoji') {
-                    label.innerText = "Emoji";
-                    input.placeholder = "Ex: 🚀";
-                } else {
-                    label.innerText = "Link da Foto (URL)";
-                    input.placeholder = "Ex: https://...";
-                }
-            }
-        }
-        document.getElementById('edit-group-avatar-type').addEventListener('change', toggleGroupAvatarInputs);
-
-        function renderGroupMembers() {
-            const container = document.getElementById('group-members-container');
-            container.innerHTML = '';
-            
-            const groupAdmins = activeGroup.admins || [activeGroup.creator];
-            const currentIsAdmin = activeGroup.creator === currentUser.username || groupAdmins.includes(currentUser.username);
-
-            activeGroup.members.forEach(memberUsername => {
-                const memberData = accountsMap[memberUsername];
-                const displayName = memberData ? memberData.name : memberUsername;
-                const isCreator = memberUsername === activeGroup.creator;
-                const isMemberAdmin = groupAdmins.includes(memberUsername);
-                
-                const div = document.createElement('div');
-                div.className = "flex items-center justify-between p-2 rounded-xl bg-slate-100/50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800/40 text-xs gap-3 animate-pop-in";
-                
-                const avatarHTML = getAvatarHTML(
-                    memberData ? memberData.avatarType : 'initial',
-                    memberData ? memberData.avatarValue : '',
-                    displayName.charAt(0).toUpperCase()
-                );
-
-                const isMe = memberUsername === currentUser.username;
-                const showKickBtn = currentIsAdmin && !isMemberAdmin && !isMe;
-                const showPromoteBtn = currentIsAdmin && !isMemberAdmin && !isMe;
-
-                div.innerHTML = `
-                    <div class="flex items-center gap-2 truncate flex-1 cursor-pointer hover:opacity-85 select-none" id="member-profile-${memberUsername}">
-                        <div class="w-6 h-6 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-[10px] shrink-0 transition-all duration-300">
-                            ${avatarHTML}
-                        </div>
-                        <div class="truncate">
-                            <p class="font-bold text-slate-800 dark:text-white truncate max-w-[140px]">${displayName}</p>
-                            <p class="text-[9px] text-slate-400">@${memberUsername} ${isCreator ? '• Criador' : isMemberAdmin ? '• Admin' : ''}</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-1 shrink-0">
-                        ${showPromoteBtn ? `
-                            <button class="promote-btn text-[9px] font-bold text-indigo-500 hover:text-indigo-600 bg-indigo-500/10 hover:bg-indigo-500/20 px-2 py-1 rounded-lg border border-indigo-500/20 transition-all duration-300 active:scale-90 shrink-0" title="Promover a Administrador">
-                                +Admin
-                            </button>
-                        ` : ''}
-                        ${showKickBtn ? `
-                            <button class="kick-btn text-[9px] font-bold text-rose-500 hover:text-rose-600 bg-rose-500/10 hover:bg-rose-500/20 px-2 py-1 rounded-lg border border-rose-500/20 transition-all duration-300 active:scale-90 shrink-0">
-                                Expulsar
-                            </button>
-                        ` : ''}
-                    </div>
-                `;
-                
-                div.querySelector(`#member-profile-${memberUsername}`).addEventListener('click', () => {
-                    if (memberData) {
-                        showUserInfoModal(memberData);
-                    } else {
-                        showUserInfoModal({ username: memberUsername, name: displayName, avatarType: 'initial', avatarValue: '' });
-                    }
-                });
-
-                if (showPromoteBtn) {
-                    div.querySelector('.promote-btn').addEventListener('click', () => handlePromoteMember(memberUsername));
-                }
-
-                if (showKickBtn) {
-                    div.querySelector('.kick-btn').addEventListener('click', () => handleKickMember(memberUsername));
-                }
-                
-                container.appendChild(div);
-            });
-        }
-
-        async function handlePromoteMember(username) {
-            const groupAdmins = activeGroup.admins || [activeGroup.creator];
-            if (groupAdmins.includes(username)) return;
-
-            const updatedAdmins = [...groupAdmins, username];
-
-            if (isOfflineMode) {
-                simData.groups[activeGroup.id].admins = updatedAdmins;
-                saveLocalSimulationData();
-                triggerOfflineCallbacks();
-                showToast(`@${username} promovido a administrador offline.`);
-                setupGroupSettingsTrigger();
-                return;
-            }
-
-            try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), {
-                    ...activeGroup,
-                    admins: updatedAdmins
-                });
-                showToast(`@${username} agora é Administrador do grupo!`);
-                setupGroupSettingsTrigger();
-            } catch (err) {
-                console.error("Erro ao promover membro:", err);
-                showToast("Erro ao promover membro.", "error");
-            }
-        }
 
         async function handleKickMember(username) {
             const updatedMembers = activeGroup.members.filter(m => m !== username);
@@ -3040,7 +2704,7 @@
                 simData.groups[activeGroup.id].admins = updatedAdmins;
                 saveLocalSimulationData();
                 triggerOfflineCallbacks();
-                showToast(`Membro @${username} expulso offline.`);
+                showToast(`Membro @${username} expulso.`);
                 setupGroupSettingsTrigger();
                 return;
             }
@@ -3054,12 +2718,93 @@
                 showToast(`Membro @${username} expulso com sucesso!`);
                 setupGroupSettingsTrigger();
             } catch (err) {
-                console.error(err);
                 showToast("Erro ao expulsar membro.", "error");
             }
         }
 
-        // --- RECONSTRUTOR DINÂMICO DE VÍDEOS FATIADOS ---
+        function setupGroupSettingsTrigger() {
+            if (!activeGroup) return;
+
+            document.getElementById('settings-group-title').innerText = activeGroup.name;
+            document.getElementById('settings-group-creator').innerText = `Criado por @${activeGroup.creator}`;
+
+            const isCreator = activeGroup.creator === currentUser.username;
+            const adminSection = document.getElementById('admin-group-details-section');
+            const addMemberSection = document.getElementById('admin-add-member-section');
+
+            if (isCreator) {
+                adminSection.classList.remove('hidden');
+                addMemberSection.classList.remove('hidden');
+                document.getElementById('edit-group-name').value = activeGroup.name;
+                document.getElementById('edit-group-avatar-type').value = activeGroup.avatarType || 'initial';
+                document.getElementById('edit-group-avatar-value').value = activeGroup.avatarValue || '';
+            } else {
+                adminSection.classList.add('hidden');
+                addMemberSection.classList.add('hidden');
+            }
+
+            const membersContainer = document.getElementById('group-members-container');
+            membersContainer.innerHTML = '';
+
+            activeGroup.members.forEach(memberUsername => {
+                const memberData = accountsMap[memberUsername];
+                const displayName = memberData ? memberData.name : memberUsername;
+                
+                const isMemberCreator = activeGroup.creator === memberUsername;
+                const isMe = memberUsername === currentUser.username;
+
+                const memberRow = document.createElement('div');
+                memberRow.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-all';
+                
+                const avatarHTML = getAvatarHTML(
+                    memberData ? memberData.avatarType : 'initial',
+                    memberData ? memberData.avatarValue : '',
+                    displayName.charAt(0).toUpperCase(),
+                    'from-slate-500 to-slate-600'
+                );
+
+                let badgeHTML = '';
+                if (isMemberCreator) {
+                    badgeHTML = `<span class="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase bg-amber-500/20 text-amber-600 dark:text-amber-400">Criador</span>`;
+                }
+
+                let actionButtonHTML = '';
+                if (isCreator && !isMe) {
+                    actionButtonHTML = `
+                        <button class="kick-btn p-1 text-rose-500 hover:text-white hover:bg-rose-500 rounded-lg transition-all" title="Expulsar">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    `;
+                }
+
+                memberRow.innerHTML = `
+                    <div class="flex items-center gap-2 truncate flex-1">
+                        <div class="w-6 h-6 rounded-full overflow-hidden shrink-0">
+                            ${avatarHTML}
+                        </div>
+                        <div class="truncate text-left flex-1">
+                            <p class="text-xs font-bold text-slate-800 dark:text-white truncate inline-flex items-center gap-1.5 w-full">
+                                <span class="truncate max-w-[100px]">${displayName}</span>
+                                ${badgeHTML}
+                            </p>
+                            <p class="text-[9px] text-slate-400 dark:text-slate-500">@${memberUsername}</p>
+                        </div>
+                    </div>
+                    ${actionButtonHTML}
+                `;
+
+                if (isCreator && !isMe) {
+                    memberRow.querySelector('.kick-btn').addEventListener('click', () => {
+                        handleKickMember(memberUsername);
+                    });
+                }
+
+                membersContainer.appendChild(memberRow);
+            });
+        }
+
         function setupVideoChunkLoader(msgElement, msgId, audioData, total) {
             const container = msgElement.querySelector(`.video-chunk-player-${msgId}`);
             if (!container) return;
@@ -3071,20 +2816,9 @@
                         <div class="video-preview-clickable rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-95 transition-all duration-300 shadow-sm">
                             <video src="${cachedUrl}" controls class="max-h-60 w-full" preload="metadata"></video>
                         </div>
-                        <button class="expand-media-btn absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md" title="Ecrã Inteiro">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4m12 4V4h-4M4 16v4h4m12-4v4h-4" />
-                            </svg>
-                        </button>
                     </div>
                 `;
-                
-                // Clique rápido na prévia de cache para ecrã inteiro
                 container.querySelector('.video-preview-clickable').addEventListener('click', () => {
-                    openMediaModal(cachedUrl, 'video');
-                });
-
-                container.querySelector('.expand-media-btn').addEventListener('click', () => {
                     openMediaModal(cachedUrl, 'video');
                 });
                 return;
@@ -3126,11 +2860,6 @@
                                 <div class="video-preview-clickable rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-95 transition-all duration-300 shadow-sm">
                                     <video src="${fullBase64}" controls class="max-h-60 w-full" preload="metadata"></video>
                                 </div>
-                                <button class="expand-media-btn absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-md" title="Ecrã Inteiro">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4h4m12 4V4h-4M4 16v4h4m12-4v4h-4" />
-                                    </svg>
-                                </button>
                             </div>
                         `;
 
@@ -3140,12 +2869,7 @@
                             vidNode.play().catch(() => {});
                         }
 
-                        // Clique rápido na prévia descarregada para ecrã inteiro
                         container.querySelector('.video-preview-clickable').addEventListener('click', () => {
-                            openMediaModal(fullBase64, 'video');
-                        });
-
-                        container.querySelector('.expand-media-btn').addEventListener('click', () => {
                             openMediaModal(fullBase64, 'video');
                         });
                     } catch (e) {
@@ -3175,7 +2899,7 @@
                         updateProgressUI();
                         checkCompletion();
                     }
-                }).catch(err => console.error("Falha ao ler pedaço de vídeo:", err));
+                }).catch(err => console.error(err));
             }
         }
 
@@ -3186,7 +2910,7 @@
             
             if (!username) return;
             if (activeGroup.members.includes(username)) {
-                showToast("Usuário já é membro do grupo.", "error");
+                showToast("Usuário já é membro.", "error");
                 return;
             }
 
@@ -3217,7 +2941,6 @@
                 input.value = '';
                 setupGroupSettingsTrigger();
             } catch (err) {
-                console.error(err);
                 showToast("Erro ao convidar membro.", "error");
             }
         });
@@ -3251,7 +2974,6 @@
                 showToast("Grupo atualizado com sucesso!");
                 document.getElementById('group-settings-modal').classList.add('hidden');
             } catch (err) {
-                console.error(err);
                 showToast("Erro ao salvar configurações do grupo.", "error");
             }
         });
@@ -3282,6 +3004,7 @@
                 sender: currentUser.username,
                 timestamp: Date.now(),
                 text: text,
+                seen: false, 
                 hiddenBy: [] 
             };
 
@@ -3326,7 +3049,6 @@
                     try {
                         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgPayload);
                     } catch (err) {
-                        console.error("Erro ao enviar DM:", err);
                         showToast("Erro ao enviar mensagem.", "error");
                         return;
                     }
@@ -3343,8 +3065,7 @@
                     try {
                         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'group_messages'), msgPayload);
                     } catch (err) {
-                        console.error("Erro ao enviar mensagem no grupo:", err);
-                        showToast("Erro ao enviar mensagem no grupo.", "error");
+                        showToast("Erro ao enviar no grupo.", "error");
                         return;
                     }
                 }
@@ -3355,13 +3076,13 @@
         });
 
         const addFriendForm = document.getElementById('add-friend-form');
+        const friendSearchInput = document.getElementById('friend-search-input');
 
         addFriendForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const targetUsername = friendSearchInput.value.trim().toLowerCase();
             await executeAddFriend(targetUsername);
             friendSearchInput.value = '';
-            searchDropdown.classList.add('hidden');
         });
 
         function closeActiveChat() {
@@ -3409,7 +3130,6 @@
             panelRequests.classList.remove('hidden');
         });
 
-        // --- EDITAR PERFIL PESSOAL ---
         const profileModal = document.getElementById('profile-modal');
         const profileForm = document.getElementById('profile-form');
         const profileNameInput = document.getElementById('profile-name-input');
@@ -3448,6 +3168,42 @@
         }
         profileAvatarType.addEventListener('change', toggleProfileAvatarInputs);
 
+        document.getElementById('btn-reset-avatar').addEventListener('click', () => {
+            profileAvatarType.value = 'initial';
+            profileAvatarValue.value = '';
+            toggleProfileAvatarInputs();
+            showToast("Foto redefinida para iniciais. Guarde para confirmar.");
+        });
+
+        document.getElementById('btn-delete-account').addEventListener('click', async () => {
+            const confirmed = confirm("ATENÇÃO: Deseja realmente excluir sua conta de forma permanente? Esta operação não pode ser desfeita!");
+            if (!confirmed) return;
+
+            const targetUsername = currentUser.username;
+            
+            if (isOfflineMode) {
+                delete simData.accounts[targetUsername];
+                saveLocalSimulationData();
+                showToast("Sua conta offline foi apagada.");
+                document.getElementById('logout-btn').click();
+                profileModal.classList.add('hidden');
+                return;
+            }
+
+            try {
+                showToast("Excluindo conta...", "info");
+                const accountDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', targetUsername);
+                await deleteDoc(accountDocRef);
+                
+                showToast("Sua conta foi excluída permanentemente.");
+                localStorage.removeItem('conectachat_last_account');
+                document.getElementById('logout-btn').click();
+                profileModal.classList.add('hidden');
+            } catch (err) {
+                showToast("Erro ao excluir a conta.", "error");
+            }
+        });
+
         profileForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newName = profileNameInput.value.trim();
@@ -3468,7 +3224,7 @@
                 saveLocalSimulationData();
                 currentUser = updatedUser;
                 updateUIPersonalProfile();
-                showToast("Perfil updated offline!");
+                showToast("Perfil atualizado offline!");
                 profileModal.classList.add('hidden');
                 return;
             }
@@ -3481,12 +3237,10 @@
                 showToast("Perfil atualizado com sucesso!");
                 profileModal.classList.add('hidden');
             } catch (err) {
-                console.error("Erro ao salvar perfil:", err);
                 showToast("Erro ao salvar perfil.", "error");
             }
         });
 
-        // --- SISTEMA DE SELEÇÃO DE TEMA ---
         function toggleTheme() {
             if (document.documentElement.classList.contains('dark')) {
                 document.documentElement.classList.remove('dark');
@@ -3523,7 +3277,6 @@
         window.addEventListener('focus', () => { isWindowFocused = true; });
         window.addEventListener('blur', () => { isWindowFocused = false; });
 
-        // --- CONEXÃO AO FIREBASE E INICIALIZAÇÃO ---
         window.onload = function() {
             setupFavicon();
             renderLanguages();
@@ -3543,7 +3296,6 @@
                 } catch (e) {}
             }
 
-            // Testar conexão com o servidor
             const connectedRef = doc(db, 'artifacts', appId, 'public', 'data', 'status', 'connection');
             setStatusBanner('checking', getTranslation('verifyingConnection'));
             
@@ -3552,33 +3304,30 @@
                 isConnected = true;
                 setStatusBanner('real', getTranslation('connectedFirebase'));
                 startAccountsListener();
-            }).catch((err) => {
-                console.warn("Conexão ao Firebase falhou, ativando fallback offline:", err);
+            }).catch(() => {
                 activateOfflineFallback();
             });
 
-            // Fallback se demorar mais que 4s para responder
             setTimeout(() => {
                 if (!isConnected) {
                     activateOfflineFallback();
                 }
             }, 4000);
 
-            // Gerenciar sessão do Firebase de forma silenciosa e transparente
             onAuthStateChanged(auth, async (firebaseUser) => {
                 if (firebaseUser) {
                     const savedToken = localStorage.getItem('conectachat_last_account');
                     if (savedToken && !currentUser) {
                         try {
-                            const saved = JSON.parse(savedToken);
-                            const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', saved.username);
+                            const savedObj = JSON.parse(savedToken);
+                            const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', savedObj.username);
                             const userSnap = await getDoc(userDocRef);
-                            if (userSnap.exists() && userSnap.data().password === saved.password) {
+                            if (userSnap.exists() && userSnap.data().password === savedObj.password) {
                                 currentUser = userSnap.data();
                                 enterApplication();
                             }
                         } catch (e) {
-                            console.warn("Erro ao restaurar última sessão ativa:", e);
+                            console.warn("Sessão não restaurada:", e);
                         }
                     }
                 } else {
@@ -3589,13 +3338,245 @@
                             await signInAnonymously(auth);
                         }
                     } catch (e) {
-                        console.error("Erro ao autenticar anonimamente:", e);
+                        console.error("Erro de Auth:", e);
                     }
                 }
             });
         };
 
-        // Botão de retornar do chat no Mobile
+        async function handleToggleBlock() {
+            if (!activeFriend) return;
+            const target = activeFriend.username;
+            const blockedList = currentUser.blockedUsers || [];
+            const isBlocked = blockedList.includes(target);
+            
+            let updatedBlocked;
+            if (isBlocked) {
+                updatedBlocked = blockedList.filter(u => u !== target);
+                showToast(`@${target} foi desbloqueado.`);
+            } else {
+                updatedBlocked = [...blockedList, target];
+                showToast(`@${target} foi bloqueado com sucesso.`);
+            }
+            
+            currentUser.blockedUsers = updatedBlocked;
+            updateUIPersonalProfile();
+            
+            if (isOfflineMode) {
+                simData.accounts[currentUser.username].blockedUsers = updatedBlocked;
+                saveLocalSimulationData();
+                triggerOfflineCallbacks();
+                updateBlockButtonUI();
+                return;
+            }
+            
+            try {
+                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', currentUser.username);
+                await updateDoc(userRef, { blockedUsers: updatedBlocked });
+                updateBlockButtonUI();
+            } catch (err) {
+                console.error("Erro ao alternar bloqueio:", err);
+            }
+        }
+
+        function updateBlockButtonUI() {
+            const blockBtn = document.getElementById('block-chat-btn');
+            if (!blockBtn) return;
+            
+            if (activeFriend) {
+                blockBtn.classList.remove('hidden');
+                const blockedList = currentUser.blockedUsers || [];
+                const isBlocked = blockedList.includes(activeFriend.username);
+                
+                if (isBlocked) {
+                    blockBtn.innerText = "Desbloquear";
+                    blockBtn.className = "text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 transition-all active:scale-95";
+                    
+                    document.getElementById('message-input').disabled = true;
+                    document.getElementById('message-input').placeholder = "Desbloqueie este utilizador para conversar...";
+                    document.getElementById('record-audio-btn').disabled = true;
+                    document.getElementById('attach-file-btn').disabled = true;
+                } else {
+                    blockBtn.innerText = "Bloquear";
+                    blockBtn.className = "text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-700 dark:text-rose-400 hover:text-white border border-rose-500/20 transition-all active:scale-95";
+                    
+                    document.getElementById('message-input').disabled = false;
+                    document.getElementById('message-input').placeholder = "Escreva sua mensagem aqui...";
+                    document.getElementById('record-audio-btn').disabled = false;
+                    document.getElementById('attach-file-btn').disabled = false;
+                }
+            } else {
+                blockBtn.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('block-chat-btn').addEventListener('click', handleToggleBlock);
+
+        async function handleClearChat() {
+            if (!activeFriend && !activeGroup) return;
+            const isGroup = !!activeGroup;
+            const collectionName = isGroup ? 'group_messages' : 'messages';
+            const messagesToHide = isGroup ? activeGroupMessagesListCached : activeMessagesListCached;
+
+            if (messagesToHide.length === 0) {
+                showToast("Nenhuma mensagem para limpar.", "info");
+                return;
+            }
+
+            if (isOfflineMode) {
+                messagesToHide.forEach(msg => {
+                    if (!msg.hiddenBy) msg.hiddenBy = [];
+                    if (!msg.hiddenBy.includes(currentUser.username)) {
+                        msg.hiddenBy.push(currentUser.username);
+                    }
+                });
+                saveLocalSimulationData();
+                triggerOfflineCallbacks();
+                showToast("Conversa limpa com sucesso!");
+                return;
+            }
+
+            try {
+                showToast("Limpando conversa...", "info");
+                for (const msg of messagesToHide) {
+                    const msgRef = doc(db, 'artifacts', appId, 'public', 'data', collectionName, msg.id);
+                    const currentHiddenBy = msg.hiddenBy || [];
+                    if (!currentHiddenBy.includes(currentUser.username)) {
+                        await updateDoc(msgRef, {
+                            hiddenBy: [...currentHiddenBy, currentUser.username]
+                        });
+                    }
+                }
+                showToast("Conversa limpa com sucesso!");
+            } catch (err) {
+                showToast("Erro ao limpar chat.", "error");
+            }
+        }
+
+        document.getElementById('clear-chat-btn').addEventListener('click', handleClearChat);
+
+        function openChatWith(friendUsername, friendName) {
+            activeFriend = { username: friendUsername, name: friendName };
+            activeGroup = null;
+
+            document.getElementById('chat-panel').classList.remove('hidden');
+            document.getElementById('chat-panel').classList.add('flex');
+            
+            document.getElementById('chat-header').classList.remove('hidden');
+            document.getElementById('chat-input-bar').classList.remove('hidden');
+            document.getElementById('chat-placeholder').classList.add('hidden');
+            document.getElementById('group-settings-btn').classList.add('hidden');
+
+            document.getElementById('clear-chat-btn').classList.remove('hidden');
+            updateBlockButtonUI();
+
+            document.getElementById('active-chat-name').innerText = friendName;
+            document.getElementById('active-chat-status').innerText = `@${friendUsername}`;
+            
+            const friendData = accountsMap[friendUsername];
+            document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(
+                friendData ? friendData.avatarType : 'initial',
+                friendData ? friendData.avatarValue : '',
+                friendName.charAt(0).toUpperCase()
+            );
+
+            if (unsubscribeMessages) unsubscribeMessages();
+            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
+
+            if (isOfflineMode) {
+                triggerOfflineCallbacks();
+                return;
+            }
+
+            const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+            unsubscribeMessages = onSnapshot(messagesCol, (snapshot) => {
+                const messagesList = [];
+                const blockedList = currentUser.blockedUsers || [];
+                
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
+                    const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
+                    const isHiddenByMe = data.hiddenBy && data.hiddenBy.includes(currentUser.username);
+                    
+                    const isSenderBlocked = !isFromMeToFriend && blockedList.includes(data.sender);
+
+                    if ((isFromMeToFriend || isFromFriendToMe) && !isHiddenByMe && !isSenderBlocked) {
+                        messagesList.push({ id: docSnap.id, ...data });
+                        
+                        if (isFromFriendToMe && !data.seen) {
+                            const mRef = doc(db, 'artifacts', appId, 'public', 'data', 'messages', docSnap.id);
+                            updateDoc(mRef, { seen: true }).catch(e => console.debug(e));
+                        }
+                    }
+                });
+
+                messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                activeMessagesListCached = messagesList;
+                renderMessages(messagesList);
+            }, (error) => {
+                console.error("Erro ao carregar chat:", error);
+            });
+        }
+
+        function openGroupChatWith(group) {
+            activeGroup = group;
+            activeFriend = null;
+
+            document.getElementById('chat-panel').classList.remove('hidden');
+            document.getElementById('chat-panel').classList.add('flex');
+            
+            document.getElementById('chat-header').classList.remove('hidden');
+            document.getElementById('chat-input-bar').classList.remove('hidden');
+            document.getElementById('chat-placeholder').classList.add('hidden');
+            document.getElementById('group-settings-btn').classList.remove('hidden');
+
+            document.getElementById('clear-chat-btn').classList.add('hidden');
+            document.getElementById('block-chat-btn').classList.add('hidden');
+
+            document.getElementById('message-input').disabled = false;
+            document.getElementById('message-input').placeholder = "Escreva sua mensagem aqui...";
+            document.getElementById('record-audio-btn').disabled = false;
+            document.getElementById('attach-file-btn').disabled = false;
+
+            document.getElementById('active-chat-name').innerText = group.name;
+            document.getElementById('active-chat-status').innerText = `${group.members.length} membros • Criado por @${group.creator}`;
+            document.getElementById('active-chat-avatar').innerHTML = getAvatarHTML(
+                group.avatarType,
+                group.avatarValue,
+                group.name.charAt(0).toUpperCase(),
+                'from-emerald-500 to-teal-500'
+            );
+
+            setupGroupSettingsTrigger();
+
+            if (unsubscribeMessages) unsubscribeMessages();
+            if (unsubscribeGroupMessages) unsubscribeGroupMessages();
+
+            if (isOfflineMode) {
+                triggerOfflineCallbacks();
+                return;
+            }
+
+            const groupMessagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'group_messages');
+            unsubscribeGroupMessages = onSnapshot(groupMessagesCol, (snapshot) => {
+                const messagesList = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const isHiddenByMe = data.hiddenBy && data.hiddenBy.includes(currentUser.username);
+                    if (data.groupId === activeGroup.id && !isHiddenByMe) {
+                        messagesList.push({ id: docSnap.id, ...data });
+                    }
+                });
+
+                messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                activeGroupMessagesListCached = messagesList;
+                renderGroupMessages(messagesList);
+            }, (error) => {
+                console.error("Erro ao carregar chat do grupo:", error);
+            });
+        }
+
         document.getElementById('chat-back-btn').addEventListener('click', () => {
             document.getElementById('chat-panel').classList.add('hidden');
             document.getElementById('chat-panel').classList.remove('flex');
@@ -3604,7 +3585,6 @@
             startUserSession();
         });
 
-        // Logout de Utilizador
         document.getElementById('logout-btn').addEventListener('click', () => {
             currentUser = null;
             activeFriend = null;
