@@ -223,17 +223,28 @@
                 </div>
             </div>
 
-            <!-- Adicionar Amigo -->
-            <div class="flex-1 max-w-md min-w-[240px] relative">
-                <form id="add-friend-form" class="relative flex items-center">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <span class="text-slate-400 text-sm">@</span>
+            <!-- Adicionar Amigo + Botão de Mostrar Todos -->
+            <div class="flex-1 max-w-md min-w-[240px] flex gap-2 relative">
+                <div class="relative flex-1">
+                    <form id="add-friend-form" class="relative flex items-center">
+                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <span class="text-slate-400 text-sm">@</span>
+                        </div>
+                        <input id="friend-search-input" type="text" autocomplete="off" placeholder="Adicionar amigo pelo utilizador..." required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-24 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300">
+                        <button type="submit" id="btn-add-action" class="absolute right-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-semibold px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider border border-emerald-500/30 transition-all duration-300 active:scale-95">
+                            Adicionar
+                        </button>
+                    </form>
+                    
+                    <!-- Menu Suspenso de Sugestões de Pesquisa (Corrigido e adicionado no HTML) -->
+                    <div id="search-dropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl max-h-52 overflow-y-auto z-50 p-1 divide-y divide-slate-100 dark:divide-slate-800">
+                        <!-- Utilizadores encontrados injetados aqui -->
                     </div>
-                    <input id="friend-search-input" type="text" autocomplete="off" placeholder="Adicionar amigo pelo utilizador..." required class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-24 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300">
-                    <button type="submit" id="btn-add-action" class="absolute right-1.5 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white dark:hover:text-slate-950 font-semibold px-3 py-1 rounded-lg text-[10px] uppercase tracking-wider border border-emerald-500/30 transition-all duration-300 active:scale-95">
-                        Adicionar
-                    </button>
-                </form>
+                </div>
+                
+                <button id="show-all-users-btn" type="button" class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-700 dark:text-indigo-300 hover:text-white border border-indigo-500/30 font-semibold px-3.5 py-2 rounded-xl text-xs transition-all duration-300 active:scale-95 whitespace-nowrap">
+                    Todos
+                </button>
             </div>
 
             <div class="flex items-center gap-2">
@@ -434,7 +445,7 @@
                     <button id="info-modal-action-btn" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2.5 rounded-xl shadow-lg transition-all active:scale-95 text-xs">
                         Adicionar Amigo
                     </button>
-                    <!-- NOVO: Botão Desfazer Amizade -->
+                    <!-- Botão Desfazer Amizade -->
                     <button id="info-modal-unfriend-btn" class="hidden w-full bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/20 font-bold py-2.5 rounded-xl text-xs transition-all active:scale-95">
                         Desfazer Amizade
                     </button>
@@ -502,7 +513,7 @@
                         Limpar Foto
                     </button>
                 </div>
-                <!-- NOVO: Botão Excluir Conta Permanentemente -->
+                <!-- Botão Excluir Conta Permanentemente -->
                 <div class="border-t border-slate-100 dark:border-slate-800 pt-4 mt-2">
                     <button type="button" id="btn-delete-account" class="w-full bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/20 hover:border-rose-600 font-bold py-3 rounded-xl text-xs transition-all duration-300 active:scale-95">
                         Excluir Minha Conta Permanentemente
@@ -1314,26 +1325,38 @@
         document.getElementById('record-audio-btn').addEventListener('click', toggleVoiceRecording);
 
         function getAvatarHTML(type, value, initial, fallbackBg = 'from-indigo-500 to-indigo-600') {
-            if (type === 'emoji' && value) {
+            let cleanValue = value ? value.trim() : '';
+            if (type === 'emoji' && cleanValue) {
                 return `
                     <div class="w-full h-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-lg">
-                        ${value}
+                        ${cleanValue}
                     </div>
                 `;
-            } else if (type === 'url' && value && (value.startsWith('http://') || value.startsWith('https://'))) {
-                return `
-                    <div class="w-full h-full relative">
-                        <img src="${value}" class="w-full h-full object-cover relative z-10" onerror="this.style.display='none';">
-                        <div class="absolute inset-0 flex w-full h-full bg-gradient-to-tr ${fallbackBg} text-white items-center justify-center font-bold z-0">${initial}</div>
-                    </div>
-                `;
-            } else {
-                return `
-                    <div class="w-full h-full bg-gradient-to-tr ${fallbackBg} text-white flex items-center justify-center font-bold">
-                        ${initial}
-                    </div>
-                `;
+            } else if (type === 'url' && cleanValue) {
+                const isDataUrl = cleanValue.startsWith('data:image/');
+                // Normaliza URLs que omitem o protocolo (ex: www.site.com ou site.com/foto.jpg)
+                if (!isDataUrl && !/^https?:\/\//i.test(cleanValue) && (cleanValue.includes('.') || cleanValue.includes('/'))) {
+                    if (cleanValue.startsWith('//')) {
+                        cleanValue = 'https:' + cleanValue;
+                    } else {
+                        cleanValue = 'https://' + cleanValue;
+                    }
+                }
+                
+                if (isDataUrl || /^https?:\/\//i.test(cleanValue)) {
+                    return `
+                        <div class="w-full h-full relative">
+                            <img src="${cleanValue}" class="w-full h-full object-cover relative z-10" onerror="this.style.display='none';">
+                            <div class="absolute inset-0 flex w-full h-full bg-gradient-to-tr ${fallbackBg} text-white items-center justify-center font-bold z-0">${initial}</div>
+                        </div>
+                    `;
+                }
             }
+            return `
+                <div class="w-full h-full bg-gradient-to-tr ${fallbackBg} text-white flex items-center justify-center font-bold">
+                    ${initial}
+                </div>
+            `;
         }
 
         function updateUIPersonalProfile() {
@@ -2971,7 +2994,7 @@
 
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), updatedGroup);
-                showToast("Grupo atualizado com sucesso!");
+                showToast("Grupo updated com sucesso!");
                 document.getElementById('group-settings-modal').classList.add('hidden');
             } catch (err) {
                 showToast("Erro ao salvar configurações do grupo.", "error");
@@ -3077,12 +3100,92 @@
 
         const addFriendForm = document.getElementById('add-friend-form');
         const friendSearchInput = document.getElementById('friend-search-input');
+        const searchDropdown = document.getElementById('search-dropdown');
+        const showAllUsersBtn = document.getElementById('show-all-users-btn');
 
         addFriendForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const targetUsername = friendSearchInput.value.trim().toLowerCase();
             await executeAddFriend(targetUsername);
             friendSearchInput.value = '';
+            searchDropdown.classList.add('hidden');
+        });
+
+        // Preenche e exibe a lista suspensa de utilizadores encontrados
+        function fillSearchDropdown(usersList) {
+            searchDropdown.innerHTML = '';
+            if (usersList.length === 0) {
+                searchDropdown.innerHTML = `<div class="p-3 text-xs text-slate-400 dark:text-slate-500 italic text-center">Nenhum utilizador encontrado</div>`;
+            } else {
+                usersList.forEach(acc => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between p-2 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-xl cursor-pointer transition-all duration-200';
+                    const avatarHTML = getAvatarHTML(acc.avatarType, acc.avatarValue, acc.name.charAt(0).toUpperCase());
+                    
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2 truncate flex-1 info-trigger">
+                            <div class="w-7 h-7 rounded-full relative overflow-hidden font-bold flex items-center justify-center text-[10px] shrink-0 transition-all duration-300">
+                                ${avatarHTML}
+                            </div>
+                            <div class="truncate text-left flex-1">
+                                <p class="text-xs font-bold text-slate-800 dark:text-white truncate">${acc.name}</p>
+                                <p class="text-[9px] text-slate-400 dark:text-slate-500">@${acc.username}</p>
+                            </div>
+                        </div>
+                        <button type="button" class="add-quick-btn p-1 text-slate-400 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all" title="Adicionar Rápido">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                    `;
+
+                    item.querySelector('.info-trigger').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showUserInfoModal(acc);
+                        searchDropdown.classList.add('hidden');
+                    });
+
+                    item.querySelector('.add-quick-btn').addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        await executeAddFriend(acc.username);
+                        searchDropdown.classList.add('hidden');
+                    });
+
+                    searchDropdown.appendChild(item);
+                });
+            }
+            searchDropdown.classList.remove('hidden');
+        }
+
+        // Filtra em tempo real à medida que digita
+        friendSearchInput.addEventListener('input', () => {
+            const queryVal = friendSearchInput.value.trim().toLowerCase();
+            if (!queryVal) {
+                searchDropdown.classList.add('hidden');
+                return;
+            }
+
+            const matchedUsers = Object.values(accountsMap).filter(acc => 
+                acc.username.startsWith(queryVal) || 
+                (acc.name && acc.name.toLowerCase().includes(queryVal))
+            );
+
+            fillSearchDropdown(matchedUsers);
+        });
+
+        // Mostra todos os utilizadores ao carregar o botão "Todos" (exceto a si próprio)
+        showAllUsersBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (!currentUser) return;
+            const allUsers = Object.values(accountsMap).filter(acc => acc.username !== currentUser.username);
+            fillSearchDropdown(allUsers);
+        });
+
+        // Oculta a dropdown de pesquisa ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!addFriendForm.contains(e.target) && e.target !== showAllUsersBtn) {
+                searchDropdown.classList.add('hidden');
+            }
         });
 
         function closeActiveChat() {
@@ -3234,7 +3337,7 @@
                 await setDoc(userRef, updatedUser);
                 currentUser = updatedUser;
                 updateUIPersonalProfile();
-                showToast("Perfil atualizado com sucesso!");
+                showToast("Perfil updated com sucesso!");
                 profileModal.classList.add('hidden');
             } catch (err) {
                 showToast("Erro ao salvar perfil.", "error");
