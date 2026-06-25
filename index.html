@@ -2,7 +2,7 @@
 <html lang="pt-PT" class="h-full dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ConectaChat | Conversas & Amizades</title>
     <!-- Tailwind CSS com suporte a Modo Escuro por classe -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -46,7 +46,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         html, body {
-            height: 100%;
+            height: 100dvh;
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -69,7 +69,7 @@
         }
     </style>
 </head>
-<body class="h-full flex flex-col bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
+<body class="h-[100dvh] flex flex-col bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
@@ -229,8 +229,8 @@
                 </div>
             </div>
 
-            <!-- Adicionar Amigo + Botão de Mostrar Todos -->
-            <div class="flex-1 max-w-md min-w-[240px] flex gap-2 relative">
+            <!-- Pesquisa de Amigo Principal -->
+            <div id="topbar-search-wrapper" class="flex-1 max-w-md min-w-[240px] flex gap-2 relative">
                 <div class="relative flex-1">
                     <form id="add-friend-form" class="relative flex items-center">
                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -269,9 +269,12 @@
         </header>
 
         <!-- Corpo Principal -->
-        <main class="flex-1 flex overflow-hidden relative">
+        <main class="flex-1 flex overflow-hidden relative h-full">
             <!-- LATERAL: Contatos, Amigos, Grupos e Pedidos -->
             <aside id="sidebar-panel" class="w-full md:w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full shrink-0 z-20 transition-all duration-300 overflow-hidden">
+                <!-- Barra de Pesquisa Injetada para o Modo WhatsApp -->
+                <div id="whatsapp-search-container" class="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/55 hidden shrink-0"></div>
+
                 <div class="flex border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 shrink-0">
                     <button id="tab-friends" class="flex-1 py-3 text-center text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500 transition-all duration-300">
                         Amigos (<span id="count-friends">0</span>)
@@ -336,7 +339,7 @@
             </aside>
 
             <!-- AREA PRINCIPAL: Chat de Conversa -->
-            <section id="chat-panel" class="absolute inset-0 md:relative md:flex flex-1 flex flex-col bg-white dark:bg-slate-950 z-10 hidden transition-all duration-300">
+            <section id="chat-panel" class="absolute inset-0 md:relative md:flex flex-1 flex flex-col bg-white dark:bg-slate-950 z-10 hidden transition-all duration-300 h-full overflow-hidden">
                 <!-- Chat Selecionado / Header -->
                 <div id="chat-header" class="hidden bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800/80 px-4 py-3 flex items-center justify-between animate-fade-in shrink-0">
                     <div class="flex items-center gap-3">
@@ -372,7 +375,7 @@
                 </div>
 
                 <!-- Feed de Mensagens -->
-                <div id="chat-messages" class="flex-1 scrollable-panel p-4 space-y-3 no-scrollbar flex flex-col">
+                <div id="chat-messages" class="flex-1 scrollable-panel p-4 space-y-3 no-scrollbar flex flex-col h-full overflow-y-auto">
                     <div id="chat-placeholder" class="flex-1 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 p-8 animate-pop-in">
                         <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mb-4">
                             <svg class="w-8 h-8 text-indigo-500 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -401,10 +404,11 @@
                     </button>
                 </div>
 
-                <input type="file" id="media-file-input" class="hidden" accept="image/*,video/*">
+                <!-- Modificado accept para permitir qualquer formato de ficheiro -->
+                <input type="file" id="media-file-input" class="hidden" accept="*">
 
                 <!-- Barra de envio de mensagens -->
-                <div id="chat-input-bar" class="hidden p-3 bg-slate-50/40 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800/80 animate-fade-in shrink-0">
+                <div id="chat-input-bar" class="hidden p-3 bg-slate-50/40 dark:bg-slate-900/40 border-t border-slate-200 dark:border-slate-800/80 animate-fade-in shrink-0 mb-safe">
                     <form id="chat-form" class="flex items-center gap-2">
                         <button id="record-audio-btn" type="button" class="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/50 transition-all flex items-center justify-center shrink-0 active:scale-90" aria-label="Gravar áudio" title="Gravar áudio">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -512,7 +516,7 @@
                     <input id="profile-avatar-value" type="text" placeholder="Ex: 🚀 ou https://..." class="mt-1 block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all">
                 </div>
                 
-                <!-- Nova Configuração: Modo WhatsApp -->
+                <!-- Configuração: Modo WhatsApp -->
                 <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
                     <label class="flex items-center justify-between cursor-pointer py-1">
                         <div class="flex flex-col text-left">
@@ -791,8 +795,8 @@
                 connectedFirebase: "Conectado ao Firebase Cloud Server",
                 offlineModeActive: "MODO OFFLINE ATIVO: Conta predefinida @{name} criada automaticamente!",
                 toastOfflineGuestCreated: "Bypass ativo: Conta de convidado gerada com sucesso!",
-                toastLimitExceeded: "O arquivo de imagem excede o limite de 1.5MB.",
-                toastVideoLimitExceeded: "O vídeo ultrapassa o limite de 7 minutos.",
+                toastLimitExceeded: "O arquivo excede o limite de tamanho.",
+                toastVideoLimitExceeded: "O vídeo ultrapassa o limite de 10 minutos.",
                 toastCompressionError: "Erro ao processar e comprimir o vídeo para 480p.",
                 toastMicError: "Não foi possível aceder ao microfone ou gravação não suportada.",
                 audioRecordStart: "Gravação de áudio iniciada...",
@@ -836,8 +840,8 @@
                 connectedFirebase: "Connected to Firebase Cloud Server",
                 offlineModeActive: "OFFLINE MODE ACTIVE: Preset account @{name} created automatically!",
                 toastOfflineGuestCreated: "Guest account generated successfully!",
-                toastLimitExceeded: "The image file exceeds the 1.5MB limit.",
-                toastVideoLimitExceeded: "The video exceeds the 7 minutes limit.",
+                toastLimitExceeded: "The file exceeds the size limit.",
+                toastVideoLimitExceeded: "The video exceeds the 10 minutes limit.",
                 toastCompressionError: "Error processing and compressing video.",
                 toastMicError: "Unable to access microphone.",
                 audioRecordStart: "Audio recording started...",
@@ -1416,7 +1420,7 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const max_size = 800;
+                        const max_size = 1200; // Aumentado limite para screenshots de alta densidade
                         if (width > height) {
                             if (width > max_size) {
                                 height *= max_size / width;
@@ -1431,8 +1435,13 @@
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
+
+                        // FIX ECRÃ PRETO: Preencher com fundo branco sólido antes de desenhar a imagem transparentes (PNG/Capturas)
+                        ctx.fillStyle = "#FFFFFF";
+                        ctx.fillRect(0, 0, width, height);
+
                         ctx.drawImage(img, 0, 0, width, height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7); 
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8); 
                         resolve({ base64: dataUrl, type: 'image' });
                     };
                     img.onerror = err => reject(err);
@@ -1530,7 +1539,7 @@
                 
                 video.onloadedmetadata = async () => {
                     const duration = video.duration;
-                    if (duration > 420) { 
+                    if (duration > 600) { 
                         video.remove();
                         reject(new Error("duration_exceeded"));
                         return;
@@ -1659,20 +1668,43 @@
 
         attachFileBtn.addEventListener('click', () => mediaFileInput.click());
 
-        mediaFileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
+        // Lógica unificada para gerir colagens e ficheiros de qualquer tipo
+        async function processFile(file) {
             if (!file) return;
 
+            const isImage = file.type.startsWith('image/');
             const isVideo = file.type.startsWith('video/');
+            const isAudio = file.type.startsWith('audio/');
+            const isGif = file.type === 'image/gif';
 
-            if (!isVideo) {
-                if (file.size > 1.5 * 1024 * 1024) {
-                    showToast(getTranslation('toastLimitExceeded'), "error");
-                    mediaFileInput.value = '';
-                    return;
-                }
-                showToast("A processar anexo...", "info");
-                try {
+            // Limite de 8MB para garantir estabilidade no Firestore/Sessão
+            if (file.size > 8 * 1024 * 1024) {
+                showToast("O arquivo excede o limite máximo de 8MB.", "error");
+                return;
+            }
+
+            showToast("A processar arquivo...", "info");
+
+            try {
+                // Caso seja GIF animado ou Figurinhas (não passa pelo Canvas para preservar animação)
+                if (isGif) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        selectedFilePayload = {
+                            base64: reader.result,
+                            type: 'image',
+                            name: file.name,
+                            size: (file.size / 1024).toFixed(1) + " KB"
+                        };
+                        filePreviewName.innerText = file.name;
+                        filePreviewSize.innerText = selectedFilePayload.size;
+                        filePreviewContainer.innerHTML = `<img src="${selectedFilePayload.base64}" class="w-full h-full object-cover">`;
+                        filePreviewBar.classList.remove('hidden');
+                    };
+                } 
+                // Imagens convencionais e Screenshots (PNG, JPG)
+                else if (isImage) {
                     const res = await compressAndConvertToBase64(file);
                     selectedFilePayload = {
                         base64: res.base64,
@@ -1684,13 +1716,9 @@
                     filePreviewSize.innerText = selectedFilePayload.size;
                     filePreviewContainer.innerHTML = `<img src="${selectedFilePayload.base64}" class="w-full h-full object-cover">`;
                     filePreviewBar.classList.remove('hidden');
-                } catch (err) {
-                    showToast("Erro ao processar imagem.", "error");
-                    clearSelectedFile();
-                }
-            } else {
-                showToast("A analisar metadados do vídeo...", "info");
-                try {
+                } 
+                // Ficheiros de Vídeo
+                else if (isVideo) {
                     const result = await compressVideoTo480p(file);
                     selectedFilePayload = {
                         base64: result.base64,
@@ -1700,19 +1728,81 @@
                         size: "480p Comprimido"
                     };
                     filePreviewName.innerText = file.name;
-                    filePreviewSize.innerText = "Pronto para fatiar";
+                    filePreviewSize.innerText = "Vídeo pronto";
                     filePreviewContainer.innerHTML = `<video src="${result.base64}" class="w-full h-full object-cover" muted autoplay loop></video>`;
                     filePreviewBar.classList.remove('hidden');
-                } catch (err) {
-                    if (err.message === "duration_exceeded") {
-                        showToast(getTranslation('toastVideoLimitExceeded'), "error");
-                    } else {
-                        showToast(getTranslation('toastCompressionError'), "error");
-                    }
-                    clearSelectedFile();
                 }
+                // Ficheiros de Áudio
+                else if (isAudio) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        selectedFilePayload = {
+                            base64: reader.result,
+                            type: 'audio',
+                            name: file.name,
+                            size: (file.size / 1024).toFixed(1) + " KB"
+                        };
+                        filePreviewName.innerText = file.name;
+                        filePreviewSize.innerText = selectedFilePayload.size;
+                        filePreviewContainer.innerHTML = `
+                            <div class="text-indigo-500 dark:text-indigo-400">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                </svg>
+                            </div>
+                        `;
+                        filePreviewBar.classList.remove('hidden');
+                    };
+                }
+                // Qualquer outro arquivo genérico (Zip, PDF, TXT, APK, etc.)
+                else {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => {
+                        selectedFilePayload = {
+                            base64: reader.result,
+                            type: 'file',
+                            name: file.name,
+                            size: (file.size / 1024).toFixed(1) + " KB"
+                        };
+                        filePreviewName.innerText = file.name;
+                        filePreviewSize.innerText = selectedFilePayload.size;
+                        filePreviewContainer.innerHTML = `
+                            <div class="text-emerald-500 dark:text-emerald-400">
+                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                        `;
+                        filePreviewBar.classList.remove('hidden');
+                    };
+                }
+            } catch (err) {
+                showToast("Erro ao carregar o arquivo.", "error");
+                clearSelectedFile();
             }
             document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+        }
+
+        mediaFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            processFile(file);
+        });
+
+        // Suporte a COLAR do Teclado (Copiar e colar Screenshots, GIFs e Figurinhas do Clipboard)
+        document.addEventListener('paste', (e) => {
+            if (!currentUser || (!activeFriend && !activeGroup)) return;
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let index in items) {
+                const item = items[index];
+                if (item.kind === 'file') {
+                    const file = item.getAsFile();
+                    processFile(file);
+                    e.preventDefault();
+                    break;
+                }
+            }
         });
 
         cancelFileBtn.addEventListener('click', clearSelectedFile);
@@ -1767,6 +1857,9 @@
             const chat = document.getElementById('chat-panel');
             const topbar = document.getElementById('app-topbar');
             const backBtn = document.getElementById('chat-back-btn');
+            
+            const mainSearch = document.getElementById('topbar-search-wrapper');
+            const waSearch = document.getElementById('whatsapp-search-container');
 
             if (!sidebar || !chat || !currentUser) return;
 
@@ -1774,17 +1867,23 @@
 
             if (waActive) {
                 // Modo WhatsApp ativado
-                topbar.classList.add('hidden'); // Esconder barra do topo padrão para focar nos chats
-                backBtn.classList.remove('md:hidden'); // Garantir que botão de voltar sempre apareça no desktop e móvel
+                topbar.classList.add('hidden'); 
+                backBtn.classList.remove('md:hidden'); 
+
+                // Mover campo de busca para o topo da barra lateral para não perder a funcionalidade
+                if (mainSearch && waSearch && waSearch.children.length === 0) {
+                    waSearch.appendChild(mainSearch);
+                    waSearch.classList.remove('hidden');
+                }
 
                 if (activeFriend || activeGroup) {
-                    // Chat aberto: cobre 100% da tela e esconde a barra lateral
+                    // Chat aberto ocupa 100% da tela e barra lateral some
                     sidebar.classList.add('hidden');
                     sidebar.classList.remove('md:block', 'md:w-80');
                     chat.classList.remove('hidden');
                     chat.classList.add('flex');
                 } else {
-                    // Nenhum chat ativo: mostra apenas a barra lateral cobrindo toda a tela
+                    // Nenhum chat ativo mostra apenas a barra lateral em ecrã cheio
                     sidebar.classList.remove('hidden');
                     sidebar.classList.remove('md:block', 'md:w-80');
                     sidebar.classList.add('w-full');
@@ -1794,7 +1893,16 @@
             } else {
                 // Layout padrão clássico restabelecido
                 topbar.classList.remove('hidden');
-                backBtn.classList.add('md:hidden'); // Esconde o botão de voltar no desktop padrão
+                backBtn.classList.add('md:hidden'); 
+
+                // Devolver barra de pesquisa para a topbar
+                if (mainSearch && waSearch && topbar.contains(waSearch)) {
+                    // sem ação se já estiver lá
+                } else if (mainSearch && topbar) {
+                    const logoutBtn = document.getElementById('logout-btn');
+                    topbar.insertBefore(mainSearch, logoutBtn.parentNode);
+                    waSearch.classList.add('hidden');
+                }
 
                 sidebar.classList.remove('hidden', 'w-full');
                 sidebar.classList.add('md:w-80');
@@ -1893,7 +2001,6 @@
         }
 
         function applyWhitespaceFixForMobile() {
-            // Garante o redimensionamento dinâmico sem prejudicar a rolagem nos celulares
             applyWhatsappModeClasses();
         }
 
@@ -2194,7 +2301,7 @@
                                 const isViewingSender = activeFriend && activeFriend.username === data.sender;
                                 if (!isWindowFocused || !isViewingSender) {
                                     const senderName = accountsMap[data.sender]?.name || data.sender;
-                                    const bodyText = data.fileData ? `${senderName} lhe enviou um anexo` : `${senderName}: ${data.text}`;
+                                    const bodyText = data.fileType ? `${senderName} lhe enviou um ficheiro` : `${senderName}: ${data.text}`;
                                     sendSystemNotification("ConectaChat", bodyText, () => {
                                         openChatWith(data.sender, senderName);
                                     });
@@ -2221,7 +2328,7 @@
                                     const senderName = data.senderName || accountsMap[data.sender]?.name || data.sender;
                                     const groupItem = activeGroupList.find(g => g.id === data.groupId);
                                     const groupName = groupItem ? groupItem.name : "Grupo";
-                                    const bodyText = data.fileData ? `${senderName} enviou mídia no canal` : `${senderName}: ${data.text}`;
+                                    const bodyText = data.fileType ? `${senderName} enviou mídia no canal` : `${senderName}: ${data.text}`;
                                     sendSystemNotification(groupName, bodyText, () => {
                                         openGroupChatWith(groupItem);
                                     });
@@ -2525,6 +2632,16 @@
             }
         }
 
+        // Função de utilidade para descarregar arquivos genéricos
+        function downloadBase64File(base64Data, fileName) {
+            const link = document.createElement("a");
+            link.href = base64Data;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         function renderMessages(messages) {
             const container = document.getElementById('messages-container');
             container.innerHTML = '';
@@ -2584,6 +2701,27 @@
                                 <audio src="${msg.fileData}" controls class="w-full h-8 outline-none"></audio>
                             </div>
                         `;
+                    } 
+                    // Cartão para arquivos genéricos de qualquer formato
+                    else if (msg.fileType === 'file') {
+                        mediaHtml = `
+                            <div class="${hasText ? 'mt-2' : ''} p-3 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 w-64 sm:w-80 max-w-full shadow-sm flex items-center justify-between gap-3 cursor-pointer transition-all duration-300 active:scale-[0.98]" id="file-download-${msg.id}">
+                                <div class="flex items-center gap-2.5 truncate">
+                                    <div class="p-2 bg-emerald-500/15 text-emerald-500 rounded-lg shrink-0">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="truncate text-left">
+                                        <p class="text-xs font-semibold text-slate-800 dark:text-white truncate max-w-[140px]">${msg.name || "Ficheiro"}</p>
+                                        <p class="text-[9px] text-slate-400 dark:text-slate-500">${msg.size || "A calcular..."}</p>
+                                    </div>
+                                </div>
+                                <svg class="w-4.5 h-4.5 text-slate-400 dark:text-slate-500 hover:text-emerald-500 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                            </div>
+                        `;
                     }
                     contentHtml += mediaHtml;
                 }
@@ -2619,6 +2757,14 @@
                 if (imgPreview) {
                     imgPreview.addEventListener('click', () => {
                         openMediaModal(msg.fileData, 'image');
+                    });
+                }
+
+                // Handler de Download para Ficheiros Genéricos
+                const fileDownloadBtn = msgElement.querySelector(`#file-download-${msg.id}`);
+                if (fileDownloadBtn) {
+                    fileDownloadBtn.addEventListener('click', () => {
+                        downloadBase64File(msg.fileData, msg.name || "Ficheiro_Descarregado");
                     });
                 }
 
@@ -2690,6 +2836,27 @@
                             </div>
                         `;
                     }
+                    // Cartão para arquivos genéricos de qualquer formato no grupo
+                    else if (msg.fileType === 'file') {
+                        mediaHtml = `
+                            <div class="${hasText ? 'mt-2' : ''} p-3 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 w-64 sm:w-80 max-w-full shadow-sm flex items-center justify-between gap-3 cursor-pointer transition-all duration-300 active:scale-[0.98]" id="file-download-${msg.id}">
+                                <div class="flex items-center gap-2.5 truncate">
+                                    <div class="p-2 bg-emerald-500/15 text-emerald-500 rounded-lg shrink-0">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div class="truncate text-left">
+                                        <p class="text-xs font-semibold text-slate-800 dark:text-white truncate max-w-[140px]">${msg.name || "Ficheiro"}</p>
+                                        <p class="text-[9px] text-slate-400 dark:text-slate-500">${msg.size || "A calcular..."}</p>
+                                    </div>
+                                </div>
+                                <svg class="w-4.5 h-4.5 text-slate-400 dark:text-slate-500 hover:text-emerald-500 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                            </div>
+                        `;
+                    }
                     contentHtml += mediaHtml;
                 }
 
@@ -2730,6 +2897,14 @@
                 if (imgPreview) {
                     imgPreview.addEventListener('click', () => {
                         openMediaModal(msg.fileData, 'image');
+                    });
+                }
+
+                // Handler de Download para Ficheiros Genéricos
+                const fileDownloadBtn = msgElement.querySelector(`#file-download-${msg.id}`);
+                if (fileDownloadBtn) {
+                    fileDownloadBtn.addEventListener('click', () => {
+                        downloadBase64File(msg.fileData, msg.name || "Ficheiro_Descarregado");
                     });
                 }
                 
@@ -3154,6 +3329,8 @@
             } else if (selectedFilePayload) {
                 msgPayload.fileData = selectedFilePayload.base64;
                 msgPayload.fileType = selectedFilePayload.type;
+                msgPayload.name = selectedFilePayload.name;
+                msgPayload.size = selectedFilePayload.size;
             }
 
             if (activeFriend) {
@@ -3288,7 +3465,6 @@
             document.getElementById('chat-header').classList.add('hidden');
             document.getElementById('chat-input-bar').classList.add('hidden');
             
-            // Reajusta telas com base no estado de WhatsApp
             applyWhitespaceFixForMobile();
         }
 
@@ -3417,7 +3593,7 @@
                 avatarValue: newValue,
                 blockedUsers: currentUser.blockedUsers || [],
                 blockedBy: currentUser.blockedBy || [],
-                whatsappLayout: isWhatsappModeActive // Corrigido para sincronizar corretamente com whatsappLayout
+                whatsappLayout: isWhatsappModeActive 
             };
 
             if (isOfflineMode) {
@@ -3425,8 +3601,8 @@
                 saveLocalSimulationData();
                 currentUser = updatedUser;
                 updateUIPersonalProfile();
-                applyWhitespaceFixForMobile(); // Atualiza layout
-                showToast("Perfil atualizado offline!");
+                applyWhitespaceFixForMobile(); 
+                showToast("Perfil updated offline!");
                 profileModal.classList.add('hidden');
                 return;
             }
@@ -3436,8 +3612,8 @@
                 await setDoc(userRef, updatedUser);
                 currentUser = updatedUser;
                 updateUIPersonalProfile();
-                applyWhitespaceFixForMobile(); // Atualiza layout
-                showToast("Perfil atualizado com sucesso!");
+                applyWhitespaceFixForMobile(); 
+                showToast("Perfil updated com sucesso!");
                 profileModal.classList.add('hidden');
             } catch (err) {
                 showToast("Erro ao salvar perfil.", "error");
