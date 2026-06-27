@@ -211,7 +211,7 @@
     <!-- MAIN INTERFACE -->
     <div id="main-app" class="hidden flex-1 flex flex-col overflow-hidden h-full">
         <!-- Topbar -->
-        <header id="app-topbar" class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-30 shadow-md transition-colors duration-305 shrink-0">
+        <header id="app-topbar" class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-4 z-30 shadow-md transition-colors duration-300 shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center animate-pop-in">
                     <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -705,8 +705,8 @@
             const urlRegex = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
             const wwwRegex = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
             
-            let linkedText = safeText.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-sky-500 hover:text-sky-400 font-semibold underline break-all">$1</a>');
-            linkedText = linkedText.replace(wwwRegex, '$1<a href="http://$2" target="_blank" rel="noopener noreferrer" class="text-sky-500 hover:text-sky-400 font-semibold underline break-all">$2</a>');
+            let linkedText = safeText.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:underline font-bold break-all">$1</a>');
+            linkedText = linkedText.replace(wwwRegex, '$1<a href="http://$2" target="_blank" rel="noopener noreferrer" class="text-indigo-600 dark:text-indigo-400 hover:underline font-bold break-all">$2</a>');
             
             return linkedText;
         }
@@ -932,306 +932,103 @@
             { code: "KO", name: "Korean", native: "한국어" }
         ];
 
-const translations = {
-  PT: {
-    confirmLanguage: "Confirmar Idioma",
-    authTitle: "Acesse sua conta para conversar",
-    username: "Nome de Utilizador (@ID)",
-    password: "Palavra-passe",
-    login: "Entrar no Chat",
-    register: "Registar",
-    logout: "Sair",
-    addFriend: "Adicionar",
-    allUsers: "Todos",
-    friends: "Amigos",
-    groups: "Grupos",
-    requests: "Solicit.",
-    noFriends: "Nenhum amigo conectado ainda.\nAdicione pessoas pelo topo!",
-    createGroup: "Criar Novo Grupo",
-    noGroups: "Você não está em nenhum grupo.\nCrie um agora mesmo!",
-    received: "Recebidos",
-    sent: "Enviados",
-    members: "Membros",
-    clearChat: "Limpar Chat",
-    block: "Bloquear",
-    writeMessage: "Escreva sua mensagem aqui...",
-    send: "Enviar",
-    attachFile: "Anexar arquivo",
-    recordAudio: "Gravar áudio",
-    editProfile: "Editar Seu Perfil",
-    saveChanges: "Salvar Alterações",
-    deleteAccount: "Excluir Minha Conta Permanentemente"
-  },
+        const translations = {
+            PT: {
+                authTitle: "Acesse sua conta para conversar",
+                authTitleReg: "Crie sua conta para conversar",
+                loginBtn: "Entrar no Chat",
+                registerBtn: "Registar",
+                haveAccount: "Já tem uma conta? Entre agora",
+                noAccount: "Não tem uma conta? Registe-se agora",
+                displayName: "Como quer ser chamado? (Nome de Exibição)",
+                username: "Nome de Utilizador (@ID)",
+                password: "Palavra-passe",
+                orText: "Ou ligue-se com outra conta",
+                addFriendPlaceholder: "Adicionar amigo pelo utilizador...",
+                addFriendBtn: "Adicionar",
+                logout: "Sair",
+                friendsTab: "Amigos",
+                groupsTab: "Grupos",
+                requestsTab: "Solicit.",
+                friendsEmpty: "Nenhum amigo conectado ainda.<br>Adicione pessoas pelo topo!",
+                groupsEmpty: "Você não está em nenhum grupo.<br>Crie um agora mesmo!",
+                openCreateGroupBtn: "Criar Novo Grupo",
+                createGroupModalTitle: "Criar Novo Grupo",
+                groupNameLabel: "Nome do Grupo",
+                recebidosHeader: "Recebidos",
+                enviadosHeader: "Enviados",
+                chatPlaceholderHeader: "Escolha uma conversa ou grupo para começar",
+                chatPlaceholderSub: "Troque mensagens e ligue-se instantaneamente!",
+                membrosBtn: "Membros",
+                editPerfilTitle: "Editar Seu Perfil",
+                nomeExibicaoLabel: "Seu Nome de Exibição",
+                salvarBtn: "Salvar Alterações",
+                personalizarGrupo: "Personalizar Grupo",
+                convidarMembro: "Convidar Novo Membro",
+                membrosTitulo: "Membros do Canal",
+                convidarBtn: "Convidar",
+                offlineModeActive: "Modo Offline Ativo - @{name}",
+                toastOfflineGuestCreated: "Modo offline ativado com utilizador temporário!",
+                audioRecordStart: "Gravação de áudio iniciada...",
+                audioRecordStop: "Gravação finalizada com sucesso.",
+                toastMicError: "Não foi possível aceder ao microfone.",
+                verifyingConnection: "A verificar ligação com o Firebase...",
+                connectedFirebase: "Ligado com sucesso ao Firebase!"
+            },
+            EN: {
+                authTitle: "Access your account to chat",
+                authTitleReg: "Create your account to chat",
+                loginBtn: "Enter Chat",
+                registerBtn: "Register",
+                haveAccount: "Already have an account? Log in",
+                noAccount: "Don't have an account? Sign up now",
+                displayName: "What's your display name?",
+                username: "Username (@ID)",
+                password: "Password",
+                orText: "Or connect with another account",
+                addFriendPlaceholder: "Add friend by username...",
+                addFriendBtn: "Add",
+                logout: "Logout",
+                friendsTab: "Friends",
+                groupsTab: "Groups",
+                requestsTab: "Requests",
+                friendsEmpty: "No friends connected yet.<br>Add people from the top!",
+                groupsEmpty: "You are not in any group.<br>Create one right now!",
+                openCreateGroupBtn: "Create New Group",
+                createGroupModalTitle: "Create New Group",
+                groupNameLabel: "Group Name",
+                recebidosHeader: "Received",
+                enviadosHeader: "Sent",
+                chatPlaceholderHeader: "Choose a chat or group to start",
+                chatPlaceholderSub: "Exchange messages and connect instantly!",
+                membrosBtn: "Members",
+                editPerfilTitle: "Edit Your Profile",
+                nomeExibicaoLabel: "Your Display Name",
+                salvarBtn: "Save Changes",
+                personalizarGrupo: "Customize Group",
+                convidarMembro: "Invite New Member",
+                membrosTitulo: "Channel Members",
+                convidarBtn: "Invite",
+                offlineModeActive: "Offline Mode Active - @{name}",
+                toastOfflineGuestCreated: "Offline mode activated with guest account!",
+                audioRecordStart: "Audio recording started...",
+                audioRecordStop: "Audio recording finished.",
+                toastMicError: "Could not access microphone.",
+                verifyingConnection: "Verifying connection with Firebase...",
+                connectedFirebase: "Successfully connected to Firebase!"
+            }
+        };
 
-  EN: {
-    confirmLanguage: "Confirm Language",
-    authTitle: "Access your account to chat",
-    username: "Username (@ID)",
-    password: "Password",
-    login: "Enter Chat",
-    register: "Register",
-    logout: "Logout",
-    addFriend: "Add",
-    allUsers: "All",
-    friends: "Friends",
-    groups: "Groups",
-    requests: "Requests",
-    noFriends: "No friends connected yet.\nAdd people above!",
-    createGroup: "Create New Group",
-    noGroups: "You are not in any group.\nCreate one now!",
-    received: "Received",
-    sent: "Sent",
-    members: "Members",
-    clearChat: "Clear Chat",
-    block: "Block",
-    writeMessage: "Write your message here...",
-    send: "Send",
-    attachFile: "Attach file",
-    recordAudio: "Record audio",
-    editProfile: "Edit Your Profile",
-    saveChanges: "Save Changes",
-    deleteAccount: "Delete My Account Permanently"
-  },
+        // Associar dinamicamente os fallbacks de outros idiomas para reduzir redundância de código
+        translations.ES = translations.PT;
+        translations.FR = translations.EN;
+        translations.DE = translations.EN;
+        translations.IT = translations.EN;
+        translations.JA = translations.EN;
+        translations.ZH = translations.EN;
+        translations.RU = translations.EN;
+        translations.KO = translations.EN;
 
-  ES: {
-    confirmLanguage: "Confirmar Idioma",
-    authTitle: "Accede a tu cuenta para chatear",
-    username: "Nombre de Usuario (@ID)",
-    password: "Contraseña",
-    login: "Entrar al Chat",
-    register: "Registrarse",
-    logout: "Cerrar sesión",
-    addFriend: "Agregar",
-    allUsers: "Todos",
-    friends: "Amigos",
-    groups: "Grupos",
-    requests: "Solicitudes",
-    noFriends: "Aún no hay amigos conectados.\n¡Agrega personas arriba!",
-    createGroup: "Crear Nuevo Grupo",
-    noGroups: "No estás en ningún grupo.\n¡Crea uno ahora!",
-    received: "Recibidos",
-    sent: "Enviados",
-    members: "Miembros",
-    clearChat: "Limpiar Chat",
-    block: "Bloquear",
-    writeMessage: "Escribe tu mensaje aquí...",
-    send: "Enviar",
-    attachFile: "Adjuntar archivo",
-    recordAudio: "Grabar audio",
-    editProfile: "Editar Tu Perfil",
-    saveChanges: "Guardar Cambios",
-    deleteAccount: "Eliminar Mi Cuenta Permanentemente"
-  },
-
-  FR: {
-    confirmLanguage: "Confirmer la langue",
-    authTitle: "Accédez à votre compte pour discuter",
-    username: "Nom d'utilisateur (@ID)",
-    password: "Mot de passe",
-    login: "Entrer dans le Chat",
-    register: "S'inscrire",
-    logout: "Se déconnecter",
-    addFriend: "Ajouter",
-    allUsers: "Tous",
-    friends: "Amis",
-    groups: "Groupes",
-    requests: "Demandes",
-    noFriends: "Aucun ami connecté pour le moment.\nAjoutez des personnes ci-dessus !",
-    createGroup: "Créer un Nouveau Groupe",
-    noGroups: "Vous n'êtes dans aucun groupe.\nCréez-en un maintenant !",
-    received: "Reçus",
-    sent: "Envoyés",
-    members: "Membres",
-    clearChat: "Effacer le Chat",
-    block: "Bloquer",
-    writeMessage: "Écrivez votre message ici...",
-    send: "Envoyer",
-    attachFile: "Joindre un fichier",
-    recordAudio: "Enregistrer l'audio",
-    editProfile: "Modifier Votre Profil",
-    saveChanges: "Enregistrer les Modifications",
-    deleteAccount: "Supprimer Mon Compte Définitivement"
-  },
-
-  DE: {
-    confirmLanguage: "Sprache bestätigen",
-    authTitle: "Melden Sie sich an, um zu chatten",
-    username: "Benutzername (@ID)",
-    password: "Passwort",
-    login: "Chat betreten",
-    register: "Registrieren",
-    logout: "Abmelden",
-    addFriend: "Hinzufügen",
-    allUsers: "Alle",
-    friends: "Freunde",
-    groups: "Gruppen",
-    requests: "Anfragen",
-    noFriends: "Noch keine Freunde verbunden.\nFüge oben Personen hinzu!",
-    createGroup: "Neue Gruppe erstellen",
-    noGroups: "Du bist in keiner Gruppe.\nErstelle jetzt eine!",
-    received: "Erhalten",
-    sent: "Gesendet",
-    members: "Mitglieder",
-    clearChat: "Chat löschen",
-    block: "Blockieren",
-    writeMessage: "Schreibe deine Nachricht hier...",
-    send: "Senden",
-    attachFile: "Datei anhängen",
-    recordAudio: "Audio aufnehmen",
-    editProfile: "Profil bearbeiten",
-    saveChanges: "Änderungen speichern",
-    deleteAccount: "Mein Konto dauerhaft löschen"
-  },
-
-  JA: {
-    confirmLanguage: "言語を確認",
-    authTitle: "チャットするにはログインしてください",
-    username: "ユーザー名 (@ID)",
-    password: "パスワード",
-    login: "チャットに入る",
-    register: "登録",
-    logout: "ログアウト",
-    addFriend: "追加",
-    allUsers: "すべて",
-    friends: "友達",
-    groups: "グループ",
-    requests: "リクエスト",
-    noFriends: "まだ友達がいません。\n上から追加してください！",
-    createGroup: "新しいグループを作成",
-    noGroups: "どのグループにも参加していません。\n今すぐ作成！",
-    received: "受信",
-    sent: "送信",
-    members: "メンバー",
-    clearChat: "チャットを消去",
-    block: "ブロック",
-    writeMessage: "ここにメッセージを書いてください...",
-    send: "送信",
-    attachFile: "ファイルを添付",
-    recordAudio: "音声を録音",
-    editProfile: "プロフィールを編集",
-    saveChanges: "変更を保存",
-    deleteAccount: "アカウントを完全削除"
-  },
-IT: {
-    confirmLanguage: "Conferma Lingua",
-    authTitle: "Accedi al tuo account per chattare",
-    username: "Nome utente (@ID)",
-    password: "Password",
-    login: "Entra nella Chat",
-    register: "Registrati",
-    logout: "Disconnetti",
-    addFriend: "Aggiungi",
-    allUsers: "Tutti",
-    friends: "Amici",
-    groups: "Gruppi",
-    requests: "Richieste",
-    noFriends: "Nessun amico connesso.\nAggiungi persone sopra!",
-    createGroup: "Crea Nuovo Gruppo",
-    noGroups: "Non sei in nessun gruppo.\nCreane uno adesso!",
-    received: "Ricevuti",
-    sent: "Inviati",
-    members: "Membri",
-    clearChat: "Cancella Chat",
-    block: "Blocca",
-    writeMessage: "Scrivi qui il tuo messaggio...",
-    send: "Invia",
-    attachFile: "Allega file",
-    recordAudio: "Registra audio",
-    editProfile: "Modifica il tuo profilo",
-    saveChanges: "Salva modifiche",
-    deleteAccount: "Elimina definitivamente il mio account"
-},
-
-ZH: {
-    confirmLanguage: "确认语言",
-    authTitle: "登录您的帐户进行聊天",
-    username: "用户名 (@ID)",
-    password: "密码",
-    login: "进入聊天",
-    register: "注册",
-    logout: "退出登录",
-    addFriend: "添加",
-    allUsers: "全部",
-    friends: "好友",
-    groups: "群组",
-    requests: "请求",
-    noFriends: "暂无好友连接。\n在上方添加好友！",
-    createGroup: "创建新群组",
-    noGroups: "您尚未加入任何群组。\n立即创建一个！",
-    received: "已接收",
-    sent: "已发送",
-    members: "成员",
-    clearChat: "清空聊天",
-    block: "屏蔽",
-    writeMessage: "在这里输入消息...",
-    send: "发送",
-    attachFile: "附加文件",
-    recordAudio: "录制音频",
-    editProfile: "编辑您的个人资料",
-    saveChanges: "保存更改",
-    deleteAccount: "永久删除我的账户"
-},
-
-RU: {
-    confirmLanguage: "Подтвердить язык",
-    authTitle: "Войдите в аккаунт для общения",
-    username: "Имя пользователя (@ID)",
-    password: "Пароль",
-    login: "Войти в чат",
-    register: "Регистрация",
-    logout: "Выйти",
-    addFriend: "Добавить",
-    allUsers: "Все",
-    friends: "Друзья",
-    groups: "Группы",
-    requests: "Запросы",
-    noFriends: "Пока нет друзей онлайн.\nДобавьте людей сверху!",
-    createGroup: "Создать новую группу",
-    noGroups: "Вы не состоите ни в одной группе.\nСоздайте её прямо сейчас!",
-    received: "Полученные",
-    sent: "Отправленные",
-    members: "Участники",
-    clearChat: "Очистить чат",
-    block: "Заблокировать",
-    writeMessage: "Введите сообщение...",
-    send: "Отправить",
-    attachFile: "Прикрепить файл",
-    recordAudio: "Записать аудио",
-    editProfile: "Редактировать профиль",
-    saveChanges: "Сохранить изменения",
-    deleteAccount: "Удалить мой аккаунт навсегда"
-},
-
-KO: {
-    confirmLanguage: "언어 확인",
-    authTitle: "채팅하려면 계정에 로그인하세요",
-    username: "사용자 이름 (@ID)",
-    password: "비밀번호",
-    login: "채팅 입장",
-    register: "회원가입",
-    logout: "로그아웃",
-    addFriend: "추가",
-    allUsers: "전체",
-    friends: "친구",
-    groups: "그룹",
-    requests: "요청",
-    noFriends: "아직 연결된 친구가 없습니다.\n위에서 친구를 추가하세요!",
-    createGroup: "새 그룹 만들기",
-    noGroups: "현재 그룹이 없습니다.\n지금 생성하세요!",
-    received: "받음",
-    sent: "보냄",
-    members: "멤버",
-    clearChat: "채팅 삭제",
-    block: "차단",
-    writeMessage: "여기에 메시지를 입력하세요...",
-    send: "보내기",
-    attachFile: "파일 첨부",
-    recordAudio: "오디오 녹음",
-    editProfile: "프로필 수정",
-    saveChanges: "변경사항 저장",
-    deleteAccount: "내 계정 영구 삭제"
-}
-  };
         let currentLang = "PT";
         let selectedLang = "PT";
 
@@ -3259,7 +3056,7 @@ KO: {
                                 <div class="flex items-center gap-2.5 truncate">
                                     <div class="p-2 bg-emerald-500/15 text-emerald-500 rounded-lg shrink-0 flex flex-col items-center justify-center min-w-[36px]">
                                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                         <span class="text-[7px] font-bold tracking-wider mt-0.5 text-center truncate max-w-[32px]">${ext}</span>
                                     </div>
@@ -4313,7 +4110,7 @@ KO: {
             document.getElementById('block-chat-btn').classList.add('hidden');
 
             document.getElementById('message-input').disabled = false;
-            document.getElementById('message-input').placeholder = "Escreva sua mensagem aqui...";
+            document.getElementById('message-input').placeholder = "Escreva sua mensagem aqui..._";
             document.getElementById('record-audio-btn').disabled = false;
             document.getElementById('attach-file-btn').disabled = false;
 
@@ -4362,6 +4159,50 @@ KO: {
             activeFriend = null;
             activeGroup = null;
             applyWhitespaceFixForMobile();
+        });
+
+        document.getElementById('edit-group-details-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newName = document.getElementById('edit-group-name').value.trim();
+            const newType = document.getElementById('edit-group-avatar-type').value;
+            const newValue = document.getElementById('edit-group-avatar-value').value.trim();
+
+            if (!newName) return;
+
+            const updatedGroup = {
+                ...activeGroup,
+                name: newName,
+                avatarType: newType,
+                avatarValue: newValue
+            };
+
+            if (isOfflineMode) {
+                simData.groups[activeGroup.id] = updatedGroup;
+                saveLocalSimulationData();
+                activeGroup = updatedGroup;
+                triggerOfflineCallbacks();
+                showToast("Configurações do grupo atualizadas offline!");
+                document.getElementById('group-settings-modal').classList.add('hidden');
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), updatedGroup);
+                activeGroup = updatedGroup;
+                showToast("Grupo atualizado com sucesso!");
+                document.getElementById('group-settings-modal').classList.add('hidden');
+            } catch (err) {
+                showToast("Erro ao salvar dados do grupo.", "error");
+            }
+        });
+
+        document.getElementById('group-settings-btn').addEventListener('click', () => {
+            setupGroupSettingsTrigger();
+            document.getElementById('group-settings-modal').classList.remove('hidden');
+        });
+
+        document.getElementById('close-group-settings-modal').addEventListener('click', () => {
+            document.getElementById('group-settings-modal').classList.add('hidden');
         });
 
         document.getElementById('logout-btn').addEventListener('click', () => {
