@@ -54,12 +54,10 @@
             -webkit-text-size-adjust: 100%;
             -moz-text-size-adjust: 100%;
         }
-        /* Rolagem suave e toque nativo para dispositivos móveis */
         .scrollable-panel {
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
-        /* Esconder barras de rolagem mas manter funcionamento */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -404,7 +402,6 @@
                     </button>
                 </div>
 
-                <!-- Modificado accept para permitir qualquer formato de ficheiro -->
                 <input type="file" id="media-file-input" class="hidden" accept="*">
 
                 <!-- Barra de envio de mensagens -->
@@ -524,6 +521,19 @@
                             <span class="text-[10px] text-slate-400 dark:text-slate-500">Conversas ocupam toda a página com botão Voltar</span>
                         </div>
                         <input id="profile-whatsapp-mode" type="checkbox" class="w-4 h-4 rounded text-indigo-500 border-slate-300 focus:ring-indigo-500">
+                    </label>
+                </div>
+
+                <!-- Configuração: Notificações do Sistema -->
+                <div class="border-t border-slate-100 dark:border-slate-800 pt-3">
+                    <label class="flex items-center justify-between cursor-pointer py-1">
+                        <div class="flex flex-col text-left">
+                            <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">Notificações do Sistema</span>
+                            <span class="text-[10px] text-slate-400 dark:text-slate-500">Exibir avisos no ambiente de trabalho e no telemóvel</span>
+                        </div>
+                        <button type="button" id="btn-request-notifications" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-500/15 hover:bg-indigo-500 text-indigo-700 dark:text-indigo-300 hover:text-white transition-all active:scale-95">
+                            Ativar
+                        </button>
                     </label>
                 </div>
 
@@ -680,6 +690,150 @@
         let activeMessagesListCached = [];
         let activeGroupMessagesListCached = [];
 
+        let typingTimeout = null;
+        let isCurrentlyTyping = false;
+        let unsubscribeTyping = null;
+        let typingStates = {};
+
+        // Converter texto em hiperligações seguras com estilo azul
+        function linkify(text) {
+            if (!text) return "";
+            const temp = document.createElement('div');
+            temp.textContent = text;
+            const safeText = temp.innerHTML;
+            
+            const urlRegex = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+            const wwwRegex = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+            
+            let linkedText = safeText.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-sky-500 hover:text-sky-400 font-semibold underline break-all">$1</a>');
+            linkedText = linkedText.replace(wwwRegex, '$1<a href="http://$2" target="_blank" rel="noopener noreferrer" class="text-sky-500 hover:text-sky-400 font-semibold underline break-all">$2</a>');
+            
+            return linkedText;
+        }
+
+        // Extrair extensão do arquivo de forma segura
+        function getFileExtension(filename) {
+            if (!filename) return 'FILE';
+            return filename.split('.').pop().toUpperCase();
+        }
+
+        // Presença e batimento cardíaco em tempo real
+        function startPresenceHeartbeat() {
+            if (!currentUser) return;
+            const updatePresence = async () => {
+                if (isOfflineMode) {
+                    if (simData.accounts[currentUser.username]) {
+                        simData.accounts[currentUser.username].lastActive = Date.now();
+                        saveLocalSimulationData();
+                    }
+                } else {
+                    try {
+                        const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'accounts', currentUser.username);
+                        await updateDoc(userRef, { lastActive: Date.now() });
+                    } catch (e) {
+                        console.debug("Presença erro:", e);
+                    }
+                }
+            };
+            updatePresence();
+            setInterval(updatePresence, 5000);
+        }
+
+        function isUserOnline(userAcc) {
+            if (!userAcc || !userAcc.lastActive) return false;
+            return (Date.now() - userAcc.lastActive) < 15000; // Online se ativo nos últimos 15s
+        }
+
+        // Lógica de Estado de Escrita ("Escrevendo...")
+        async function setTypingState(typing) {
+            if (!currentUser) return;
+            if (isCurrentlyTyping === typing) return;
+            isCurrentlyTyping = typing;
+
+            const target = activeFriend ? activeFriend.username : (activeGroup ? activeGroup.id : null);
+            if (!target) return;
+
+            const typingDocId = `typing_${currentUser.username}`;
+            const payload = {
+                username: currentUser.username,
+                typingTo: target,
+                timestamp: Date.now(),
+                isTyping: typing
+            };
+
+            if (isOfflineMode) {
+                if (!simData.typing) simData.typing = {};
+                simData.typing[typingDocId] = payload;
+                saveLocalSimulationData();
+            } else {
+                try {
+                    const typingRef = doc(db, 'artifacts', appId, 'public', 'data', 'typing', typingDocId);
+                    await setDoc(typingRef, payload);
+                } catch (e) {
+                    console.debug("Erro ao definir escrita:", e);
+                }
+            }
+        }
+
+        function startTypingListener() {
+            if (unsubscribeTyping) unsubscribeTyping();
+            
+            const handleTypingData = (typingList) => {
+                typingStates = {};
+                typingList.forEach(t => {
+                    if (t.isTyping && (Date.now() - t.timestamp < 6000)) {
+                        typingStates[t.username] = t.typingTo;
+                    }
+                });
+                updateTypingIndicators();
+            };
+
+            if (isOfflineMode) {
+                setInterval(() => {
+                    const raw = simData.typing || {};
+                    handleTypingData(Object.values(raw));
+                }, 1000);
+                return;
+            }
+
+            const typingCol = collection(db, 'artifacts', appId, 'public', 'data', 'typing');
+            unsubscribeTyping = onSnapshot(typingCol, (snapshot) => {
+                const list = [];
+                snapshot.forEach(docSnap => {
+                    list.push(docSnap.data());
+                });
+                handleTypingData(list);
+            }, (error) => {
+                console.debug("Erro no listener de escrita:", error);
+            });
+        }
+
+        function updateTypingIndicators() {
+            const statusEl = document.getElementById('active-chat-status');
+            if (statusEl) {
+                if (activeFriend) {
+                    const isTyping = typingStates[activeFriend.username] === currentUser.username;
+                    if (isTyping) {
+                        statusEl.innerHTML = `<span class="text-emerald-500 font-bold animate-pulse">escrevendo...</span>`;
+                    } else {
+                        statusEl.innerText = `@${activeFriend.username}`;
+                    }
+                } else if (activeGroup) {
+                    const typingMembers = Object.keys(typingStates).filter(user => 
+                        user !== currentUser.username && 
+                        typingStates[user] === activeGroup.id &&
+                        activeGroup.members.includes(user)
+                    );
+                    if (typingMembers.length > 0) {
+                        const names = typingMembers.map(u => accountsMap[u]?.name || u).join(', ');
+                        statusEl.innerHTML = `<span class="text-emerald-500 font-bold animate-pulse">${names} está escrevendo...</span>`;
+                    } else {
+                        statusEl.innerText = `${activeGroup.members.length} membros • Criado por @${activeGroup.creator}`;
+                    }
+                }
+            }
+        }
+
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             if (!container) return;
@@ -708,8 +862,30 @@
         function ativarNotificacoes() {
             if ("Notification" in window) {
                 if (Notification.permission !== "granted" && Notification.permission !== "denied") {
-                    Notification.requestPermission();
+                    Notification.requestPermission().then(permission => {
+                        updateNotificationBtnUI(permission);
+                    });
+                } else {
+                    updateNotificationBtnUI(Notification.permission);
                 }
+            }
+        }
+
+        function updateNotificationBtnUI(permission) {
+            const btn = document.getElementById('btn-request-notifications');
+            if (!btn) return;
+            if (permission === 'granted') {
+                btn.innerText = "Ativo ✓";
+                btn.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 cursor-default";
+                btn.disabled = true;
+            } else if (permission === 'denied') {
+                btn.innerText = "Bloqueado ✗";
+                btn.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 cursor-default";
+                btn.disabled = true;
+            } else {
+                btn.innerText = "Ativar";
+                btn.className = "text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-500/15 hover:bg-indigo-500 text-indigo-700 dark:text-indigo-300 hover:text-white transition-all active:scale-95";
+                btn.disabled = false;
             }
         }
 
@@ -756,99 +932,306 @@
             { code: "KO", name: "Korean", native: "한국어" }
         ];
 
-        const translations = {
-            PT: {
-                authTitle: "Acesse sua conta para conversar",
-                authTitleReg: "Crie sua conta para começar",
-                displayName: "Como quer ser chamado? (Nome de Exibição)",
-                username: "Nome de Usuário (@ID)",
-                password: "Senha",
-                loginBtn: "Entrar no Chat",
-                registerBtn: "Registrar Conta",
-                noAccount: "Não tem uma conta? Cadastre-se agora",
-                haveAccount: "Já tem uma conta? Conecte-se",
-                addFriendPlaceholder: "Adicionar amigo pelo usuário...",
-                friendsTab: "Amigos",
-                groupsTab: "Grupos",
-                requestsTab: "Solicitações",
-                logout: "Sair",
-                chatPlaceholderHeader: "Escolha uma conversa ou grupo para começar",
-                chatPlaceholderSub: "Troque mensagens e conecte-se instantaneamente!",
-                membrosBtn: "Membros",
-                openCreateGroupBtn: "Criar Novo Grupo",
-                groupNameLabel: "Nome do Grupo",
-                createGroupModalTitle: "Criar Novo Grupo",
-                editPerfilTitle: "Editar Seu Perfil",
-                nomeExibicaoLabel: "Seu Nome de Exibição",
-                recebidosHeader: "Recebidos",
-                enviadosHeader: "Enviados",
-                orText: "Ou conecte-se com outra conta",
-                personalizarGrupo: "Personalizar Grupo",
-                convidarMembro: "Convidar Novo Membro",
-                membrosTitulo: "Membros do Canal",
-                convidarBtn: "Convidar",
-                addFriendBtn: "Adicionar",
-                salvarBtn: "Salvar Alterações",
-                friendsEmpty: "Nenhum amigo conectado ainda.<br>Adicione pessoas pelo topo!",
-                groupsEmpty: "Você não está em nenhum grupo.<br>Crie um agora mesmo!",
-                verifyingConnection: "Verificando conexão com o Firebase...",
-                connectedFirebase: "Conectado ao Firebase Cloud Server",
-                offlineModeActive: "MODO OFFLINE ATIVO: Conta predefinida @{name} criada automaticamente!",
-                toastOfflineGuestCreated: "Bypass ativo: Conta de convidado gerada com sucesso!",
-                toastLimitExceeded: "O arquivo excede o limite de tamanho.",
-                toastVideoLimitExceeded: "O vídeo ultrapassa o limite de 10 minutos.",
-                toastCompressionError: "Erro ao processar e comprimir o vídeo para 480p.",
-                toastMicError: "Não foi possível aceder ao microfone ou gravação não suportada.",
-                audioRecordStart: "Gravação de áudio iniciada...",
-                audioRecordStop: "Gravação de áudio concluída!"
-            },
-            EN: {
-                authTitle: "Access your account to chat",
-                authTitleReg: "Create your account to start",
-                displayName: "What should we call you? (Display Name)",
-                username: "Username (@ID)",
-                password: "Password",
-                loginBtn: "Enter Chat",
-                registerBtn: "Register Account",
-                noAccount: "Don't have an account? Sign up now",
-                haveAccount: "Already have an account? Log in",
-                addFriendPlaceholder: "Add friend by username...",
-                friendsTab: "Friends",
-                groupsTab: "Groups",
-                requestsTab: "Requests",
-                logout: "Log out",
-                chatPlaceholderHeader: "Choose a chat or group to start",
-                chatPlaceholderSub: "Exchange messages and connect instantly!",
-                membrosBtn: "Members",
-                openCreateGroupBtn: "Create New Group",
-                groupNameLabel: "Group Name",
-                createGroupModalTitle: "Create New Group",
-                editPerfilTitle: "Edit Your Profile",
-                nomeExibicaoLabel: "Your Display Name",
-                recebidosHeader: "Received",
-                enviadosHeader: "Sent",
-                orText: "Or connect with another account",
-                personalizarGrupo: "Customize Group",
-                convidarMembro: "Invite New Member",
-                membrosTitulo: "Channel Members",
-                convidarBtn: "Invite",
-                addFriendBtn: "Add",
-                salvarBtn: "Save Changes",
-                friendsEmpty: "No friends connected yet.<br>Add people at the top!",
-                groupsEmpty: "You are not in any group.<br>Create one right now!",
-                verifyingConnection: "Verifying connection with Firebase...",
-                connectedFirebase: "Connected to Firebase Cloud Server",
-                offlineModeActive: "OFFLINE MODE ACTIVE: Preset account @{name} created automatically!",
-                toastOfflineGuestCreated: "Guest account generated successfully!",
-                toastLimitExceeded: "The file exceeds the size limit.",
-                toastVideoLimitExceeded: "The video exceeds the 10 minutes limit.",
-                toastCompressionError: "Error processing and compressing video.",
-                toastMicError: "Unable to access microphone.",
-                audioRecordStart: "Audio recording started...",
-                audioRecordStop: "Audio recording stopped!"
-            }
-        };
+const translations = {
+  PT: {
+    confirmLanguage: "Confirmar Idioma",
+    authTitle: "Acesse sua conta para conversar",
+    username: "Nome de Utilizador (@ID)",
+    password: "Palavra-passe",
+    login: "Entrar no Chat",
+    register: "Registar",
+    logout: "Sair",
+    addFriend: "Adicionar",
+    allUsers: "Todos",
+    friends: "Amigos",
+    groups: "Grupos",
+    requests: "Solicit.",
+    noFriends: "Nenhum amigo conectado ainda.\nAdicione pessoas pelo topo!",
+    createGroup: "Criar Novo Grupo",
+    noGroups: "Você não está em nenhum grupo.\nCrie um agora mesmo!",
+    received: "Recebidos",
+    sent: "Enviados",
+    members: "Membros",
+    clearChat: "Limpar Chat",
+    block: "Bloquear",
+    writeMessage: "Escreva sua mensagem aqui...",
+    send: "Enviar",
+    attachFile: "Anexar arquivo",
+    recordAudio: "Gravar áudio",
+    editProfile: "Editar Seu Perfil",
+    saveChanges: "Salvar Alterações",
+    deleteAccount: "Excluir Minha Conta Permanentemente"
+  },
 
+  EN: {
+    confirmLanguage: "Confirm Language",
+    authTitle: "Access your account to chat",
+    username: "Username (@ID)",
+    password: "Password",
+    login: "Enter Chat",
+    register: "Register",
+    logout: "Logout",
+    addFriend: "Add",
+    allUsers: "All",
+    friends: "Friends",
+    groups: "Groups",
+    requests: "Requests",
+    noFriends: "No friends connected yet.\nAdd people above!",
+    createGroup: "Create New Group",
+    noGroups: "You are not in any group.\nCreate one now!",
+    received: "Received",
+    sent: "Sent",
+    members: "Members",
+    clearChat: "Clear Chat",
+    block: "Block",
+    writeMessage: "Write your message here...",
+    send: "Send",
+    attachFile: "Attach file",
+    recordAudio: "Record audio",
+    editProfile: "Edit Your Profile",
+    saveChanges: "Save Changes",
+    deleteAccount: "Delete My Account Permanently"
+  },
+
+  ES: {
+    confirmLanguage: "Confirmar Idioma",
+    authTitle: "Accede a tu cuenta para chatear",
+    username: "Nombre de Usuario (@ID)",
+    password: "Contraseña",
+    login: "Entrar al Chat",
+    register: "Registrarse",
+    logout: "Cerrar sesión",
+    addFriend: "Agregar",
+    allUsers: "Todos",
+    friends: "Amigos",
+    groups: "Grupos",
+    requests: "Solicitudes",
+    noFriends: "Aún no hay amigos conectados.\n¡Agrega personas arriba!",
+    createGroup: "Crear Nuevo Grupo",
+    noGroups: "No estás en ningún grupo.\n¡Crea uno ahora!",
+    received: "Recibidos",
+    sent: "Enviados",
+    members: "Miembros",
+    clearChat: "Limpiar Chat",
+    block: "Bloquear",
+    writeMessage: "Escribe tu mensaje aquí...",
+    send: "Enviar",
+    attachFile: "Adjuntar archivo",
+    recordAudio: "Grabar audio",
+    editProfile: "Editar Tu Perfil",
+    saveChanges: "Guardar Cambios",
+    deleteAccount: "Eliminar Mi Cuenta Permanentemente"
+  },
+
+  FR: {
+    confirmLanguage: "Confirmer la langue",
+    authTitle: "Accédez à votre compte pour discuter",
+    username: "Nom d'utilisateur (@ID)",
+    password: "Mot de passe",
+    login: "Entrer dans le Chat",
+    register: "S'inscrire",
+    logout: "Se déconnecter",
+    addFriend: "Ajouter",
+    allUsers: "Tous",
+    friends: "Amis",
+    groups: "Groupes",
+    requests: "Demandes",
+    noFriends: "Aucun ami connecté pour le moment.\nAjoutez des personnes ci-dessus !",
+    createGroup: "Créer un Nouveau Groupe",
+    noGroups: "Vous n'êtes dans aucun groupe.\nCréez-en un maintenant !",
+    received: "Reçus",
+    sent: "Envoyés",
+    members: "Membres",
+    clearChat: "Effacer le Chat",
+    block: "Bloquer",
+    writeMessage: "Écrivez votre message ici...",
+    send: "Envoyer",
+    attachFile: "Joindre un fichier",
+    recordAudio: "Enregistrer l'audio",
+    editProfile: "Modifier Votre Profil",
+    saveChanges: "Enregistrer les Modifications",
+    deleteAccount: "Supprimer Mon Compte Définitivement"
+  },
+
+  DE: {
+    confirmLanguage: "Sprache bestätigen",
+    authTitle: "Melden Sie sich an, um zu chatten",
+    username: "Benutzername (@ID)",
+    password: "Passwort",
+    login: "Chat betreten",
+    register: "Registrieren",
+    logout: "Abmelden",
+    addFriend: "Hinzufügen",
+    allUsers: "Alle",
+    friends: "Freunde",
+    groups: "Gruppen",
+    requests: "Anfragen",
+    noFriends: "Noch keine Freunde verbunden.\nFüge oben Personen hinzu!",
+    createGroup: "Neue Gruppe erstellen",
+    noGroups: "Du bist in keiner Gruppe.\nErstelle jetzt eine!",
+    received: "Erhalten",
+    sent: "Gesendet",
+    members: "Mitglieder",
+    clearChat: "Chat löschen",
+    block: "Blockieren",
+    writeMessage: "Schreibe deine Nachricht hier...",
+    send: "Senden",
+    attachFile: "Datei anhängen",
+    recordAudio: "Audio aufnehmen",
+    editProfile: "Profil bearbeiten",
+    saveChanges: "Änderungen speichern",
+    deleteAccount: "Mein Konto dauerhaft löschen"
+  },
+
+  JA: {
+    confirmLanguage: "言語を確認",
+    authTitle: "チャットするにはログインしてください",
+    username: "ユーザー名 (@ID)",
+    password: "パスワード",
+    login: "チャットに入る",
+    register: "登録",
+    logout: "ログアウト",
+    addFriend: "追加",
+    allUsers: "すべて",
+    friends: "友達",
+    groups: "グループ",
+    requests: "リクエスト",
+    noFriends: "まだ友達がいません。\n上から追加してください！",
+    createGroup: "新しいグループを作成",
+    noGroups: "どのグループにも参加していません。\n今すぐ作成！",
+    received: "受信",
+    sent: "送信",
+    members: "メンバー",
+    clearChat: "チャットを消去",
+    block: "ブロック",
+    writeMessage: "ここにメッセージを書いてください...",
+    send: "送信",
+    attachFile: "ファイルを添付",
+    recordAudio: "音声を録音",
+    editProfile: "プロフィールを編集",
+    saveChanges: "変更を保存",
+    deleteAccount: "アカウントを完全削除"
+  },
+IT: {
+    confirmLanguage: "Conferma Lingua",
+    authTitle: "Accedi al tuo account per chattare",
+    username: "Nome utente (@ID)",
+    password: "Password",
+    login: "Entra nella Chat",
+    register: "Registrati",
+    logout: "Disconnetti",
+    addFriend: "Aggiungi",
+    allUsers: "Tutti",
+    friends: "Amici",
+    groups: "Gruppi",
+    requests: "Richieste",
+    noFriends: "Nessun amico connesso.\nAggiungi persone sopra!",
+    createGroup: "Crea Nuovo Gruppo",
+    noGroups: "Non sei in nessun gruppo.\nCreane uno adesso!",
+    received: "Ricevuti",
+    sent: "Inviati",
+    members: "Membri",
+    clearChat: "Cancella Chat",
+    block: "Blocca",
+    writeMessage: "Scrivi qui il tuo messaggio...",
+    send: "Invia",
+    attachFile: "Allega file",
+    recordAudio: "Registra audio",
+    editProfile: "Modifica il tuo profilo",
+    saveChanges: "Salva modifiche",
+    deleteAccount: "Elimina definitivamente il mio account"
+},
+
+ZH: {
+    confirmLanguage: "确认语言",
+    authTitle: "登录您的帐户进行聊天",
+    username: "用户名 (@ID)",
+    password: "密码",
+    login: "进入聊天",
+    register: "注册",
+    logout: "退出登录",
+    addFriend: "添加",
+    allUsers: "全部",
+    friends: "好友",
+    groups: "群组",
+    requests: "请求",
+    noFriends: "暂无好友连接。\n在上方添加好友！",
+    createGroup: "创建新群组",
+    noGroups: "您尚未加入任何群组。\n立即创建一个！",
+    received: "已接收",
+    sent: "已发送",
+    members: "成员",
+    clearChat: "清空聊天",
+    block: "屏蔽",
+    writeMessage: "在这里输入消息...",
+    send: "发送",
+    attachFile: "附加文件",
+    recordAudio: "录制音频",
+    editProfile: "编辑您的个人资料",
+    saveChanges: "保存更改",
+    deleteAccount: "永久删除我的账户"
+},
+
+RU: {
+    confirmLanguage: "Подтвердить язык",
+    authTitle: "Войдите в аккаунт для общения",
+    username: "Имя пользователя (@ID)",
+    password: "Пароль",
+    login: "Войти в чат",
+    register: "Регистрация",
+    logout: "Выйти",
+    addFriend: "Добавить",
+    allUsers: "Все",
+    friends: "Друзья",
+    groups: "Группы",
+    requests: "Запросы",
+    noFriends: "Пока нет друзей онлайн.\nДобавьте людей сверху!",
+    createGroup: "Создать новую группу",
+    noGroups: "Вы не состоите ни в одной группе.\nСоздайте её прямо сейчас!",
+    received: "Полученные",
+    sent: "Отправленные",
+    members: "Участники",
+    clearChat: "Очистить чат",
+    block: "Заблокировать",
+    writeMessage: "Введите сообщение...",
+    send: "Отправить",
+    attachFile: "Прикрепить файл",
+    recordAudio: "Записать аудио",
+    editProfile: "Редактировать профиль",
+    saveChanges: "Сохранить изменения",
+    deleteAccount: "Удалить мой аккаунт навсегда"
+},
+
+KO: {
+    confirmLanguage: "언어 확인",
+    authTitle: "채팅하려면 계정에 로그인하세요",
+    username: "사용자 이름 (@ID)",
+    password: "비밀번호",
+    login: "채팅 입장",
+    register: "회원가입",
+    logout: "로그아웃",
+    addFriend: "추가",
+    allUsers: "전체",
+    friends: "친구",
+    groups: "그룹",
+    requests: "요청",
+    noFriends: "아직 연결된 친구가 없습니다.\n위에서 친구를 추가하세요!",
+    createGroup: "새 그룹 만들기",
+    noGroups: "현재 그룹이 없습니다.\n지금 생성하세요!",
+    received: "받음",
+    sent: "보냄",
+    members: "멤버",
+    clearChat: "채팅 삭제",
+    block: "차단",
+    writeMessage: "여기에 메시지를 입력하세요...",
+    send: "보내기",
+    attachFile: "파일 첨부",
+    recordAudio: "오디오 녹음",
+    editProfile: "프로필 수정",
+    saveChanges: "변경사항 저장",
+    deleteAccount: "내 계정 영구 삭제"
+}
+  };
         let currentLang = "PT";
         let selectedLang = "PT";
 
@@ -1033,7 +1416,8 @@
             messages: [],
             groups: {},         
             groupMessages: [],
-            videoChunks: {}
+            videoChunks: {},
+            typing: {}
         };
 
         function loadLocalSimulationData() {
@@ -1044,6 +1428,7 @@
                     if (!simData.groups) simData.groups = {};
                     if (!simData.groupMessages) simData.groupMessages = [];
                     if (!simData.videoChunks) simData.videoChunks = {};
+                    if (!simData.typing) simData.typing = {};
                 }
             } catch (e) {
                 console.warn("Erro no localStorage:", e);
@@ -1395,13 +1780,14 @@
                     (currentUser.name || currentUser.username).charAt(0).toUpperCase()
                 );
             }
-            // Sincronizar o estado visual do checkbox do modo WhatsApp
             const waCheckbox = document.getElementById('profile-whatsapp-mode');
             if (waCheckbox && currentUser) {
                 waCheckbox.checked = !!currentUser.whatsappLayout;
             }
-            // Atualizar o layout imediatamente baseado no estado atualizado do usuário
-            applyWhatsappModeClasses();
+            if ("Notification" in window) {
+                updateNotificationBtnUI(Notification.permission);
+            }
+            applyWhitespaceFixForMobile();
         }
 
         function compressAndConvertToBase64(file) {
@@ -1420,7 +1806,7 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-                        const max_size = 1200; // Aumentado limite para screenshots de alta densidade
+                        const max_size = 1200;
                         if (width > height) {
                             if (width > max_size) {
                                 height *= max_size / width;
@@ -1436,7 +1822,6 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
 
-                        // FIX ECRÃ PRETO: Preencher com fundo branco sólido antes de desenhar a imagem transparentes (PNG/Capturas)
                         ctx.fillStyle = "#FFFFFF";
                         ctx.fillRect(0, 0, width, height);
 
@@ -1539,7 +1924,7 @@
                 
                 video.onloadedmetadata = async () => {
                     const duration = video.duration;
-                    if (duration > 600) { 
+                    if (duration > 420) { 
                         video.remove();
                         reject(new Error("duration_exceeded"));
                         return;
@@ -1668,7 +2053,6 @@
 
         attachFileBtn.addEventListener('click', () => mediaFileInput.click());
 
-        // Lógica unificada para gerir colagens e ficheiros de qualquer tipo
         async function processFile(file) {
             if (!file) return;
 
@@ -1677,7 +2061,6 @@
             const isAudio = file.type.startsWith('audio/');
             const isGif = file.type === 'image/gif';
 
-            // Limite de 8MB para garantir estabilidade no Firestore/Sessão
             if (file.size > 8 * 1024 * 1024) {
                 showToast("O arquivo excede o limite máximo de 8MB.", "error");
                 return;
@@ -1686,7 +2069,6 @@
             showToast("A processar arquivo...", "info");
 
             try {
-                // Caso seja GIF animado ou Figurinhas (não passa pelo Canvas para preservar animação)
                 if (isGif) {
                     const reader = new FileReader();
                     reader.readAsDataURL(file);
@@ -1703,7 +2085,6 @@
                         filePreviewBar.classList.remove('hidden');
                     };
                 } 
-                // Imagens convencionais e Screenshots (PNG, JPG)
                 else if (isImage) {
                     const res = await compressAndConvertToBase64(file);
                     selectedFilePayload = {
@@ -1717,7 +2098,6 @@
                     filePreviewContainer.innerHTML = `<img src="${selectedFilePayload.base64}" class="w-full h-full object-cover">`;
                     filePreviewBar.classList.remove('hidden');
                 } 
-                // Ficheiros de Vídeo
                 else if (isVideo) {
                     const result = await compressVideoTo480p(file);
                     selectedFilePayload = {
@@ -1732,7 +2112,6 @@
                     filePreviewContainer.innerHTML = `<video src="${result.base64}" class="w-full h-full object-cover" muted autoplay loop></video>`;
                     filePreviewBar.classList.remove('hidden');
                 }
-                // Ficheiros de Áudio
                 else if (isAudio) {
                     const reader = new FileReader();
                     reader.readAsDataURL(file);
@@ -1747,16 +2126,16 @@
                         filePreviewSize.innerText = selectedFilePayload.size;
                         filePreviewContainer.innerHTML = `
                             <div class="text-indigo-500 dark:text-indigo-400">
-                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                                <svg class="w-6 h-6 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                                 </svg>
                             </div>
                         `;
                         filePreviewBar.classList.remove('hidden');
                     };
                 }
-                // Qualquer outro arquivo genérico (Zip, PDF, TXT, APK, etc.)
                 else {
+                    // Qualquer arquivo personalizado (ex: .xis, .zip, .pdf)
                     const reader = new FileReader();
                     reader.readAsDataURL(file);
                     reader.onload = () => {
@@ -1782,7 +2161,6 @@
                 showToast("Erro ao carregar o arquivo.", "error");
                 clearSelectedFile();
             }
-            document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
         }
 
         mediaFileInput.addEventListener('change', (e) => {
@@ -1790,7 +2168,6 @@
             processFile(file);
         });
 
-        // Suporte a COLAR do Teclado (Copiar e colar Screenshots, GIFs e Figurinhas do Clipboard)
         document.addEventListener('paste', (e) => {
             if (!currentUser || (!activeFriend && !activeGroup)) return;
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
@@ -1849,10 +2226,23 @@
             document.getElementById('user-tag').innerText = `@${currentUser.username}`;
             updateUIPersonalProfile();
             startUserSession();
+            
+            startPresenceHeartbeat();
+            startTypingListener();
+
+            const messageInputEl = document.getElementById('message-input');
+            if (messageInputEl) {
+                messageInputEl.addEventListener('input', () => {
+                    setTypingState(true);
+                    clearTimeout(typingTimeout);
+                    typingTimeout = setTimeout(() => {
+                        setTypingState(false);
+                    }, 3000);
+                });
+            }
         }
 
-        // --- SISTEMA DUAL DE RENDERIZAÇÃO DE TELA (PADRÃO VS MODO WHATSAPP) ---
-        function applyWhatsappModeClasses() {
+        function applyWhitespaceFixForMobile() {
             const sidebar = document.getElementById('sidebar-panel');
             const chat = document.getElementById('chat-panel');
             const topbar = document.getElementById('app-topbar');
@@ -1866,24 +2256,20 @@
             const waActive = !!currentUser.whatsappLayout;
 
             if (waActive) {
-                // Modo WhatsApp ativado
                 topbar.classList.add('hidden'); 
                 backBtn.classList.remove('md:hidden'); 
 
-                // Mover campo de busca para o topo da barra lateral para não perder a funcionalidade
                 if (mainSearch && waSearch && waSearch.children.length === 0) {
                     waSearch.appendChild(mainSearch);
                     waSearch.classList.remove('hidden');
                 }
 
                 if (activeFriend || activeGroup) {
-                    // Chat aberto ocupa 100% da tela e barra lateral some
                     sidebar.classList.add('hidden');
                     sidebar.classList.remove('md:block', 'md:w-80');
                     chat.classList.remove('hidden');
                     chat.classList.add('flex');
                 } else {
-                    // Nenhum chat ativo mostra apenas a barra lateral em ecrã cheio
                     sidebar.classList.remove('hidden');
                     sidebar.classList.remove('md:block', 'md:w-80');
                     sidebar.classList.add('w-full');
@@ -1891,13 +2277,11 @@
                     chat.classList.remove('flex');
                 }
             } else {
-                // Layout padrão clássico restabelecido
                 topbar.classList.remove('hidden');
                 backBtn.classList.add('md:hidden'); 
 
-                // Devolver barra de pesquisa para a topbar
                 if (mainSearch && waSearch && topbar.contains(waSearch)) {
-                    // sem ação se já estiver lá
+                    // Sem alteração
                 } else if (mainSearch && topbar) {
                     const logoutBtn = document.getElementById('logout-btn');
                     topbar.insertBefore(mainSearch, logoutBtn.parentNode);
@@ -1953,12 +2337,10 @@
 
             if (activeFriend) {
                 const blockedList = currentUser.blockedUsers || [];
-                
                 const messagesList = simData.messages.filter(msg => {
                     const isFromMeToFriend = (msg.sender === currentUser.username && msg.receiver === activeFriend.username);
                     const isFromFriendToMe = (msg.sender === activeFriend.username && msg.receiver === currentUser.username);
                     const isHiddenByMe = msg.hiddenBy && msg.hiddenBy.includes(currentUser.username);
-                    
                     const isSenderBlocked = !isFromMeToFriend && blockedList.includes(msg.sender);
 
                     return (isFromMeToFriend || isFromFriendToMe) && !isHiddenByMe && !isSenderBlocked;
@@ -2000,17 +2382,12 @@
             applyWhitespaceFixForMobile();
         }
 
-        function applyWhitespaceFixForMobile() {
-            applyWhatsappModeClasses();
-        }
-
         const authForm = document.getElementById('auth-form');
         let registerMode = false;
         const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
 
         toggleAuthModeBtn.addEventListener('click', () => {
             registerMode = !registerMode;
-            
             const displayNameGroup = document.getElementById('display-name-group');
             const lastAccountContainer = document.getElementById('last-account-container');
             
@@ -2030,14 +2407,9 @@
         if (lastAccountBtn) {
             lastAccountBtn.addEventListener('click', () => {
                 if (!lastAccountData) return;
-                
                 document.getElementById('auth-username').value = lastAccountData.username;
                 document.getElementById('auth-password').value = lastAccountData.password;
-                
-                if (registerMode) {
-                    toggleAuthModeBtn.click();
-                }
-                
+                if (registerMode) toggleAuthModeBtn.click();
                 authForm.dispatchEvent(new Event('submit'));
             });
         }
@@ -2247,7 +2619,6 @@
                     const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
                     const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
                     const isHiddenByMe = data.hiddenBy && data.hiddenBy.includes(currentUser.username);
-                    
                     const isSenderBlocked = !isFromMeToFriend && blockedList.includes(data.sender);
 
                     if ((isFromMeToFriend || isFromFriendToMe) && !isHiddenByMe && !isSenderBlocked) {
@@ -2501,6 +2872,10 @@
                     displayName.charAt(0).toUpperCase()
                 );
 
+                const isOnline = friendData ? isUserOnline(friendData) : false;
+                const presenceDotColor = isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300 dark:bg-slate-700';
+                const presenceText = isOnline ? 'Online' : 'Offline';
+
                 friendItem.innerHTML = `
                     <div class="flex items-center gap-3 w-full justify-between">
                         <div class="flex items-center gap-3 truncate flex-1 open-chat-trigger">
@@ -2508,8 +2883,11 @@
                                 ${avatarHTML}
                             </div>
                             <div class="truncate flex-1">
-                                <p class="text-xs font-bold truncate max-w-[140px] text-slate-800 dark:text-white truncate">${displayName}</p>
-                                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">@${f.friendUsername}</p>
+                                <p class="text-xs font-bold truncate max-w-[140px] text-slate-800 dark:text-white">${displayName}</p>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 font-medium flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full ${presenceDotColor}"></span>
+                                    <span>${presenceText} • @${f.friendUsername}</span>
+                                </p>
                             </div>
                         </div>
                         <button type="button" class="view-profile-btn p-1.5 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-200/40 dark:hover:bg-slate-800/40 transition-all shrink-0 ml-1">
@@ -2632,7 +3010,7 @@
             }
         }
 
-        // Função de utilidade para descarregar arquivos genéricos
+        // Descarregar qualquer arquivo em Base64
         function downloadBase64File(base64Data, fileName) {
             const link = document.createElement("a");
             link.href = base64Data;
@@ -2678,7 +3056,7 @@
                 if (hasText) {
                     contentHtml += `
                         <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor} transition-all duration-300 shadow-sm">
-                            ${msg.text}
+                            ${linkify(msg.text)}
                         </div>
                     `;
                 }
@@ -2686,31 +3064,51 @@
                 if (hasFile) {
                     let mediaHtml = '';
                     if (msg.fileType === 'image') {
+                        const ext = getFileExtension(msg.name);
                         mediaHtml = `
                             <div class="relative group w-64 sm:w-80 max-w-full ${hasText ? 'mt-2' : ''}">
                                 <div class="image-preview-clickable rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-95 transition-all duration-300 shadow-sm">
                                     <img src="${msg.fileData}" class="max-h-60 object-contain w-full" alt="Imagem">
                                 </div>
+                                <div class="mt-1 flex items-center justify-between text-[10px] text-slate-400 px-1">
+                                    <span class="truncate font-semibold">${msg.name || 'Imagem'}</span>
+                                    <span class="bg-indigo-500/15 text-indigo-500 dark:text-indigo-400 px-1.5 py-0.5 rounded font-bold">${ext}</span>
+                                </div>
                             </div>
                         `;
                     } else if (msg.fileType === 'video_chunked') {
-                        mediaHtml = `<div class="video-chunk-player-${msg.id} ${hasText ? 'mt-2' : ''} w-64 sm:w-80 max-w-full relative group"></div>`;
+                        const ext = getFileExtension(msg.name);
+                        mediaHtml = `
+                            <div class="${hasText ? 'mt-2' : ''} w-64 sm:w-80 max-w-full">
+                                <div class="video-chunk-player-${msg.id} relative group"></div>
+                                <div class="mt-1 flex items-center justify-between text-[10px] text-slate-400 px-1">
+                                    <span class="truncate font-semibold">${msg.name || 'Video'}</span>
+                                    <span class="bg-indigo-500/15 text-indigo-500 dark:text-indigo-400 px-1.5 py-0.5 rounded font-bold">${ext}</span>
+                                </div>
+                            </div>
+                        `;
                     } else if (msg.fileType === 'audio') {
+                        const ext = getFileExtension(msg.name);
                         mediaHtml = `
                             <div class="${hasText ? 'mt-2' : ''} p-2 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800/80 w-64 sm:w-80 max-w-full shadow-sm">
                                 <audio src="${msg.fileData}" controls class="w-full h-8 outline-none"></audio>
+                                <div class="mt-1 flex items-center justify-between text-[9px] text-slate-400 px-1">
+                                    <span class="truncate font-semibold">${msg.name || 'Áudio'}</span>
+                                    <span class="bg-indigo-500/10 text-indigo-500 px-1 py-0.2 rounded font-bold text-[8px]">${ext}</span>
+                                </div>
                             </div>
                         `;
                     } 
-                    // Cartão para arquivos genéricos de qualquer formato
                     else if (msg.fileType === 'file') {
+                        const ext = getFileExtension(msg.name);
                         mediaHtml = `
                             <div class="${hasText ? 'mt-2' : ''} p-3 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 w-64 sm:w-80 max-w-full shadow-sm flex items-center justify-between gap-3 cursor-pointer transition-all duration-300 active:scale-[0.98]" id="file-download-${msg.id}">
                                 <div class="flex items-center gap-2.5 truncate">
-                                    <div class="p-2 bg-emerald-500/15 text-emerald-500 rounded-lg shrink-0">
+                                    <div class="p-2 bg-emerald-500/15 text-emerald-500 rounded-lg shrink-0 flex flex-col items-center justify-center min-w-[36px]">
                                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
+                                        <span class="text-[7px] font-bold tracking-wider mt-0.5 text-center truncate max-w-[32px]">${ext}</span>
                                     </div>
                                     <div class="truncate text-left">
                                         <p class="text-xs font-semibold text-slate-800 dark:text-white truncate max-w-[140px]">${msg.name || "Ficheiro"}</p>
@@ -2760,7 +3158,6 @@
                     });
                 }
 
-                // Handler de Download para Ficheiros Genéricos
                 const fileDownloadBtn = msgElement.querySelector(`#file-download-${msg.id}`);
                 if (fileDownloadBtn) {
                     fileDownloadBtn.addEventListener('click', () => {
@@ -2812,7 +3209,7 @@
                 if (hasText) {
                     contentHtml += `
                         <div class="px-4 py-2.5 rounded-2xl text-sm leading-relaxed break-words ${bubbleColor} transition-all duration-300 shadow-sm">
-                            ${msg.text}
+                            ${linkify(msg.text)}
                         </div>
                     `;
                 }
@@ -2820,31 +3217,51 @@
                 if (hasFile) {
                     let mediaHtml = '';
                     if (msg.fileType === 'image') {
+                        const ext = getFileExtension(msg.name);
                         mediaHtml = `
                             <div class="relative group w-64 sm:w-80 max-w-full ${hasText ? 'mt-2' : ''}">
                                 <div class="image-preview-clickable rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 cursor-pointer hover:opacity-95 transition-all duration-300 shadow-sm">
                                     <img src="${msg.fileData}" class="max-h-60 object-contain w-full" alt="Imagem">
                                 </div>
+                                <div class="mt-1 flex items-center justify-between text-[10px] text-slate-400 px-1">
+                                    <span class="truncate font-semibold">${msg.name || 'Imagem'}</span>
+                                    <span class="bg-indigo-500/15 text-indigo-500 dark:text-indigo-400 px-1.5 py-0.5 rounded font-bold">${ext}</span>
+                                </div>
                             </div>
                         `;
                     } else if (msg.fileType === 'video_chunked') {
-                        mediaHtml = `<div class="video-chunk-player-${msg.id} ${hasText ? 'mt-2' : ''} w-64 sm:w-80 max-w-full relative group"></div>`;
+                        const ext = getFileExtension(msg.name);
+                        mediaHtml = `
+                            <div class="${hasText ? 'mt-2' : ''} w-64 sm:w-80 max-w-full">
+                                <div class="video-chunk-player-${msg.id} relative group"></div>
+                                <div class="mt-1 flex items-center justify-between text-[10px] text-slate-400 px-1">
+                                    <span class="truncate font-semibold">${msg.name || 'Video'}</span>
+                                    <span class="bg-indigo-500/15 text-indigo-500 dark:text-indigo-400 px-1.5 py-0.5 rounded font-bold">${ext}</span>
+                                </div>
+                            </div>
+                        `;
                     } else if (msg.fileType === 'audio') {
+                        const ext = getFileExtension(msg.name);
                         mediaHtml = `
                             <div class="${hasText ? 'mt-2' : ''} p-2 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800/80 w-64 sm:w-80 max-w-full shadow-sm">
                                 <audio src="${msg.fileData}" controls class="w-full h-8 outline-none"></audio>
+                                <div class="mt-1 flex items-center justify-between text-[9px] text-slate-400 px-1">
+                                    <span class="truncate font-semibold">${msg.name || 'Áudio'}</span>
+                                    <span class="bg-indigo-500/10 text-indigo-500 px-1 py-0.2 rounded font-bold text-[8px]">${ext}</span>
+                                </div>
                             </div>
                         `;
                     }
-                    // Cartão para arquivos genéricos de qualquer formato no grupo
                     else if (msg.fileType === 'file') {
+                        const ext = getFileExtension(msg.name);
                         mediaHtml = `
                             <div class="${hasText ? 'mt-2' : ''} p-3 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-800 w-64 sm:w-80 max-w-full shadow-sm flex items-center justify-between gap-3 cursor-pointer transition-all duration-300 active:scale-[0.98]" id="file-download-${msg.id}">
                                 <div class="flex items-center gap-2.5 truncate">
-                                    <div class="p-2 bg-emerald-500/15 text-emerald-500 rounded-lg shrink-0">
+                                    <div class="p-2 bg-emerald-500/15 text-emerald-500 rounded-lg shrink-0 flex flex-col items-center justify-center min-w-[36px]">
                                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
+                                        <span class="text-[7px] font-bold tracking-wider mt-0.5 text-center truncate max-w-[32px]">${ext}</span>
                                     </div>
                                     <div class="truncate text-left">
                                         <p class="text-xs font-semibold text-slate-800 dark:text-white truncate max-w-[140px]">${msg.name || "Ficheiro"}</p>
@@ -2900,7 +3317,6 @@
                     });
                 }
 
-                // Handler de Download para Ficheiros Genéricos
                 const fileDownloadBtn = msgElement.querySelector(`#file-download-${msg.id}`);
                 if (fileDownloadBtn) {
                     fileDownloadBtn.addEventListener('click', () => {
@@ -3238,48 +3654,6 @@
             }
         });
 
-        document.getElementById('edit-group-details-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newName = document.getElementById('edit-group-name').value.trim();
-            const newType = document.getElementById('edit-group-avatar-type').value;
-            const newValue = document.getElementById('edit-group-avatar-value').value.trim();
-
-            if (!newName) return;
-
-            const updatedGroup = {
-                ...activeGroup,
-                name: newName,
-                avatarType: newType,
-                avatarValue: newValue
-            };
-
-            if (isOfflineMode) {
-                simData.groups[activeGroup.id] = updatedGroup;
-                saveLocalSimulationData();
-                triggerOfflineCallbacks();
-                showToast("Configurações do grupo salvas offline!");
-                document.getElementById('group-settings-modal').classList.add('hidden');
-                return;
-            }
-
-            try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), updatedGroup);
-                showToast("Grupo updated com sucesso!");
-                document.getElementById('group-settings-modal').classList.add('hidden');
-            } catch (err) {
-                showToast("Erro ao salvar configurações do grupo.", "error");
-            }
-        });
-
-        document.getElementById('group-settings-btn').addEventListener('click', () => {
-            setupGroupSettingsTrigger();
-            document.getElementById('group-settings-modal').classList.remove('hidden');
-        });
-
-        document.getElementById('close-group-settings-modal').addEventListener('click', () => {
-            document.getElementById('group-settings-modal').classList.add('hidden');
-        });
-
         const chatForm = document.getElementById('chat-form');
         const messageInput = document.getElementById('message-input');
 
@@ -3290,6 +3664,9 @@
             if (!text && !selectedFilePayload) {
                 return;
             }
+
+            setTypingState(false);
+            clearTimeout(typingTimeout);
 
             const msgId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
             const msgPayload = {
@@ -3309,6 +3686,7 @@
                 msgPayload.fileType = 'video_chunked';
                 msgPayload.audioData = selectedFilePayload.audioBase64 || "";
                 msgPayload.totalChunks = chunksCount;
+                msgPayload.name = selectedFilePayload.name;
 
                 for (let i = 0; i < chunksCount; i++) {
                     const chunkSlice = fullBase64.slice(i * chunkSize, (i + 1) * chunkSize);
@@ -3342,7 +3720,7 @@
                     triggerOfflineCallbacks();
                 } else {
                     try {
-                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), msgPayload);
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'messages', msgId), msgPayload);
                     } catch (err) {
                         showToast("Erro ao enviar mensagem.", "error");
                         return;
@@ -3358,7 +3736,7 @@
                     triggerOfflineCallbacks();
                 } else {
                     try {
-                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'group_messages'), msgPayload);
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'group_messages', msgId), msgPayload);
                     } catch (err) {
                         showToast("Erro ao enviar no grupo.", "error");
                         return;
@@ -3516,6 +3894,22 @@
             profileAvatarValue.value = currentUser.avatarValue || '';
             toggleProfileAvatarInputs();
             profileModal.classList.remove('hidden');
+        });
+
+        document.getElementById('btn-request-notifications').addEventListener('click', () => {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    updateNotificationBtnUI(permission);
+                    if (permission === 'granted') {
+                        showToast("Notificações do sistema ativadas!");
+                        new Notification("ConectaChat", {
+                            body: "Parabéns! As notificações foram configuradas com sucesso."
+                        });
+                    }
+                });
+            } else {
+                showToast("Este dispositivo não suporta notificações de sistema.", "error");
+            }
         });
 
         document.getElementById('close-profile-modal').addEventListener('click', () => {
@@ -3883,7 +4277,6 @@
                     const isFromMeToFriend = (data.sender === currentUser.username && data.receiver === activeFriend.username);
                     const isFromFriendToMe = (data.sender === activeFriend.username && data.receiver === currentUser.username);
                     const isHiddenByMe = data.hiddenBy && data.hiddenBy.includes(currentUser.username);
-                    
                     const isSenderBlocked = !isFromMeToFriend && blockedList.includes(data.sender);
 
                     if ((isFromMeToFriend || isFromFriendToMe) && !isHiddenByMe && !isSenderBlocked) {
