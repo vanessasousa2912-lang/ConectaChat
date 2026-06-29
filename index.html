@@ -65,6 +65,83 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        @media (max-width: 767px) {
+            #toast-container {
+                top: auto;
+                left: 0.75rem;
+                right: 0.75rem;
+                bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+            }
+            #toast-container > div {
+                width: 100%;
+                align-items: flex-start;
+            }
+            #connection-banner {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+            #app-topbar {
+                padding: 0.65rem 0.75rem;
+                gap: 0.5rem;
+            }
+            #app-topbar > div:first-child {
+                min-width: 0;
+                flex: 1 1 auto;
+            }
+            #topbar-search-wrapper {
+                order: 3;
+                flex-basis: 100%;
+                min-width: 0 !important;
+                max-width: none;
+            }
+            #chat-header {
+                padding: 0.65rem 0.75rem;
+                gap: 0.5rem;
+            }
+            #chat-header > div:first-child {
+                min-width: 0;
+                flex: 1 1 auto;
+            }
+            #chat-header > div:last-child {
+                max-width: 42%;
+                overflow-x: auto;
+                padding-bottom: 0.1rem;
+            }
+            #active-chat-name,
+            #active-chat-status {
+                max-width: 42vw;
+            }
+            #chat-messages {
+                padding: 0.75rem;
+            }
+            #messages-container {
+                padding-bottom: 0.5rem;
+            }
+            #chat-form {
+                align-items: flex-end;
+                gap: 0.45rem;
+            }
+            #message-input {
+                min-width: 0;
+                padding-left: 0.85rem;
+                padding-right: 0.85rem;
+            }
+            #record-audio-btn,
+            #attach-file-btn,
+            #chat-form button[type="submit"] {
+                padding: 0.7rem;
+                border-radius: 0.85rem;
+            }
+            .message-bubble-wrap {
+                max-width: min(86vw, 28rem) !important;
+            }
+            .message-action-btn {
+                opacity: 1 !important;
+            }
+            #logout-text-label {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body class="h-[100dvh] flex flex-col bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
@@ -651,6 +728,34 @@
         </div>
     </div>
 
+    <!-- MODAL DE EDITAR MENSAGEM -->
+    <div id="edit-message-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all duration-300">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4 animate-slide-up">
+            <div class="flex items-center justify-between gap-3">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Editar mensagem</h3>
+                <button id="close-edit-message-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all active:scale-90" aria-label="Fechar" title="Fechar">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <form id="edit-message-form" class="space-y-3">
+                <textarea id="edit-message-input" rows="5" maxlength="1500" class="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/80 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all resize-none" placeholder="Atualize sua mensagem..."></textarea>
+                <div class="flex items-center justify-between gap-3">
+                    <p id="edit-message-helper" class="text-[10px] text-slate-400 dark:text-slate-500">Somente mensagens enviadas por voce podem ser editadas.</p>
+                    <div class="flex gap-2 shrink-0">
+                        <button type="button" id="cancel-edit-message" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-700 transition-all active:scale-95">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
+                            Salvar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Script de lógica do app -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -689,6 +794,9 @@
 
         let activeMessagesListCached = [];
         let activeGroupMessagesListCached = [];
+        let editingMessageContext = null;
+        const originalDocumentTitle = document.title;
+        let unreadNotificationCount = 0;
 
         let typingTimeout = null;
         let isCurrentlyTyping = false;
@@ -834,29 +942,53 @@
             }
         }
 
-        function showToast(message, type = 'success') {
+        function showToast(message, type = 'success', options = {}) {
             const container = document.getElementById('toast-container');
             if (!container) return;
             const toast = document.createElement('div');
-            toast.className = `flex items-center gap-2 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold pointer-events-auto animate-pop-in transition-all duration-300 ${
+            toast.className = `flex items-start gap-2 px-4 py-3 rounded-xl shadow-2xl border text-xs font-semibold pointer-events-auto animate-pop-in transition-all duration-300 max-w-sm ${
                 type === 'success' 
                     ? 'bg-emerald-100 border-emerald-300 text-emerald-800 dark:bg-emerald-950/90 dark:border-emerald-500/30 dark:text-emerald-300' 
                     : type === 'error' 
                     ? 'bg-rose-100 border-rose-300 text-rose-800 dark:bg-rose-950/90 dark:border-rose-500/30 dark:text-rose-300' 
                     : 'bg-indigo-100 border-indigo-300 text-indigo-800 dark:bg-indigo-950/90 dark:border-indigo-500/30 dark:text-indigo-300'
             }`;
-            
-            toast.innerHTML = `
-                <span class="w-1.5 h-1.5 rounded-full ${type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-rose-500' : 'bg-indigo-500'}"></span>
-                <span>${message}</span>
+
+            const dot = document.createElement('span');
+            dot.className = `w-2 h-2 mt-1 rounded-full shrink-0 ${type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-rose-500' : 'bg-indigo-500'}`;
+            const text = document.createElement('span');
+            text.className = 'leading-relaxed flex-1 break-words';
+            text.textContent = message;
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.className = 'ml-1 -mt-1 p-1 rounded-lg opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/10 transition-all';
+            closeBtn.setAttribute('aria-label', 'Fechar notificação');
+            closeBtn.innerHTML = `
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
             `;
-            
+            const dismissToast = () => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            };
+            closeBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                dismissToast();
+            });
+            if (typeof options.onClick === 'function') {
+                toast.classList.add('cursor-pointer');
+                toast.addEventListener('click', () => {
+                    options.onClick();
+                    dismissToast();
+                });
+            }
+            toast.append(dot, text, closeBtn);
             container.appendChild(toast);
 
             setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
+                dismissToast();
+            }, options.duration || 4200);
         }
 
         function ativarNotificacoes() {
@@ -889,15 +1021,30 @@
             }
         }
 
+        function truncateNotificationText(text, maxLength = 110) {
+            const cleanText = String(text || '').replace(/\s+/g, ' ').trim();
+            return cleanText.length > maxLength ? `${cleanText.slice(0, maxLength - 1)}...` : cleanText;
+        }
+
+        function markUnreadNotification() {
+            if (isWindowFocused) return;
+            unreadNotificationCount += 1;
+            document.title = `(${unreadNotificationCount}) ${originalDocumentTitle}`;
+        }
+
         function mostrarNotificacaoNativa(usuario, message, chatTargetFn) {
+            const safeMessage = truncateNotificationText(message);
+            markUnreadNotification();
             if ("Notification" in window && Notification.permission === "granted") {
                 const logoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="url(#grad)"/><defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><path d="M30 45h.01M50 45h.01M70 45h.01M80 45c0 16.5-13.5 30-30 30a32.8 32.8 0 01-14.2-3.2L16 75l4.6-12.4C17.7 56.8 16 51.1 16 45c0-16.5 13.5-30 30-30s30 13.5 30 30z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>`;
                 const logoUrl = `data:image/svg+xml;utf8,${encodeURIComponent(logoSvg)}`;
                 
                 try {
                     const notification = new Notification(usuario, {
-                        body: message,
-                        icon: logoUrl
+                        body: safeMessage,
+                        icon: logoUrl,
+                        tag: `conectachat-${usuario}`,
+                        renotify: true
                     });
                     
                     notification.onclick = function() {
@@ -908,6 +1055,8 @@
                 } catch (e) {
                     console.debug("Navegador bloqueou disparo de notificação:", e);
                 }
+            } else {
+                showToast(`${usuario}: ${safeMessage}`, "info", { duration: 6500, onClick: chatTargetFn });
             }
         }
 
@@ -2807,6 +2956,73 @@
             }
         }
 
+        function canEditMessage(msg) {
+            return msg && currentUser && msg.sender === currentUser.username && !!(msg.text && msg.text.trim());
+        }
+
+        function closeEditMessageModal() {
+            editingMessageContext = null;
+            document.getElementById('edit-message-modal').classList.add('hidden');
+            document.getElementById('edit-message-input').value = '';
+        }
+
+        function openEditMessageModal(msg, isGroup) {
+            if (!canEditMessage(msg)) {
+                showToast("Apenas mensagens de texto enviadas por voce podem ser editadas.", "info");
+                return;
+            }
+            editingMessageContext = { msg, isGroup };
+            const input = document.getElementById('edit-message-input');
+            input.value = msg.text || '';
+            document.getElementById('edit-message-modal').classList.remove('hidden');
+            setTimeout(() => {
+                input.focus();
+                input.setSelectionRange(input.value.length, input.value.length);
+            }, 50);
+        }
+
+        async function saveEditedMessage() {
+            if (!editingMessageContext) return;
+            const { msg, isGroup } = editingMessageContext;
+            const newText = document.getElementById('edit-message-input').value.trim();
+            if (!newText) {
+                showToast("A mensagem editada nao pode ficar vazia.", "error");
+                return;
+            }
+            if (newText === (msg.text || '').trim()) {
+                closeEditMessageModal();
+                return;
+            }
+
+            const patch = {
+                text: newText,
+                edited: true,
+                editedAt: Date.now()
+            };
+
+            if (isOfflineMode) {
+                const list = isGroup ? simData.groupMessages : simData.messages;
+                const found = list.find(m => m.id === msg.id);
+                if (found && found.sender === currentUser.username) {
+                    Object.assign(found, patch);
+                    saveLocalSimulationData();
+                    triggerOfflineCallbacks();
+                    closeEditMessageModal();
+                    showToast("Mensagem editada.");
+                }
+                return;
+            }
+
+            try {
+                const collectionName = isGroup ? 'group_messages' : 'messages';
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, msg.id), patch);
+                closeEditMessageModal();
+                showToast("Mensagem editada.");
+            } catch (err) {
+                showToast("Erro ao editar mensagem.", "error");
+            }
+        }
+
         // Descarregar qualquer arquivo em Base64
         function downloadBase64File(base64Data, fileName) {
             const link = document.createElement("a");
@@ -2922,28 +3138,37 @@
                 }
 
                 const deleteButtonHTML = `
-                    <button class="delete-msg-btn text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center">
+                    <button class="delete-msg-btn message-action-btn text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center" title="Apagar mensagem" aria-label="Apagar mensagem">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
                 `;
+                const editButtonHTML = canEditMessage(msg) ? `
+                    <button class="edit-msg-btn message-action-btn text-slate-400 hover:text-indigo-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center" title="Editar mensagem" aria-label="Editar mensagem">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                        </svg>
+                    </button>
+                ` : '';
+                const metaText = msg.edited ? `${time} • editada` : time;
 
                 const msgElement = document.createElement('div');
                 msgElement.className = `flex ${alignmentClass} w-full animate-pop-in items-center gap-2 group p-0.5 rounded-xl transition-all duration-200 hover:bg-slate-500/5`;
                 
                 msgElement.innerHTML = isMine 
                     ? `
+                        ${editButtonHTML}
                         ${deleteButtonHTML}
-                        <div class="max-w-[75%] flex flex-col items-end">
+                        <div class="message-bubble-wrap max-w-[75%] flex flex-col items-end">
                             ${contentHtml}
-                            <p class="text-[9px] text-slate-400 mt-1">${time}</p>
+                            <p class="text-[9px] text-slate-400 mt-1">${metaText}</p>
                         </div>
                       `
                     : `
-                        <div class="max-w-[75%] flex flex-col items-start">
+                        <div class="message-bubble-wrap max-w-[75%] flex flex-col items-start">
                             ${contentHtml}
-                            <p class="text-[9px] text-slate-400 mt-1">${time}</p>
+                            <p class="text-[9px] text-slate-400 mt-1">${metaText}</p>
                         </div>
                         ${deleteButtonHTML}
                       `;
@@ -2965,6 +3190,10 @@
                 const delBtn = msgElement.querySelector('.delete-msg-btn');
                 if (delBtn) {
                     delBtn.addEventListener('click', () => deleteMessage(msg, false));
+                }
+                const editBtn = msgElement.querySelector('.edit-msg-btn');
+                if (editBtn) {
+                    editBtn.addEventListener('click', () => openEditMessageModal(msg, false));
                 }
 
                 container.appendChild(msgElement);
@@ -3075,12 +3304,20 @@
                 }
 
                 const deleteButtonHTML = `
-                    <button class="delete-msg-btn text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center">
+                    <button class="delete-msg-btn message-action-btn text-slate-400 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center" title="Apagar mensagem" aria-label="Apagar mensagem">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
                 `;
+                const editButtonHTML = canEditMessage(msg) ? `
+                    <button class="edit-msg-btn message-action-btn text-slate-400 hover:text-indigo-500 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 duration-200 self-center" title="Editar mensagem" aria-label="Editar mensagem">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                        </svg>
+                    </button>
+                ` : '';
+                const metaText = msg.edited ? `${time} • editada` : time;
 
                 const msgElement = document.createElement('div');
                 msgElement.className = `flex ${alignmentClass} w-full animate-pop-in items-center gap-2 group p-0.5 rounded-xl transition-all duration-200 hover:bg-slate-500/5`;
@@ -3091,18 +3328,19 @@
 
                 msgElement.innerHTML = isMine 
                     ? `
+                        ${editButtonHTML}
                         ${deleteButtonHTML}
-                        <div class="max-w-[75%] flex flex-col items-end">
+                        <div class="message-bubble-wrap max-w-[75%] flex flex-col items-end">
                             ${senderHeader}
                             ${contentHtml}
-                            <p class="text-[9px] text-slate-400 mt-1">${time}</p>
+                            <p class="text-[9px] text-slate-400 mt-1">${metaText}</p>
                         </div>
                       `
                     : `
-                        <div class="max-w-[75%] flex flex-col items-start">
+                        <div class="message-bubble-wrap max-w-[75%] flex flex-col items-start">
                             ${senderHeader}
                             ${contentHtml}
-                            <p class="text-[9px] text-slate-400 mt-1">${time}</p>
+                            <p class="text-[9px] text-slate-400 mt-1">${metaText}</p>
                         </div>
                         ${deleteButtonHTML}
                       `;
@@ -3124,6 +3362,10 @@
                 const delBtn = msgElement.querySelector('.delete-msg-btn');
                 if (delBtn) {
                     delBtn.addEventListener('click', () => deleteMessage(msg, true));
+                }
+                const editBtn = msgElement.querySelector('.edit-msg-btn');
+                if (editBtn) {
+                    editBtn.addEventListener('click', () => openEditMessageModal(msg, true));
                 }
 
                 container.appendChild(msgElement);
@@ -3454,6 +3696,13 @@
         const chatForm = document.getElementById('chat-form');
         const messageInput = document.getElementById('message-input');
 
+        document.getElementById('close-edit-message-modal').addEventListener('click', closeEditMessageModal);
+        document.getElementById('cancel-edit-message').addEventListener('click', closeEditMessageModal);
+        document.getElementById('edit-message-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            saveEditedMessage();
+        });
+
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
@@ -3702,6 +3951,10 @@
                         new Notification("ConectaChat", {
                             body: "Parabéns! As notificações foram configuradas com sucesso."
                         });
+                    } else if (permission === 'denied') {
+                        showToast("As notificações foram bloqueadas. Ative a permissão nas configurações do navegador.", "error", { duration: 6500 });
+                    } else {
+                        showToast("Permissão de notificação ainda pendente.", "info");
                     }
                 });
             } else {
@@ -3844,7 +4097,11 @@
             link.href = faviconUrl;
         }
 
-        window.addEventListener('focus', () => { isWindowFocused = true; });
+        window.addEventListener('focus', () => {
+            isWindowFocused = true;
+            unreadNotificationCount = 0;
+            document.title = originalDocumentTitle;
+        });
         window.addEventListener('blur', () => { isWindowFocused = false; });
 
         window.onload = function() {
